@@ -23,8 +23,7 @@ vitals = vitals.drop(columns=['age_indicator','bp_comment','pulse_pattern','BP',
 AD_people = diagnoses[diagnoses.description.str.contains('Alzh')].person_id.unique()
 AD_encounters = diagnoses[diagnoses.description.str.contains('Alzh')].enc_id.unique()
 
-
-# %% Rename cols: 
+# Rename cols: 
 assessments.columns = [
     'person_id', 
     'enc_id', 
@@ -81,33 +80,25 @@ labs.columns = [
     ]
 
 meds.columns = [
-    'lab_nor_person_id', 
-    'lab_nor_enc_id', 
-    'lab_nor_order_num',
-    'lab_nor_ordering_provider', 
-    'lab_nor_test_location',
-    'lab_nor_sign_off_date', 
-    'lab_nor_test_status', 
-    'lab_nor_ngn_status',
-    'lab_nor_test_desc', 
-    'lab_nor_delete_ind', 
-    'lab_nor_completed_ind',
-    'lab_results_obr_p_seq_num',
-    'lab_results_obr_p_obs_batt_id',
-    'lab_results_obr_p_producer_field_1', 
-    'lab_results_obr_p_test_desc',
-    'lab_results_obr_p_ng_test_desc', 
-    'lab_results_obr_p_coll_date_time',
-    'lab_results_obr_p_spec_rcv_date_time', 
-    'lab_results_obx_observ_value',
-    'lab_results_obx_units', 
-    'lab_results_obx_ref_range',
-    'lab_results_obx_abnorm_flags', 
-    'lab_results_obx_observ_result_stat',
-    'lab_results_obx_obs_date_time', 
-    'lab_results_obx_result_desc',
-    'lab_results_obx_delete_ind', 
-    'lab_results_obx_result_comment'
+    'person_id', 
+    'enc_id', 
+    'ndc_id', 
+    'start_date', 
+    'date_stopped',
+    'sig_codes', 
+    'rx_quanity', 
+    'rx_refills', 
+    'generic_ok_ind',
+    'org_refills', 
+    'date_last_refilled', 
+    'sig_desc', 
+    'prescribed_else_ind',
+    'rx_units', 
+    'rx_comment', 
+    'formulary_id', 
+    'refills_left',
+    'medid',
+    'medication_name'
     ]
 
 vitals.columns = [
@@ -165,24 +156,45 @@ encounters.columns = [
     ]    
 
 
+# %%
+#assessments.pivot(index=['person_id','enc_id','diagnosis_code_id'], columns = 'detail_type', values = 'txt_description')
+
+# Find dupes:
+
+assessments.groupby(['person_id','enc_id','diagnosis_code_id','detail_type']).count().sort_values(by='txt_description', ascending=False)
 
 
 # %%
-assessments.head()
+# Examine dupes:
+assessments[assessments.enc_id == 'B4A43273-1B47-4B68-BC27-74EE22ECE620'].sort_values(by='diagnosis_code_id').to_csv('dupes.csv')
+
+
+# %% NOT RUN, code doesn't work yet due to dupes...
+
+#assessments = pd.concat([
+#    assessments['person_id','enc_id','diagnosis_code_id'],
+#    assessments.pivot(columns = 'detail_type', values = 'txt_description')
+#    ], axis=1)
+
+#assessments = assessments.drop(columns=['detail_type','detail_type_priority', 'txt_enc_dx_priority', 'txt_description']).drop_duplicates()
 
 # %%
-diagnoses.head()
+tmp = assessments.merge(assessments, how='inner', on=['person_id','enc_id','diagnosis_code_id'] 
+tmp
 
-# %%
+
+# %% MERGE Section
 # begin merge
 df = assessments.merge(
     diagnoses, 
-    how='inner', 
-    left_on=['person_id','enc_id','txt_diagnosis_code_id'], 
-    right_on=['person_id','enc_id','diagnosis_code_id']
+    how='left', 
+    on=['person_id','enc_id','diagnosis_code_id']
 )
 # %%
 len(assessments)
 
 # %%
 len(df)
+# %%
+tmp = assessments[assessments.enc_id == '356C735C-8F94-464A-88F6-24976C094EFD'].sort_values(by='diagnosis_code_id')
+# %%
