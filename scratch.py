@@ -1,7 +1,9 @@
 #%% Requirements:
 import numpy as np
 from numpy.lib.histograms import histogram
+from numpy.lib.shape_base import column_stack
 import pandas as pd
+from pandas.io.parsers import read_csv
 # Load data:
 data_path = 'E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/'
 
@@ -120,4 +122,12 @@ len(find_diag('|'.join(dementia_lookup)))
 # %%
 len(find_diag('|'.join(dementia_lookup), 'icd9cm_code_id'))
 
+# %% ETL codes:
+cpts = pd.read_csv('cpt_updated_full.csv')
+cpts.to_csv('cpt_descriptions.csv', index=False)
+
+icds = pd.read_csv('icd_updated.csv')
+icds = icds.drop(columns=['Unnamed: 0', 'id','Freq','VALIDITY_x','STATUS_x','CODE_TYPE_x'])
+icds.columns =  ['icd', 'short_description', 'long_description', 'full_description']
+icds.to_csv('icd_descriptions.csv', index=False)
 # %%
