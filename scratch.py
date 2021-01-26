@@ -2,8 +2,7 @@
 import numpy as np
 from numpy.lib.histograms import histogram
 import pandas as pd
-
-# %% Load data:
+# Load data:
 data_path = 'E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/'
 
 # Fix header on encounters:
@@ -38,7 +37,17 @@ def NA_dist(df):
 dfs = [encounters, cpt_codes, vitals, meds, labs, diagnoses, assessments]
 
 for df in dfs:
-    print(NA_dist(df))
+    print(NA_dist(df),'\n')
+
+
+# %%
+from plotnine import *
+
+ggplot(encounters) + geom_bar(aes(x='Race', fill='Gender')) + coord_flip()
+
+ggplot(encounters) + geom_bar(aes(x='Ethnicity', fill='Gender')) + coord_flip()
+
+
 
 
 
@@ -58,5 +67,57 @@ len(diagnoses[~diagnoses.description.str.contains('Alzh')].person_id.unique())
 e = encounters.EncounterDate.sort_values().unique()
 e.tofile('dates.csv', sep='\n')
 
+
+# %% Set Response Variables:
+encounters['AD_event'] = encounters.enc_id.isin(AD_encounters).astype(int)
+encounters['AD_person'] = encounters.person_id.isin(AD_people).astype(int)
+
+
+
+# %%
+encounters.AD_person
+# %%
+import re
+c = diagnoses[diagnoses.description.str.contains('alzh|dementia|lewy', regex=True, flags=re.IGNORECASE)].enc_id.unique()
+
+a = diagnoses[diagnoses.description.str.contains('lewy', regex=True, flags=re.IGNORECASE)].description.unique()
+b = diagnoses[diagnoses.description.str.contains('alzh', regex=True, flags=re.IGNORECASE)].description.unique()
+
+a==b
+
+b
+# %% Lewy:
+print('Lewy')
+list(diagnoses[diagnoses.description.str.contains('lewy', regex=True, flags=re.IGNORECASE)].description.unique())
+print('alzh')
+list(diagnoses[diagnoses.description.str.contains('alzh', regex=True, flags=re.IGNORECASE)].description.unique()
+
+# %% Alzheimers:
+def find_diag(lookup, return_val='description'):
+    print(lookup) 
+    result = list(diagnoses[diagnoses.description.str.contains(lookup, regex=True, flags=re.IGNORECASE)][return_val].unique())
+    return result
+
+# %%
+find_diag('parkinson')
+# %%
+
+dementia_lookup = [
+    'alzh',
+    'lewy',
+    'dementia',
+    'frontotemporal',
+    'hydrocephalus',
+    'huntington',
+    'wernicke',
+    'creutzfeldt'
+]
+# %%
+print('|'.join(dementia_lookup))
+# %%
+
+len(find_diag('|'.join(dementia_lookup)))
+# %%
+len(find_diag('|'.join(dementia_lookup), 'icd9cm_code_id'))
 
 # %%
