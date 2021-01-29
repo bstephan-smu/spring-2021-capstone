@@ -1,5 +1,6 @@
 # %% Requirements:
 import pandas as pd
+import numpy as np
 import re
 
 # Load data:
@@ -19,7 +20,7 @@ assessments = pd.read_csv(data_path + '7_assessment_impression_plan_.csv')
 
 ### SECTION Response variables: ###
 def find_diag(lookup, return_val='description'):
-    print('Terms = ', lookup) 
+    #print('Terms = ', lookup) 
     result = list(diagnoses[diagnoses.description.str.contains(lookup, regex=True, flags=re.IGNORECASE)][return_val].unique())
     return result
 
@@ -52,8 +53,8 @@ dem_descriptions = [desc for desc in dem_descriptions if not desc in non_dementi
 dementia_ICD_codes = diagnoses[diagnoses.description.isin(dem_descriptions)].icd9cm_code_id.unique()
 
 # Collect response
-AD_people = diagnoses[diagnoses.description.str.contains('Alzh')].person_id.unique()
-AD_encounters = diagnoses[diagnoses.description.str.contains('Alzh')].enc_id.unique()
+AD_people = diagnoses[diagnoses.description.str.contains('alzh', regex=True, flags=re.IGNORECASE)].person_id.unique()
+AD_encounters = diagnoses[diagnoses.description.str.contains('alzh', regex=True, flags=re.IGNORECASE)].enc_id.unique()
 dem_people = diagnoses[diagnoses.description.isin(dem_descriptions)].person_id.unique()
 dem_encounters = diagnoses[diagnoses.description.isin(dem_descriptions)].enc_id.unique()
 
@@ -62,9 +63,11 @@ encounters['AD_event'] = encounters.enc_id.isin(AD_encounters).astype(int)
 encounters['AD_person'] = encounters.person_id.isin(AD_people).astype(int)
 encounters['dem_event'] = encounters.enc_id.isin(dem_encounters).astype(int)
 encounters['dem_person'] = encounters.person_id.isin(dem_people).astype(int)
-
-
-
+encounters['Cognition'] = np.select(
+    [encounters.AD_person == 1, encounters.dem_person == 1],
+    ['AD','Dementia'],
+    default = 'Normal'
+)
 
 
 # %%

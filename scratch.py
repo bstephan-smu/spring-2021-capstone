@@ -1,90 +1,38 @@
 #%% load_data:
-import numpy as np
-from numpy.lib.histograms import histogram
-from numpy.lib.shape_base import column_stack
-import pandas as pd
-from pandas.io.parsers import read_csv
-import re
 
-# Load data:
-data_path = 'E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/'
-
-# Fix header on encounters:
-new_header = ['person_id','enc_id','place_of_service','Provider_id','EncounterDate','Race','Ethnicity','Gender','AgeAtEnc','VisitType','ServiceDepartment','LocationName','Reason_for_Visit','CPT_Code','CPT_Code_Seq','Encounter_Primary_Payer','Encounter_Secondary_Payer','Encounter_Teritiary_Payer']
-encounters = pd.read_csv(data_path + '1_BaseEncounters_Dempgraphics_Payers.csv', header=None, names=new_header, skiprows=1)
-
-cpt_codes = pd.read_csv(data_path + '2_CPT_Codes.csv')
-vitals = pd.read_csv(data_path + '3_vitals_signs.csv')
-meds = pd.read_csv(data_path + '4_patient_medication.csv')
-labs = pd.read_csv(data_path + '5_lab_nor__lab_results_obr_p__lab_results_obx.csv')
-diagnoses = pd.read_csv(data_path + '6_patient_diagnoses.csv')
-assessments = pd.read_csv(data_path + '7_assessment_impression_plan_.csv')
-
-
-### SECTION Response variables: ###
-def find_diag(lookup, return_val='description'):
-    print('Terms = ', lookup) 
-    result = list(diagnoses[diagnoses.description.str.contains(lookup, regex=True, flags=re.IGNORECASE)][return_val].unique())
-    return result
-
-# Dementia indicators:
-dementia_lookup = [
-    'alzh',
-    'lewy',
-    'dementia',
-    'frontotemporal',
-    'hydrocephalus',
-    'huntington',
-    'wernicke',
-    'creutzfeldt'
-]
-
-dem_string = '|'.join(dementia_lookup)
-dem_descriptions = find_diag(dem_string)
-
-# Remove non-dementia diagnosis codes:
-non_dementia = [
-    'Family history of dementia',
-    "Family history of Alzheimer's disease",
-    'Stress due to spouse with dementia',
-    'Sacral spina bifida without hydrocephalus',
-    'Spina bifida, unspecified hydrocephalus presence, unspecified spinal region'
-    ]
-dem_descriptions = [desc for desc in dem_descriptions if not desc in non_dementia]
-
-# Output dementia ICD codes
-dementia_ICD_codes = diagnoses[diagnoses.description.isin(dem_descriptions)].icd9cm_code_id.unique()
-
-# Collect response
-AD_people = diagnoses[diagnoses.description.str.contains('Alzh')].person_id.unique()
-AD_encounters = diagnoses[diagnoses.description.str.contains('Alzh')].enc_id.unique()
-Dem_people = diagnoses[diagnoses.description.isin(dem_descriptions)].person_id.unique()
-Dem_encounters = diagnoses[diagnoses.description.isin(dem_descriptions)].enc_id.unique()
-
-# Set response
-encounters['AD_event'] = encounters.enc_id.isin(AD_encounters).astype(int)
-encounters['AD_person'] = encounters.person_id.isin(AD_people).astype(int)
-encounters['Dem_event'] = encounters.enc_id.isin(Dem_people).astype(int)
-encounters['Dem_person'] = encounters.person_id.isin(Dem_encounters).astype(int)
-
-
-
-
-
-# %% Drop Cols
-
-# Drop columns with only one value, or contain all NAs:
-encounters = encounters.drop(columns=['place_of_service', 'CPT_Code_Seq'])
-vitals = vitals.drop(columns=['age_indicator','bp_comment','pulse_pattern','BP','bp_body_position'])
-
-
-
-
-
+# Run load data.py first
 
 
 
 ##### EDA SECTION #####
+
+
+## Count stuff: 
+
+# Unique people with AD: 517
+len(AD_people) 
+
+# Unique events with AD: 2252
+len(AD_encounters)
+
+# Unique people without AD: 4995
+len(diagnoses[~diagnoses.description.str.contains('Alzh')].person_id.unique())
+
+# Check distribution of encounter dates: looks normal
+encounters.EncounterDate.sort_values().unique()
+
+# Count dementia descriptions & codes:
+len(find_diag('|'.join(dementia_lookup))) #118 unique descriptions
+len(find_diag('|'.join(dementia_lookup), 'icd9cm_code_id')) #25 unique codes
+
+
+## List Stuff:
+print('Lewy')
+list(diagnoses[diagnoses.description.str.contains('lewy', regex=True, flags=re.IGNORECASE)].description.unique())
+
+print('alzh')
+list(diagnoses[diagnoses.description.str.contains('alzh', regex=True, flags=re.IGNORECASE)].description.unique())
+
 
 # %% check NAs:
 def NA_dist(df):
@@ -94,59 +42,31 @@ def NA_dist(df):
     result.columns = ['NA_Count','NA_Percent']
     return result
 
-dfs = [encounters, cpt_codes, vitals, meds, labs, diagnoses, assessments]
+dfs = {
+    'encounters':encounters, 
+    'cpt_codes':cpt_codes, 
+    'vitals':vitals, 
+    'meds':meds, 
+    'labs':labs, 
+    'diagnoses':diagnoses, 
+    'assessments':assessments
+}
 
 for df in dfs:
-    print(NA_dist(df),'\n')
+    print(df.center(60, '-'), '\n', NA_dist(dfs[df]),'\n')
 
 
-# %%
+# %% Plots
 from plotnine import *
 
-ggplot(encounters) + geom_bar(aes(x='Race', fill='Gender')) + coord_flip()
+ggplot(encounters) + geom_bar(aes(x='Race', fill='Cognition')) + coord_flip()
 
-ggplot(encounters) + geom_bar(aes(x='Ethnicity', fill='Gender')) + coord_flip()
-
-
-
-
-# Unique people with AD: 517
-len(AD_people) 
-
-# Unique encounters with AD: 2252
-len(AD_encounters)
-
-# Unique people without AD: 4995
-len(diagnoses[~diagnoses.description.str.contains('Alzh')].person_id.unique())
-
-
-# %% Check distribution of encounter dates:
-e = encounters.EncounterDate.sort_values().unique()
-e.tofile('dates.csv', sep='\n')
+#ggplot(encounters) + geom_bar(aes(x='Ethnicity', fill='Cognition')) + coord_flip()
 
 
 
 
-# %%
-c = diagnoses[diagnoses.description.str.contains('alzh|dementia|lewy', regex=True, flags=re.IGNORECASE)].enc_id.unique()
 
-a = diagnoses[diagnoses.description.str.contains('lewy', regex=True, flags=re.IGNORECASE)].description.unique()
-b = diagnoses[diagnoses.description.str.contains('alzh', regex=True, flags=re.IGNORECASE)].description.unique()
-
-a==b
-
-b
-# %% Lewy:
-print('Lewy')
-list(diagnoses[diagnoses.description.str.contains('lewy', regex=True, flags=re.IGNORECASE)].description.unique())
-print('alzh')
-list(diagnoses[diagnoses.description.str.contains('alzh', regex=True, flags=re.IGNORECASE)].description.unique()
-
-# %% Peek dementia descriptions:
-
-
-len(find_diag('|'.join(dementia_lookup)))
-len(find_diag('|'.join(dementia_lookup), 'icd9cm_code_id'))
 
 # %% ETL codes:  NOT RUN!!
 # cpts = pd.read_csv('cpt_updated_full.csv')
@@ -156,9 +76,9 @@ len(find_diag('|'.join(dementia_lookup), 'icd9cm_code_id'))
 # icds = icds.drop(columns=['Unnamed: 0', 'id','Freq','VALIDITY_x','STATUS_x','CODE_TYPE_x'])
 # icds.columns =  ['icd', 'short_description', 'long_description', 'full_description']
 # icds.to_csv('icd_descriptions.csv', index=False)
-# %%
 
 
+# %% ETL
 
 
 # Drop columns with only one value, or contain all NAs:
