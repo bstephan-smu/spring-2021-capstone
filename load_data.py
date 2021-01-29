@@ -54,15 +54,17 @@ dementia_ICD_codes = diagnoses[diagnoses.description.isin(dem_descriptions)].icd
 # Collect response
 AD_people = diagnoses[diagnoses.description.str.contains('Alzh')].person_id.unique()
 AD_encounters = diagnoses[diagnoses.description.str.contains('Alzh')].enc_id.unique()
-Dem_people = diagnoses[diagnoses.description.isin(dem_descriptions)].person_id.unique()
-Dem_encounters = diagnoses[diagnoses.description.isin(dem_descriptions)].enc_id.unique()
+dem_people = diagnoses[diagnoses.description.isin(dem_descriptions)].person_id.unique()
+dem_encounters = diagnoses[diagnoses.description.isin(dem_descriptions)].enc_id.unique()
 
 # Set response
 encounters['AD_event'] = encounters.enc_id.isin(AD_encounters).astype(int)
 encounters['AD_person'] = encounters.person_id.isin(AD_people).astype(int)
-encounters['Dem_event'] = encounters.enc_id.isin(Dem_people).astype(int)
-encounters['Dem_person'] = encounters.person_id.isin(Dem_encounters).astype(int)
+encounters['dem_event'] = encounters.enc_id.isin(dem_encounters).astype(int)
+encounters['dem_person'] = encounters.person_id.isin(dem_people).astype(int)
 
 
 
 
+
+# %%
