@@ -45,8 +45,10 @@ assessment2['person_id'].nunique()
 #%% Isolate AD and dementia patients from diagnoses table
 diagnoses = pd.read_csv(data_path + '6_patient_diagnoses.csv')
 
-ngd = diagnoses[diagnoses['icd9cm_code_id'].str.contains('G30|F01|F02|F03',case = False)]
-diagnoses['icd9cm_code_id'].str.contains('G30|F01|F02|F03',case = False).value_counts()
+ngd_icd10 = 'F01|F02|F03|F10|F32|F68|G20|G30|G31|G91|Q05|S09|Z63|Z82|Z81'
+
+ngd = diagnoses[diagnoses['icd9cm_code_id'].str.contains(ngd_icd10,case = False)]
+diagnoses['icd9cm_code_id'].str.contains(ngd_icd10,case = False).value_counts()
 
 ngd.reset_index(drop=True)
 ngd.head()
@@ -81,24 +83,43 @@ stop = stopwords.words('english')
 ngd_txt['txt_tokenized'] =ngd_txt['txt_tokenized'].apply(lambda x: [item for item in x if item not in stop])
 
 #Create bigrams
-ngd_txt['bigrams'] = ngd_txt.apply(lambda row: list(nltk.bigrams(row['txt_tokenized'])),axis=1) 
+ngd_txt['bigrams'] = ngd_txt.apply(lambda row: list(nltk.trigrams(row['txt_tokenized'])),axis=1) 
 #print(*map(' '.join, bigrm), sep=', ')
 
 ngd_txt.head()
 
-#%% Word Cloud to see frequent and common terms
+#%% Frequent and common terms
 pd.set_option('display.max_rows', 100)
 ngd_txt['bigram2'] = ngd_txt.bigrams.apply(lambda row:['_'.join(i) for i in row])
 ngd_txt.head()
 
 
-# %% Convert bigram lists to strings
+# %% Convert trigram lists to strings
 ngd_txt['bigram2'] = ngd_txt.bigram2.apply(lambda x: ' '.join([str(i) for i in x]))
 ngd_txt.head()
 
 
 
-# %% create table to display bigram counts
+# %% create table to display trigram counts
 word_counts = pd.Series(' '.join(ngd_txt.bigram2).split()).value_counts()
+word_counts = word_counts.reset_index()
+word_counts.columns = ['trigram','count']
+word_counts = pd.DataFrame(word_counts)
 word_counts.head(100)
-# %%
+
+
+# %% generate word cloud from trigrams
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt 
+
+#convert word_count df to dictionary for ease of use in wordcloud()
+word_counts_dict = dict(zip(word_counts['trigram'].tolist(),word_counts['count'].tolist()))
+
+#make the wordcloud
+cloud = WordCloud(width = 1600, height = 800, max_font_size=100,max_words = 100, background_color = 'white', relative_scaling = 1, colormap ="viridis").generate_from_frequencies(word_counts_dict)
+plt.figure(figsize=(20,10))
+plt.imshow(cloud)
+plt.axis('off')
+plt.show()
+
+# %% Topic modeling
