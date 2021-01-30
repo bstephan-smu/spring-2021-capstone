@@ -1,22 +1,23 @@
-
-
-#meds<-read_csv("//hsc.ad.unt.edu/DATA/IntMedHABS/Wet-Lab/David/AD_CAPA/4_patient_medication.csv")
-labs<-read_csv("//hsc.ad.unt.edu/DATA/IntMedHABS/Wet-Lab/David/AD_CAPA/5_lab_nor__lab_results_obr_p__lab_results_obx.csv")
-
-#asses<-read.csv("//hsc.ad.unt.edu/DATA/IntMedHABS/Wet-Lab/David/AD_CAPA/7_assessment_impression_plan_.csv")
-library("readr")
+library(readr)
 library(reshape2)
 library(plyr)
 library(skimr)
 library(dplyr)
 library(ggplot2)
 
+#meds<-read_csv("//hsc.ad.unt.edu/DATA/IntMedHABS/Wet-Lab/David/AD_CAPA/4_patient_medication.csv")
+#labs<-read_csv("//hsc.ad.unt.edu/DATA/IntMedHABS/Wet-Lab/David/AD_CAPA/5_lab_nor__lab_results_obr_p__lab_results_obx.csv")
+labs <- read_csv("E:\\20201208_Dementia_AD_Research_David_Julovich\\QueryResult\\5_lab_nor__lab_results_obr_p__lab_results_obx.csv")
+#asses<-read.csv("//hsc.ad.unt.edu/DATA/IntMedHABS/Wet-Lab/David/AD_CAPA/7_assessment_impression_plan_.csv")
+
+
 
 ###################ENCOUNTER TABLE###########################################################
-enct<-read_csv("//hsc.ad.unt.edu/DATA/IntMedHABS/Wet-Lab/David/AD_CAPA/1_BaseEncounters_Dempgraphics_Payers.csv")
+#enct<-read_csv("//hsc.ad.unt.edu/DATA/IntMedHABS/Wet-Lab/David/AD_CAPA/1_BaseEncounters_Dempgraphics_Payers.csv")
+enct <- read_csv("E:\\20201208_Dementia_AD_Research_David_Julovich\\QueryResult\\1_BaseEncounters_Dempgraphics_Payers.csv")
 
 # align the column names to the correct data and clean up column names
-enct %>%rename(encounterdate=EncounterDate, race=Demographics,ethnicity=Race,gender=Ethnicity,age=Gender,visittype=AgeAtEnc,serviedepartment=VisitType,locationname=ServiceDepartment,reason_for_vist=LocationName, cpt_code=Reason_for_Visit)->enct
+enct %>% rename(encounterdate=EncounterDate, race=Demographics,ethnicity=Race,gender=Ethnicity,age=Gender,visittype=AgeAtEnc,serviedepartment=VisitType,locationname=ServiceDepartment,reason_for_vist=LocationName, cpt_code=Reason_for_Visit)->enct
 #remove useless columns
 enct <- enct[ -c(3,4,11,12,15:19) ]
 
