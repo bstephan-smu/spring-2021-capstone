@@ -148,6 +148,13 @@ topic_generator(10,10,ngd_txt['txt_tokenized2'],count_vectorizer)
 
 
 # %%
-topic_generator(5,10,ngd_txt['ngram2'],count_vectorizer)
+topic_generator(4,5,ngd_txt['ngram2'],count_vectorizer)
 
+# %% remove some noise from trigrams
+
+#remove 'without_behavioral_distubance', diseases_classified_elsewhere, todays_office_visit, orders_todays_office, office_visit_1
+ngd_txt['ngram_cleaned'] = ngd_txt['ngram2'].str.replace(r'\without_behavioral_disturbance|diseases_classified_elsewhere|todays_office_visit|orders_todays_office|office_visit_1','')
+
+# %%
+topic_generator(20,5,ngd_txt['ngram_cleaned'],count_vectorizer)
 # %%
