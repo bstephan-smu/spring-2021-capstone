@@ -62,6 +62,23 @@ assessment2['ngrams'] = assessment2.apply(lambda row: list(nltk.trigrams(row['tx
 
 assessment2.head()
 
+#%% Get noun phrases
+import spacy
+import en_core_web_sm
+
+nlp = en_core_web_sm.load()
+
+def getNounChunks(text_data):
+    doc = nlp(text_data)
+    noun_chunks = list(doc.noun_chunks)
+    noun_chunks_strlist = [chunk.text for chunk in noun_chunks]
+    noun_chunks_str = '_'.join(noun_chunks_strlist)
+    return noun_chunks_str
+
+assessment2['np_chunks'] = assessment2['txt_tokenized2'].apply(getNounChunks)
+assessment2.head()
+
+
 #%% Convert lists to strings
 pd.set_option('display.max_rows', 100)
 
@@ -75,45 +92,43 @@ assessment2['ngram2'] = assessment2.ngram2.apply(lambda x: ' '.join([str(i) for 
 assessment2.head()
 
 
-# %% kmeans clustering for all assessments
+#%% Checdk unqiue number of patient ids in assessments table
+assessment2['person_id'].nunique()
+
+#%% Pair down assessments table to columns of interest
+assessment2 = assessment2[['person_id','enc_id','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks']]
+assessment2.head()
+
+#%% Read in diagnosis table
+diagnoses = pd.read_csv(data_path + '6_patient_diagnoses.csv')
+diagnoses.head()
+
+#%% Identify unique records 
+diagnoses['person_id'].nunique()
+
+#%% Merge assements[txt_description] to ngd df
+#Diagnosis occur after assessments, diagnosis table is smaller than assessments table
+assessments_diagnoses = assessment2.merge(diagnoses, how = 'left', on = ['person_id','enc_id'])
+
+#%% DBSCAN Clusterin for trigrams and noun phrase chunks
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import KMeans
-tfidf = TfidfVectorizer()
-
-tfidf_data_tokens = tfidf.fit_transform(assessment2['txt_tokenized2'])
-tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
-
-kmeans = KMeans(init = "k-means++", n_jobs=-1, random_state = 42)
-print("Starting token kmeans model fit...")
-token_kmean_model = kmeans.fit(tfidf_data_tokens)
-print("Token kmeans model fit COMPLETE...\n")
-print("Starting ngram kmeans model fit...")
-ngram_kmean_model = kmeans.fit(tfidf_data_ngram)
-print("ngram kmeans model fit COMPLETE...")
-
-
-assessment2['token_cluster'] = token_kmean_model.labels_
-assessment2['ngram_cluster'] = ngram_kmean_model.labels_
-
-# %% EDA on Clusters
-
 from sklearn.cluster import DBSCAN
 
+tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
+tfidf_data_np = tfidf.fit_transform(assessment2['np_chunk'])
+
 cluster_model = DBSCAN(n_jobs=-1)
+print("Starting ngram DBSCAN model fit...")
 ngram_db_model = cluster_model.fit(tfidf_data_ngram)
-assessment2['ngram_cluster_db'] = ngram_db_model.labels_
+print("ngram DBSCAN model fit COMPLETE...")
 
-print("Token Model Cluster Count:",assessment2['token_cluster'].nunique())
+print("Starting ngram DBSCAN model fit on np chunks...")
+np_db_model = cluster_model.fit(tfidf_data_np)
+print("ngram DBSCAN model fit on np chunks COMPLETE...")
+
+assessment2['ngram_clusters'] = ngram_db_model.labels_
+assessment2['np_chunk_clusters'] = np_db_model.labels_
+
 print("ngram Model Cluster Count:",assessment2['ngram_cluster'].nunique())
-print("ngram DBSCAN Model Cluster Count:",assessment2['ngram_cluster_db'].nunique())
+print("ngram DBSCAN Model Cluster Count:",assessment2['ngram_cluster'].nunique())
 
-### Token model EDA #########################################################################
-
-#Top10 tokens per cluster
-
-
-### ngram model EDA #########################################################################
-
-#Top10 trigrams per cluster
-
-# %%
