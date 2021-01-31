@@ -6,10 +6,14 @@ import os
 
 
 class DataLoader:
-    def __init__(self, data_path='E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/'):
+    def __init__(self, data_path='E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/',
+                 subset=None):
         # Load data: storing as environment variable in case sharing across multiple files
         os.environ['data_path'] = data_path
         self.data_path = data_path
+
+        # can specify subset of data to work with...based on encounters table
+        self.subset = subset
 
         # regex phrase to lookup alzheimers diagnosis
         self.alz_regex = 'alzh'
@@ -38,22 +42,25 @@ class DataLoader:
             'Spina bifida, unspecified hydrocephalus presence, unspecified spinal region'
         ]
 
-        # reading in raw data from all datasets
-        self.encounters = pd.read_csv(self.data_path + '1_BaseEncounters_Dempgraphics_Payers.csv')
-        self.format_encounters()  # align encounters table columns...make sure columns are aligned as planned
-
-        self.cpt = pd.read_csv(self.data_path + '2_CPT_Codes.csv')
-        self.vitals = pd.read_csv(self.data_path + '3_vitals_signs.csv')
-        self.meds = pd.read_csv(self.data_path + '4_patient_medication.csv')
-        self.labs = pd.read_csv(self.data_path + '5_lab_nor__lab_results_obr_p__lab_results_obx.csv')
-        self.diagnosis = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
-        self.assessments = pd.read_csv(self.data_path + '7_assessment_impression_plan_.csv')
+        # initializing tables as attributes
+        # to read in and process data, try self.generate_csv_attributes()
+        self.encounters = None
+        self.cpt = None
+        self.vitals = None
+        self.meds = None
+        self.labs = None
+        self.diagnosis = None
+        self.assessments = None
 
     # Fix header on encounters:
     def format_encounters(self):
         self.align_columns()  # ensure that encounters columns are properly aligned
         self.encounters['EncounterDate'] = pd.to_datetime(self.encounters['EncounterDate'], format='%Y%m%d')
-        self.encounters = self.encounters.head(1000)  # making a smaller sample of data for speed in dev environment
+
+        # in event that you'd like to subset less than total appt in data
+        if self.subset is not None:
+            self.encounters = self.encounters.head(
+                self.subset)  # making a smaller sample of data for speed in dev environment
 
     # function to correct column alignment in the encounters table
     def align_columns(self):
@@ -118,8 +125,23 @@ class DataLoader:
         # store output as boolean for that medication
         self.encounters.apply(check_meds, axis=1)
 
+    # reading in raw data from all datasets
+    def generate_csv_attributes(self):
+        self.encounters = pd.read_csv(self.data_path + '1_BaseEncounters_Dempgraphics_Payers.csv')
+        self.format_encounters()  # align encounters table columns...make sure columns are aligned as planned
+
+        self.cpt = pd.read_csv(self.data_path + '2_CPT_Codes.csv')
+        self.vitals = pd.read_csv(self.data_path + '3_vitals_signs.csv')
+        self.meds = pd.read_csv(self.data_path + '4_patient_medication.csv')
+        self.labs = pd.read_csv(self.data_path + '5_lab_nor__lab_results_obr_p__lab_results_obx.csv')
+        self.diagnosis = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
+        self.assessments = pd.read_csv(self.data_path + '7_assessment_impression_plan_.csv')
+
     # return the main data output
     def create(self):
+        # generating data attributes
+        self.generate_csv_attributes()
+
         # step 1...make sure alzheimers and dementia response is encoded
         self.encode_alzheimers()
 
@@ -141,11 +163,15 @@ class DataLoader:
 
         # step 4...encode medications to find current meds...join onto the main for medication list
         self.encode_meds()
+        # note that the meds table may or may not have columns depending on sample
         meds_wide = pd.get_dummies(self.meds[['enc_id', 'medid', 'is_currently_taking']]
                                    .query('is_currently_taking'), columns=['medid']) \
             .groupby('enc_id', as_index=False).max()
 
-        main = main.merge(meds_wide, on='enc_id')
+        main = main.merge(meds_wide, on='enc_id', how='left')
+
+        # not all patients have active meds...take care to fill those nulls
+        main[[col for col in meds_wide.columns if col != 'enc_id']].fillna(0, inplace=True)
 
         # step 5...load labs onto the main dataframe
         # come back to this one dustin is currently on it
@@ -156,18 +182,19 @@ class DataLoader:
         # step 7...load assessments onto main dataframe
         # double check to see if jeff has converted this portion yet.
 
-        return main
+        # write to pickle file
+        self.write(main)
 
     # helper function write main dataframe
-    def write(self):
-        pass
+    def write(self, df, name='main'):
+        df.to_pickle(self.data_path + 'main')
 
     # helper function to return main dataframe
-    def load(self):
-        pass
+    def load(self, name='main'):
+        return pd.read_pickle(self.data_path + 'main')
 
 
 if __name__ == "__main__":
     data = DataLoader()
-    main = data.create()
-    print(main.head())
+    data.create()
+    print(data.load())
