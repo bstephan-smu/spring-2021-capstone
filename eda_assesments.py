@@ -102,12 +102,13 @@ ngd_txt.head()
 
 
 # %% create table to display trigram counts
+pd.set_option('display.max_rows', 500)
 word_counts = pd.Series(' '.join(ngd_txt.ngram2).split()).value_counts()
 word_counts = word_counts.reset_index()
 word_counts.columns = ['ngram','count']
 word_counts = pd.DataFrame(word_counts)
-word_counts.head(100)
-
+word_counts.head(500)
+word_counts.to_csv("common_doctor_notes.csv")
 
 # %% generate word cloud from trigrams
 from wordcloud import WordCloud
@@ -154,7 +155,9 @@ topic_generator(4,5,ngd_txt['ngram2'],count_vectorizer)
 
 #remove 'without_behavioral_distubance', diseases_classified_elsewhere, todays_office_visit, orders_todays_office, office_visit_1
 ngd_txt['ngram_cleaned'] = ngd_txt['ngram2'].str.replace(r'\without_behavioral_disturbance|diseases_classified_elsewhere|todays_office_visit|orders_todays_office|office_visit_1','')
-
-# %%
+ngd_txt['ngram_cleaned'] = ngd_txt['ngram2'].str.replace(r'2_diabetes_mellitus','type_2_diabetes')
+ngd_txt['ngram_cleaned'] = ngd_txt['ngram2'].str.replace(r'\b12folate_serum_panel','vitamin_b12folate_serum')
+ngd_txt['ngram_cleaned'] = ngd_txt['ngram2'].str.replace(r'\depression_unspecified_depression','unspecified_depression_type')
+ngd_txt['ngram_cleaned'] = ngd_txt['ngram2'].str.replace(r'mass_index_bmi','body_mass_index ')
+# %% topic model on cleaned ngrams
 topic_generator(20,5,ngd_txt['ngram_cleaned'],count_vectorizer)
-# %%
