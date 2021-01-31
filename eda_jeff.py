@@ -120,3 +120,4 @@ visits_sparse[visits_sparse['enc_id'] == '000462AF-CA71-4CDF-A9B3-84F354C78E1F']
 
 # Flattened data has same number of records as number of unique enc_id's
 visits_sparse.info()
+# %%
