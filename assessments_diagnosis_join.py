@@ -51,7 +51,6 @@ assessment2['ngrams'] = assessment2.apply(lambda row: list(nltk.trigrams(row['tx
 
 assessment2.head()
 
-
 #%% Convert lists to strings
 pd.set_option('display.max_rows', 100)
 
@@ -69,7 +68,27 @@ assessment2 = assessment2[['person_id','enc_id','txt_description','txt_tokenized
 #%% Read in diagnosis table
 diagnoses = pd.read_csv(data_path + '6_patient_diagnoses.csv')
 
+diagnosis_icd9 = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['icd9cm_code_id'].apply(list))
+diagnosis_dc = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['diagnosis_code_id'].apply(list))
+diagnosis_desc = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['description'].apply(list))
+diagnosis_datesymp = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['date_onset_sympt'].apply(list))
+diagnosis_datediag = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['date_diagnosed'].apply(list))
+diagnosis_dateresl = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['date_resolved'].apply(list))
+diagnosis_statusid = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['status_id'].apply(list))
+diagnosis_dx = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['dx_priority'].apply(list))
+diagnosis_chronic = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['chronic_ind'].apply(list))
+diagnosis_rcdelswhr = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['recorded_elsewhere_ind'].apply(list))
+
+
+#%% Merge series data from text and codeID columns into one df for assessment
+
+
+diagnoses2 = diagnosis_icd9.merge(diagnosis_dc, how = 'left', on = ['person_id','enc_id']).merge(diagnosis_desc, how = 'left', on = ['person_id','enc_id']).merge(diagnosis_datesymp, how = 'left', on = ['person_id','enc_id']).merge(diagnosis_datediag, how = 'left', on = ['person_id','enc_id']).merge(diagnosis_dateresl, how = 'left', on = ['person_id','enc_id']).merge(diagnosis_statusid, how = 'left', on = ['person_id','enc_id']).merge(diagnosis_dx, how = 'left', on = ['person_id','enc_id']).merge(diagnosis_chronic, how = 'left', on = ['person_id','enc_id']).merge(diagnosis_rcdelswhr, how = 'left', on = ['person_id','enc_id'])
+diagnoses2 = pd.DataFrame(diagnoses2)
+diagnoses2.reset_index(inplace=True)
 
 #%% Merge assements[txt_description] to ngd df
 #Diagnosis occur after assessments, diagnosis table is smaller than assessments table
-assessments_diagnoses = assessment2.merge(diagnoses, how = 'left', on = ['person_id','enc_id'])
+assessments_diagnoses = assessment2.merge(diagnoses2, how = 'left', on = ['person_id','enc_id'])
+#assessments_diagnoses.reset_index(inplace=True)
+# %%
