@@ -9,6 +9,7 @@ colorama
 cycler==0.10.0
 decorator==4.4.2
 defusedxml==0.6.0
+descartes==1.1.0
 entrypoints==0.3
 importlib-metadata 
 ipykernel 
@@ -17,6 +18,7 @@ ipython-genutils
 ipywidgets 
 jedi==0.17.0
 Jinja2==2.11.2
+joblib 
 jsonschema 
 jupyter==1.0.0
 jupyter-client 
@@ -27,6 +29,7 @@ kiwisolver
 MarkupSafe==1.1.1
 matplotlib 
 mistune==0.8.4
+mizani==0.7.2
 mkl-fft==1.2.0
 mkl-random==1.1.1
 mkl-service==2.3.0
@@ -38,11 +41,14 @@ notebook
 numpy 
 olefile==0.46
 packaging 
+palettable==3.3.0
 pandas 
 pandocfilters 
 parso 
+patsy==0.5.1
 pickleshare 
 Pillow 
+plotnine 
 prometheus-client 
 prompt-toolkit 
 pycparser 
@@ -56,11 +62,15 @@ pywinpty==0.5.7
 pyzmq==20.0.0
 qtconsole 
 QtPy==1.9.0
+scikit-learn 
+scipy 
 Send2Trash 
 sip==4.19.13
 six 
+statsmodels 
 terminado==0.9.1
 testpath==0.4.4
+threadpoolctl 
 tornado 
 traitlets 
 wcwidth 
