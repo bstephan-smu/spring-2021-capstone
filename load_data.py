@@ -55,6 +55,7 @@ class DataLoader:
         self.labs = None
         self.diagnosis = None
         self.assessments = None
+        self.main = None
 
     # Fix header on encounters:
     def format_encounters(self):
@@ -258,7 +259,7 @@ class DataLoader:
             axis=1) \
             .groupby('enc_id', as_index=False).max()
 
-        main = self.encounters.merge(df_cpt_codes_encoded, on='enc_id')
+        self.main = self.encounters.merge(df_cpt_codes_encoded, on='enc_id')
 
         # step 3...load vitals table onto main
         # get average vital measurement per patient encounter
@@ -266,7 +267,7 @@ class DataLoader:
                                   'height_cm', 'pulse_rate', 'respiration_rate', 'temp_deg_F',
                                   'weight_lb']].groupby('enc_id', as_index=False).max()
 
-        main = main.merge(vitals_agg, on='enc_id')
+        self.main = self.main.merge(vitals_agg, on='enc_id')
 
         # step 4...encode medications to find current meds...join onto the main for medication list
         self.encode_meds()
@@ -275,35 +276,35 @@ class DataLoader:
                                    .query('is_currently_taking'), columns=['medid']) \
             .groupby('enc_id', as_index=False).max()
 
-        main = main.merge(meds_wide, on='enc_id', how='left')
+        self.main = self.main.merge(meds_wide, on='enc_id', how='left')
 
         # not all patients have active meds...take care to fill those nulls
-        main[[col for col in meds_wide.columns if col != 'enc_id']].fillna(0, inplace=True)
+        self.main[[col for col in meds_wide.columns if col != 'enc_id']].fillna(0, inplace=True)
 
         # step 5...load labs onto the main dataframe
         self.format_labs(encoded=True)
         labs_copy = self.labs.copy()
         labs_copy.drop(columns=['person_id', 'lab_results'], inplace=True)
-        main = main.merge(labs_copy, on='enc_id', how='left')
+        self.main = self.main.merge(labs_copy, on='enc_id', how='left')
         # TODO: address null values col
-        main[[col for col in labs_copy.columns if col != 'enc_id']].fillna(0, inplace=True)
+        self.main[[col for col in labs_copy.columns if col != 'enc_id']].fillna(0, inplace=True)
 
         # step 6...load merged assessments + diagnoses onto main dataframe
 
         
         #TODO i haven't check counts to make sure this merge worked properly@@
-        main = main.merge(self.assessments, on='enc_id', how='left')
+        self.main = self.main.merge(self.assessments, on='enc_id', how='left')
 
         # write to pickle file
-        self.write(main)
+        self.write(self.main)
 
     # helper function write main dataframe
     def write(self, df, name='main'):
-        df.to_pickle(self.data_path + 'main')
+        df.to_pickle(self.data_path + 'main2')
 
     # helper function to return main dataframe
-    def load(self, name='main'):
-        return pd.read_pickle(self.data_path + 'main')
+    def load(self, name='main2'):
+        return pd.read_pickle(self.data_path + 'main2')
 
 
 if __name__ == "__main__":
