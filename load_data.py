@@ -4,7 +4,6 @@ import numpy as np
 import re
 import os
 import nltk
-#nltk.download('stopwords')
 from nltk.corpus import stopwords
 
 
@@ -21,7 +20,7 @@ class DataLoader:
         # regex phrase to lookup alzheimers diagnosis
         self.alz_regex = 'alzh'
 
-        # store list of dementia icd codes here...will be updated in later function
+        # store list of dementia icd codes here... TODO will be updated in later function
         self.dementia_icd_codes = None
 
         # list of common word codes for dementia diagnosis
@@ -207,8 +206,8 @@ class DataLoader:
 
     # function to transform assessments table to merge with encounters
     def format_assessment(self):
-        assessment_text = self.assessments.groupby(['person_id', 'enc_id'])['txt_description'].apply(list)
-        assessment_codeID = self.assessments.groupby(['person_id', 'enc_id'])['txt_diagnosis_code_id'].apply(list)
+        assessment_text = pd.DataFrame(self.assessments.groupby(['person_id', 'enc_id'])['txt_description'].apply(list))
+        assessment_codeID = pd.DataFrame(self.assessments.groupby(['person_id', 'enc_id'])['txt_diagnosis_code_id'].apply(list))
 
         # %% Merge series data from text and codeID columns into one df for assessment
         assessment2 = assessment_text.merge(assessment_codeID, how='left', on=['person_id', 'enc_id'])
@@ -287,12 +286,11 @@ class DataLoader:
         # TODO: address null values col
         main[[col for col in labs_copy.columns if col != 'enc_id']].fillna(0, inplace=True)
 
-        # step 6...load diagnosis onto main dataframe
+        # step 6...load assessments onto main dataframe
         assessments = self.format_assessment()
-        print(assessments.head())
 
+        # step 7...load diagnosis onto main dataframe
 
-        # step 7...load assessments onto main dataframe
         # double check to see if jeff has converted this portion yet.
 
         # write to pickle file
