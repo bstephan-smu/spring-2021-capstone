@@ -69,7 +69,7 @@ assessment2 = assessment2[['person_id','enc_id','txt_description','txt_tokenized
 diagnoses = pd.read_csv(data_path + '6_patient_diagnoses.csv')
 
 diagnosis_icd9 = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['icd9cm_code_id'].apply(list))
-diagnosis_dc = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['diagnosis_code_id'].apply(list))
+diagnosis_dc = pd.DataFrame(ditheagnoses.groupby(['person_id','enc_id'])['diagnosis_code_id'].apply(list))
 diagnosis_desc = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['description'].apply(list))
 diagnosis_datesymp = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['date_onset_sympt'].apply(list))
 diagnosis_datediag = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['date_diagnosed'].apply(list))
