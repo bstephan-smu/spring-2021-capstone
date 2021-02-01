@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 import re
 import os
+import nltk
+#nltk.download('stopwords')
+from nltk.corpus import stopwords
 
 
 class DataLoader:
@@ -137,6 +140,109 @@ class DataLoader:
         self.diagnosis = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
         self.assessments = pd.read_csv(self.data_path + '7_assessment_impression_plan_.csv')
 
+    # createa a wide table out of the labs table...
+    # perform encodings, etc...
+    def format_labs(self, encoded=False):
+        # %% Remove Deleted rows and drop deleted indicators
+        self.labs = self.labs[self.labs['lab_nor_delete_ind'] == 'N']
+        self.labs = self.labs.drop(columns=['lab_nor_delete_ind', 'lab_results_obx_delete_ind'])
+
+        # Remove incomplete labs & drop column
+        self.labs = self.labs[self.labs['lab_nor_completed_ind'] == 'Y']
+        self.labs = self.labs.drop(columns=['lab_nor_completed_ind'])
+        # Remove pending labs
+        self.labs = self.labs[self.labs['lab_nor_test_status'] != 'InProcessUnspecified']
+        self.labs = self.labs[self.labs['lab_nor_test_status'] != 'Pending']
+
+        # Set lab_results to result description if exists, otherwise use test description
+        self.labs['lab_results'] = np.where(
+            self.labs['lab_results_obx_result_desc'].notnull(),
+            self.labs['lab_results_obx_result_desc'],
+            self.labs['lab_results_obr_p_test_desc']
+        )
+
+        # Combine outcome with test result
+        self.labs['lab_results'] = np.select(
+            [  # condition
+                self.labs.lab_results_obx_abnorm_flags == '>',
+                self.labs.lab_results_obx_abnorm_flags == 'H',
+                self.labs.lab_results_obx_abnorm_flags == 'HH',
+                self.labs.lab_results_obx_abnorm_flags == '<',
+                self.labs.lab_results_obx_abnorm_flags == 'L',
+                self.labs.lab_results_obx_abnorm_flags == 'LL',
+                self.labs.lab_results_obx_abnorm_flags == 'A'
+            ],
+            [  # value
+                'HIGH ' + self.labs['lab_results'],
+                'HIGH ' + self.labs['lab_results'],
+                'VERY HIGH ' + self.labs['lab_results'],
+                'LOW ' + self.labs['lab_results'],
+                'LOW ' + self.labs['lab_results'],
+                'VERY LOW ' + self.labs['lab_results'],
+                'ABNORMAL ' + self.labs['lab_results']
+            ],
+            default='NORMAL'
+        )
+
+
+        # Capture abnormal labs
+        abnormal_labs = self.labs[self.labs['lab_results'] != 'NORMAL']
+        abnormal_labs['lab_results'] = abnormal_labs['lab_results'].str.title()
+        abnormal_labs = pd.DataFrame(abnormal_labs[['lab_nor_person_id', 'lab_nor_enc_id', 'lab_results']].groupby(
+            ['lab_nor_person_id', 'lab_nor_enc_id'])['lab_results'].apply(set))
+
+        abnormal_labs.reset_index(inplace=True)
+        abnormal_labs.columns = ['person_id', 'enc_id', 'lab_results']
+
+        if not encoded:
+            self.labs = abnormal_labs
+
+        # Pandas get_dummies function will not parse lists, enter the multiLabelBinarizer
+        from sklearn.preprocessing import MultiLabelBinarizer
+        mlb = MultiLabelBinarizer()
+        encoded_labs = abnormal_labs.join(
+            pd.DataFrame(mlb.fit_transform(abnormal_labs['lab_results']), columns=mlb.classes_))
+
+        self.labs = encoded_labs
+
+    # function to transform assessments table to merge with encounters
+    def format_assessment(self):
+        assessment_text = self.assessments.groupby(['person_id', 'enc_id'])['txt_description'].apply(list)
+        assessment_codeID = self.assessments.groupby(['person_id', 'enc_id'])['txt_diagnosis_code_id'].apply(list)
+
+        # %% Merge series data from text and codeID columns into one df for assessment
+        assessment2 = assessment_text.merge(assessment_codeID, how='left', on=['person_id', 'enc_id'])
+        assessment2 = pd.DataFrame(assessment2)
+        assessment2.reset_index(inplace=True)
+
+        # Remove Punctuation and convert to lower
+        assessment2['txt_description'] = assessment2.txt_description.apply(lambda x: ', '.join([str(i) for i in x]))
+        assessment2['txt_description'] = assessment2['txt_description'].str.replace('[^\w\s]', '')
+        assessment2['txt_description'] = assessment2['txt_description'].str.lower()
+
+        # tokenize
+        assessment2['txt_tokenized'] = assessment2.apply(lambda row: nltk.word_tokenize(row['txt_description']), axis=1)
+
+        # Remove Stopwords
+        stop = stopwords.words('english')
+        assessment2['txt_tokenized'] = assessment2['txt_tokenized'].apply(
+            lambda x: [item for item in x if item not in stop])
+
+        # Create ngrams
+        assessment2['ngrams'] = assessment2.apply(lambda row: list(nltk.trigrams(row['txt_tokenized'])), axis=1)
+        # Convert trigram lists to words joined by underscores
+        assessment2['ngram2'] = assessment2.ngrams.apply(lambda row: ['_'.join(i) for i in row])
+
+        # Convert trigram and token lists to strings
+        assessment2['txt_tokenized2'] = assessment2['txt_tokenized'].apply(' '.join)
+        assessment2['ngram2'] = assessment2.ngram2.apply(lambda x: ' '.join([str(i) for i in x]))
+
+        # %% Pair down assessments table to columns of interest
+        assessment2 = assessment2[
+            ['person_id', 'enc_id', 'txt_description', 'txt_tokenized', 'ngrams', 'ngram2', 'txt_tokenized2']]
+
+        return assessment2
+
     # return the main data output
     def create(self):
         # generating data attributes
@@ -174,10 +280,17 @@ class DataLoader:
         main[[col for col in meds_wide.columns if col != 'enc_id']].fillna(0, inplace=True)
 
         # step 5...load labs onto the main dataframe
-        # come back to this one dustin is currently on it
+        self.format_labs(encoded=True)
+        labs_copy = self.labs.copy()
+        labs_copy.drop(columns=['person_id', 'lab_results'], inplace=True)
+        main = main.merge(labs_copy, on='enc_id', how='left')
+        # TODO: address null values col
+        main[[col for col in labs_copy.columns if col != 'enc_id']].fillna(0, inplace=True)
 
         # step 6...load diagnosis onto main dataframe
-        # come back to this one...jeff is currently working on this guy
+        assessments = self.format_assessment()
+        print(assessments.head())
+
 
         # step 7...load assessments onto main dataframe
         # double check to see if jeff has converted this portion yet.
@@ -195,6 +308,6 @@ class DataLoader:
 
 
 if __name__ == "__main__":
-    data = DataLoader()
+    data = DataLoader(subset=1000)
     data.create()
     print(data.load())
