@@ -1,7 +1,7 @@
 #%% load_data:
 
 # Run load data.py first
-
+pd.set_option('display.max_columns', None)
 
 
 ##### EDA SECTION #####
@@ -57,6 +57,12 @@ for df in dfs:
 
 
 # %% Plots
+from load_data import DataLoader
+from numpy.core.numeric import NaN
+from numpy.lib.arraysetops import unique
+from pandas.core import groupby
+from pandas.core.frame import DataFrame
+from pandas.core.indexes.api import union_indexes
 from plotnine import *
 
 ggplot(encounters) + geom_bar(aes(x='Race', fill='Cognition')) + coord_flip()
@@ -242,7 +248,7 @@ assessments[assessments.enc_id == 'B4A43273-1B47-4B68-BC27-74EE22ECE620'].sort_v
 #assessments = assessments.drop(columns=['detail_type','detail_type_priority', 'txt_enc_dx_priority', 'txt_description']).drop_duplicates()
 
 # %%
-tmp = assessments.merge(assessments, how='inner', on=['person_id','enc_id','diagnosis_code_id'] 
+tmp = assessments.merge(assessments, how='inner', on=['person_id','enc_id','diagnosis_code_id'] )
 tmp
 
 
@@ -261,3 +267,178 @@ len(df)
 # %%
 tmp = assessments[assessments.enc_id == '356C735C-8F94-464A-88F6-24976C094EFD'].sort_values(by='diagnosis_code_id')
 # %%
+
+
+
+# %% lab section
+[print(u, ' - ', labs[u].nunique()) for u in labs]
+# %%
+# Remove Deleted rows and drop deleted indicators
+labs = labs[labs['lab_nor_delete_ind']=='N']
+labs = labs.drop(columns=['lab_nor_delete_ind', 'lab_results_obx_delete_ind'])
+
+# Remove incomplete labs & drop column
+labs = labs[labs['lab_nor_completed_ind']=='Y']
+labs = labs.drop(columns=['lab_nor_completed_ind'])
+
+# Remove pending labs
+labs = labs[labs['lab_nor_test_status']!='InProcessUnspecified']
+labs = labs[labs['lab_nor_test_status']!='Pending']
+
+
+
+# %%
+labs[labs['lab_nor_person_id'].isin(set(labs['lab_nor_person_id']).intersection(set(encounters.person_id)))]
+labs[labs['lab_nor_enc_id'].isin(set(labs['lab_nor_enc_id']).intersection(set(encounters.enc_id)))]
+
+# %%
+labs.lab_nor_ordering_provider.unique()
+
+# %%
+labs.sort_values(by='lab_nor_enc_id')
+
+# %%
+labs.lab_nor_test_desc.nunique()
+# %%
+labs[labs['lab_nor_order_num']=='A283DA59-D234-4D33-8FE8-80F85A5CCD37']
+# %%
+labs.lab_nor_test_status.unique()
+# %%
+# Find abnormal tests:
+abnormal_indicators = ['L', 'H', 'A', '>', 'LL', 'HH', '<']
+labs[labs['lab_results_obx_abnorm_flags'].isin(abnormal_indicators)]
+# %%
+labs['lab_results_obx_abnorm_flags'].unique()
+# %%
+
+labs['Abnormal_Test'] = np.where(
+    labs['lab_results_obx_abnorm_flags'].isin(abnormal_indicators),
+    labs['lab_results_obr_p_test_desc'],
+    np.nan
+)
+
+# %%
+labs.lab_results_obx_result_desc.nunique()
+# %%
+labs.lab_results_obr_p_test_desc.nunique()
+# %%
+labs.lab_results_obr_p_ng_test_desc.nunique()
+
+
+# %%
+labs.lab_nor_test_desc.nunique()
+# %%
+labs[labs['Abnormal_Test'].notnull()]
+# %%
+labs[labs['lab_results_obx_abnorm_flags']=='LL']
+# %%
+
+# %%
+labs['lab_results'] = np.where(
+    labs['lab_results_obx_result_desc'].notnull(), 
+    labs['lab_results_obx_result_desc'], 
+    labs['lab_results_obr_p_test_desc']
+    )
+
+
+labs['lab_results'] = np.select(
+    [ #condition
+        labs.lab_results_obx_abnorm_flags == '>',
+        labs.lab_results_obx_abnorm_flags == 'H',
+        labs.lab_results_obx_abnorm_flags == 'HH', 
+        labs.lab_results_obx_abnorm_flags == '<', 
+        labs.lab_results_obx_abnorm_flags == 'L', 
+        labs.lab_results_obx_abnorm_flags == 'LL', 
+        labs.lab_results_obx_abnorm_flags == 'A'        
+        ],
+    [ #value
+        'HIGH ' + labs['lab_results'],
+        'HIGH ' + labs['lab_results'],
+        'VERY HIGH ' + labs['lab_results'],
+        'LOW ' + labs['lab_results'],
+        'LOW ' + labs['lab_results'],
+        'VERY LOW ' + labs['lab_results'],
+        'ABNORMAL ' +labs['lab_results']
+        ],
+    default = 'NORMAL'
+)
+
+labs[labs['lab_results'].notnull()]
+
+# %%
+abnormal_labs = labs[labs['lab_results'] != 'NORMAL']
+abnormal_labs = pd.DataFrame(abnormal_labs[['lab_nor_person_id','lab_nor_enc_id','lab_results']].groupby(
+    ['lab_nor_person_id','lab_nor_enc_id'])['lab_results'].apply(set))
+    
+abnormal_labs.reset_index(inplace=True)    
+abnormal_labs
+
+
+# %%
+pd.get_dummies(abnormal_labs, columns='lab_results')
+# %%
+encounters.groupby('enc_id').agg({'CPT_Code':'count'}).sort_values(by='CPT_Code')
+
+#list(encounters.columns)
+# %%
+cpt_codes.groupby('enc_id').agg({'CPT_Code':'count'}).sort_values(by='CPT_Code')
+diagnoses.groupby('enc_id').agg({'diagnosis_code_id':'count'}).sort_values(by='diagnosis_code_id')
+
+
+
+# %%
+from load_data import DataLoader
+capData = DataLoader(subset=10)
+capData.generate_csv_attributes()
+capData.encode_alzheimers()
+
+
+# %%
+ 
+assessments = capData.assessments
+
+def format_assessment():
+        assessment_text = pd.DataFrame(assessments.groupby(['person_id', 'enc_id'])['txt_description'].apply(list))
+        assessment_codeID = pd.DataFrame(assessments.groupby(['person_id', 'enc_id'])['txt_diagnosis_code_id'].apply(list))
+
+        # %% Merge series data from text and codeID columns into one df for assessment
+        assessment2 = assessment_text.merge(assessment_codeID, how='left', on=['person_id', 'enc_id'])
+        assessment2 = pd.DataFrame(assessment2)
+        assessment2.reset_index(inplace=True)
+
+        # Remove Punctuation and convert to lower
+        assessment2['txt_description'] = assessment2.txt_description.apply(lambda x: ', '.join([str(i) for i in x]))
+        assessment2['txt_description'] = assessment2['txt_description'].str.replace('[^\w\s]', '')
+        assessment2['txt_description'] = assessment2['txt_description'].str.lower()
+
+        # tokenize
+        assessment2['txt_tokenized'] = assessment2.apply(lambda row: nltk.word_tokenize(row['txt_description']), axis=1)
+
+        # Remove Stopwords
+        stop = stopwords.words('english')
+        assessment2['txt_tokenized'] = assessment2['txt_tokenized'].apply(
+            lambda x: [item for item in x if item not in stop])
+
+        # Create ngrams
+        assessment2['ngrams'] = assessment2.apply(lambda row: list(nltk.trigrams(row['txt_tokenized'])), axis=1)
+        # Convert trigram lists to words joined by underscores
+        assessment2['ngram2'] = assessment2.ngrams.apply(lambda row: ['_'.join(i) for i in row])
+
+        # Convert trigram and token lists to strings
+        assessment2['txt_tokenized2'] = assessment2['txt_tokenized'].apply(' '.join)
+        assessment2['ngram2'] = assessment2.ngram2.apply(lambda x: ' '.join([str(i) for i in x]))
+
+        # %% Pair down assessments table to columns of interest
+        assessment2 = assessment2[
+            ['person_id', 'enc_id', 'txt_description', 'txt_tokenized', 'ngrams', 'ngram2', 'txt_tokenized2']]
+
+        return assessment2
+# %%
+import pandas as pd
+import nltk
+from nltk.corpus import stopwords
+format_assessment()
+
+
+# %%
+capData.create()
