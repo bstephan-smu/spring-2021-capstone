@@ -4,6 +4,16 @@ import pandas as pd
 data_path = 'E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/'
 assessment = pd.read_csv(data_path + '7_assessment_impression_plan_.csv')
 
+encounters = pd.read_csv(data_path + 'encounters.csv')
+
+#%% Filter for relevant enc_ids
+assessment = assessment[assessment['enc_id'].isin(
+    set(assessment['enc_id']).intersection(
+        set(encounters.enc_id)))]
+
+assessment.shape
+
+
 # %% Take a look at the initial assessment data
 assessment.head()
 
@@ -117,12 +127,26 @@ np_db_model = cluster_model.fit(tfidf_data_np)
 print("ngram DBSCAN model fit on np chunks COMPLETE...")
 
 
-#%% Get cluster counts
+#%% KMeans cluster counts and labeling
 assessment2['ngram_clusters'] = ngram_db_model.labels_
 assessment2['np_chunk_clusters'] = np_db_model.labels_
 
 print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
 print("ngram DBSCAN Model Cluster Count:",assessment2['np_chunk_clusters'].nunique())
+
+#%% LDA clustering
+from sklearn.decomposition import LatentDirichletAllocation as LDA
+from sklearn.feature_extraction.text import CountVectorizer
+
+count_data = count_vectorizer.fit_transform(assessment2['ngram2'].values.astype('U'))
+lda = LDA(n_components = 20, n_jobs = -1,learning_method = 'online')
+lda.fit(count_data)
+
+
+#%% LDA Cluster labeling
+
+topic_values = LDA.transform(count_data)
+assessment2['topic_clusters'] = topic_values.argmax(axis=1)
 
 
 #%% Read in diagnosis table
