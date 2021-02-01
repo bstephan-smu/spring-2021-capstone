@@ -473,3 +473,8 @@ merged_assessments = merged_assessments[merged_assessments['enc_id'].isin(
 # %%
 merged_assessments
 # %%
+from load_data import DataLoader
+capData = DataLoader()
+capData.create()
+
+# %%

@@ -139,7 +139,7 @@ class DataLoader:
         self.meds = pd.read_csv(self.data_path + '4_patient_medication.csv')
         self.labs = pd.read_csv(self.data_path + '5_lab_nor__lab_results_obr_p__lab_results_obx.csv')
         self.diagnosis = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
-        self.assessments = pd.read_csv(self.data_path + '7_assessment_impression_plan_.csv')
+        self.assessments = pd.read_csv(self.data_path + 'assessments_diagnoses_join2.csv')
 
     # createa a wide table out of the labs table...
     # perform encodings, etc...
@@ -254,7 +254,7 @@ class DataLoader:
 
         # step 2...add on cpt table
         df_cpt_codes_encoded = pd.concat(
-            [self.cpt[['enc_id']], pd.get_dummies(self.cpt['CPT_Code'], drop_first=True, prefix='cpt')],
+            [self.cpt[['enc_id']], pd.get_dummies(self.cpt['CPT_Code'], drop_first=True, prefix='cpt', sparse=True)],
             axis=1) \
             .groupby('enc_id', as_index=False).max()
 
@@ -288,19 +288,11 @@ class DataLoader:
         # TODO: address null values col
         main[[col for col in labs_copy.columns if col != 'enc_id']].fillna(0, inplace=True)
 
-        # step 6...load assessments onto main dataframe
-        assessments = self.format_assessment()
-        # TODO Jeff merged assessments & diagnosis below. Once his code is updated, we probably won't need steps 6+7
+        # step 6...load merged assessments + diagnoses onto main dataframe
 
-        # step 7...load diagnosis onto main dataframe
-        # TODO read in Jeff's new code when model completes.  The below is uncut data, so need to prune outside encounters
-        merged_assessments = pd.read_csv(self.data_path+'assessments_diagnoses_join.csv')
-        merged_assessments = merged_assessments[merged_assessments['enc_id'].isin(
-            set(merged_assessments['enc_id']).intersection(
-            set(self.encounters.enc_id)))]
         
         #TODO i haven't check counts to make sure this merge worked properly@@
-        main = main.merge(merged_assessments, on='enc_id', how='left')
+        main = main.merge(self.assessments, on='enc_id', how='left')
 
         # write to pickle file
         self.write(main)
