@@ -1,13 +1,13 @@
 # %% Requirements:
-#import pandas as pd
+import pandas as pd
 import numpy as np
 import re
 import os
 import nltk
 from nltk.corpus import stopwords
-os.environ["MODIN_ENGINE"] = "dask"  # Modin will use Dask
+#os.environ["MODIN_ENGINE"] = "dask"  # Modin will use Dask
 
-import modin.pandas as pd
+#import modin.pandas as pd
 
 class DataLoader:
     def __init__(self, data_path='E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/',
@@ -254,7 +254,7 @@ class DataLoader:
 
         # step 2...add on cpt table
         df_cpt_codes_encoded = pd.concat(
-            [self.cpt[['enc_id']], pd.get_dummies(self.cpt['CPT_Code'], drop_first=True, prefix='cpt', sparse=True)],
+            [self.cpt[['enc_id']], pd.get_dummies(self.cpt['CPT_Code'], drop_first=True, prefix='cpt')],
             axis=1) \
             .groupby('enc_id', as_index=False).max()
 
