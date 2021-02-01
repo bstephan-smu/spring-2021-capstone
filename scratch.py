@@ -441,4 +441,35 @@ format_assessment()
 
 
 # %%
+from load_data import DataLoader
+capData = DataLoader()
 capData.create()
+
+
+# %%
+
+assessments = pd.read_csv(data_path + '7_assessment_impression_plan_.csv')
+encounters = pd.read_csv(data_path + '1_BaseEncounters_Dempgraphics_Payers.csv')
+assessments[assessments['enc_id'].isin(
+    set(assessments['enc_id']).intersection(
+        set(encounters.enc_id)))].enc_id.nunique()
+
+
+
+# %%
+set(encounters.enc_id)
+# %%
+pd.DataFrame(encounters.enc_id.unique()).to_csv('encounters.csv')
+
+# %%
+datapath='E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/'
+encounters = pd.read_csv(datapath + '1_BaseEncounters_Dempgraphics_Payers.csv')
+merged_assessments = pd.read_csv(datapath+'assessments_diagnoses_join.csv')
+merged_assessments = merged_assessments[merged_assessments['enc_id'].isin(
+    set(merged_assessments['enc_id']).intersection(
+        set(encounters.enc_id)))]
+
+
+# %%
+merged_assessments
+# %%

@@ -1,11 +1,13 @@
 # %% Requirements:
-import pandas as pd
+#import pandas as pd
 import numpy as np
 import re
 import os
 import nltk
 from nltk.corpus import stopwords
+os.environ["MODIN_ENGINE"] = "dask"  # Modin will use Dask
 
+import modin.pandas as pd
 
 class DataLoader:
     def __init__(self, data_path='E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/',
@@ -288,10 +290,17 @@ class DataLoader:
 
         # step 6...load assessments onto main dataframe
         assessments = self.format_assessment()
+        # TODO Jeff merged assessments & diagnosis below. Once his code is updated, we probably won't need steps 6+7
 
         # step 7...load diagnosis onto main dataframe
-
-        # double check to see if jeff has converted this portion yet.
+        # TODO read in Jeff's new code when model completes.  The below is uncut data, so need to prune outside encounters
+        merged_assessments = pd.read_csv(self.data_path+'assessments_diagnoses_join.csv')
+        merged_assessments = merged_assessments[merged_assessments['enc_id'].isin(
+            set(merged_assessments['enc_id']).intersection(
+            set(self.encounters.enc_id)))]
+        
+        #TODO i haven't check counts to make sure this merge worked properly@@
+        main = main.merge(merged_assessments, on='enc_id', how='left')
 
         # write to pickle file
         self.write(main)
