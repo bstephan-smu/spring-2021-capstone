@@ -134,10 +134,11 @@ assessment2['np_chunk_clusters'] = np_db_model.labels_
 print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
 print("ngram DBSCAN Model Cluster Count:",assessment2['np_chunk_clusters'].nunique())
 
-#%% LDA clustering
+'''#%% LDA clustering
 from sklearn.decomposition import LatentDirichletAllocation as LDA
 from sklearn.feature_extraction.text import CountVectorizer
 
+count_vectorizer =CountVectorizer()
 count_data = count_vectorizer.fit_transform(assessment2['ngram2'].values.astype('U'))
 lda = LDA(n_components = 20, n_jobs = -1,learning_method = 'online')
 lda.fit(count_data)
@@ -147,6 +148,7 @@ lda.fit(count_data)
 
 topic_values = LDA.transform(count_data)
 assessment2['topic_clusters'] = topic_values.argmax(axis=1)
+'''
 
 
 #%% Read in diagnosis table
@@ -177,5 +179,5 @@ assessments_diagnoses = assessment2.merge(diagnoses2, how = 'left', on = ['perso
 assessments_diagnoses.head()
 
 #%% Write to CSV
-assessments_diagnoses.to_csv("assessments_diagnoses_join.csv")
+assessments_diagnoses.to_csv("assessments_diagnoses_join2.csv")
 
