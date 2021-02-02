@@ -262,24 +262,26 @@ class DataLoader:
 
         assessment2 = pd.read_csv(self.data_path + 'assessments_diagnoses_join2.csv')
         # %% Pair down assessments table to columns of interest
-        assessment2 = assessment2[[
-            'person_id', 
-            'enc_id', 
-            'txt_description', 
-            'txt_tokenized', 
-            'ngrams', 
-            'ngram2', 
-            'txt_tokenized2'
-            ]]
+        #assessment2 = assessment2[[
+        #     'person_id', 
+        #     'enc_id', 
+        #     'txt_description', 
+        #     'txt_tokenized', 
+        #     'ngrams', 
+        #     'ngram2', 
+        #     'txt_tokenized2'
+        #     ]]
 
-        return assessment2
+        self.assessments = assessment2
 
 
     def merge_assessments(self, rename=True):
         assess_copy = self.assessments.copy()
+
         if rename:
-            assess_copy = self.rename_cols(assess_copy, prefix='as_')
+            assess_copy = self.rename_cols(assess_copy, prefix='asmt_')
         self.main = self.main.merge(assess_copy, on='enc_id', how='left')
+        self.main.drop(columns=['person_id_y'], inplace=True)
 
 
     # return the main data output
