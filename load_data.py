@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import re
 import os
+import pickle
 import nltk
 from nltk.corpus import stopwords
 #os.environ["MODIN_ENGINE"] = "dask"  # Modin will use Dask
@@ -107,13 +108,35 @@ class DataLoader:
             default='Normal'
         )
 
+
+    def merge_cpt(self):
+        df_cpt_codes_encoded = pd.concat(
+            [
+                self.cpt[['enc_id']], 
+                pd.get_dummies(self.cpt['CPT_Code'], drop_first=True, prefix='cpt')
+            ], axis=1) \
+        .groupby('enc_id', as_index=False).max()
+
+        self.main = self.main.merge(df_cpt_codes_encoded, on='enc_id')
+
+
+    def merge_vitals(self, rename=True):
+        # get average vital measurement per patient encounter
+        vitals_agg = self.vitals[['enc_id', 'BMI_calc', 'bp_diastolic', 'bp_systolic',
+                                  'height_cm', 'pulse_rate', 'respiration_rate', 'temp_deg_F',
+                                  'weight_lb']].groupby('enc_id', as_index=False).max()
+
+        vitals_copy = vitals_agg.copy()
+        if rename:
+            vitals_copy = self.rename_cols(vitals_copy, prefix='vit_')
+        self.main = self.main.merge(vitals_copy, on='enc_id')
+
     # function to find which meds were currently being taken during the encounter period
     def encode_meds(self):
         self.meds['start_date'] = pd.to_datetime(self.meds['start_date'], format='%Y%m%d')
         self.meds['date_stopped'] = pd.to_datetime(self.meds['date_stopped'], format='%Y%m%d')
 
         self.meds['is_currently_taking'] = False
-        x = 1
 
         def check_meds(row):
             patient_medical_history = self.meds[(self.meds['person_id'] == row['person_id'])
@@ -130,6 +153,19 @@ class DataLoader:
         # store output as boolean for that medication
         self.encounters.apply(check_meds, axis=1)
 
+
+    def merge_meds(self):
+        # note that the meds table may or may not have columns depending on sample
+        meds_wide = pd.get_dummies(self.meds[['enc_id', 'medid', 'is_currently_taking']]
+                                   .query('is_currently_taking'), columns=['medid']) \
+            .groupby('enc_id', as_index=False).max()
+
+        self.main = self.main.merge(meds_wide, on='enc_id', how='left')
+
+        # not all patients have active meds...take care to fill those nulls
+        self.main[[col for col in meds_wide.columns if col != 'enc_id']].fillna(0, inplace=True)
+
+
     # reading in raw data from all datasets
     def generate_csv_attributes(self):
         self.encounters = pd.read_csv(self.data_path + '1_BaseEncounters_Dempgraphics_Payers.csv')
@@ -140,7 +176,9 @@ class DataLoader:
         self.meds = pd.read_csv(self.data_path + '4_patient_medication.csv')
         self.labs = pd.read_csv(self.data_path + '5_lab_nor__lab_results_obr_p__lab_results_obx.csv')
         self.diagnosis = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
-        self.assessments = pd.read_csv(self.data_path + 'assessments_diagnoses_join2.csv')
+        self.assessments = pd.read_csv(self.data_path + '7_assessment_impression_plan_.csv')
+        self.main = self.encounters.copy()
+
 
     # createa a wide table out of the labs table...
     # perform encodings, etc...
@@ -186,7 +224,6 @@ class DataLoader:
             default='NORMAL'
         )
 
-
         # Capture abnormal labs
         abnormal_labs = self.labs[self.labs['lab_results'] != 'NORMAL']
         abnormal_labs['lab_results'] = abnormal_labs['lab_results'].str.title()
@@ -207,43 +244,43 @@ class DataLoader:
 
         self.labs = encoded_labs
 
+
+    def merge_labs(self, rename=True):
+        labs_copy = self.labs.copy()
+        labs_copy.drop(columns=['person_id', 'lab_results'], inplace=True)
+        if rename:
+            labs_copy =  self.rename_cols(labs_copy, prefix='lab_')
+        self.main = self.main.merge(labs_copy, on='enc_id', how='left')
+        
+        # TODO: address null values col
+        self.main[[col for col in labs_copy.columns if col != 'enc_id']].fillna(0, inplace=True)
+
+
     # function to transform assessments table to merge with encounters
-    def format_assessment(self):
-        assessment_text = pd.DataFrame(self.assessments.groupby(['person_id', 'enc_id'])['txt_description'].apply(list))
-        assessment_codeID = pd.DataFrame(self.assessments.groupby(['person_id', 'enc_id'])['txt_diagnosis_code_id'].apply(list))
+    def format_assessments(self):
+        #TODO: replace this code block with Jeff's new code
 
-        # %% Merge series data from text and codeID columns into one df for assessment
-        assessment2 = assessment_text.merge(assessment_codeID, how='left', on=['person_id', 'enc_id'])
-        assessment2 = pd.DataFrame(assessment2)
-        assessment2.reset_index(inplace=True)
-
-        # Remove Punctuation and convert to lower
-        assessment2['txt_description'] = assessment2.txt_description.apply(lambda x: ', '.join([str(i) for i in x]))
-        assessment2['txt_description'] = assessment2['txt_description'].str.replace('[^\w\s]', '')
-        assessment2['txt_description'] = assessment2['txt_description'].str.lower()
-
-        # tokenize
-        assessment2['txt_tokenized'] = assessment2.apply(lambda row: nltk.word_tokenize(row['txt_description']), axis=1)
-
-        # Remove Stopwords
-        stop = stopwords.words('english')
-        assessment2['txt_tokenized'] = assessment2['txt_tokenized'].apply(
-            lambda x: [item for item in x if item not in stop])
-
-        # Create ngrams
-        assessment2['ngrams'] = assessment2.apply(lambda row: list(nltk.trigrams(row['txt_tokenized'])), axis=1)
-        # Convert trigram lists to words joined by underscores
-        assessment2['ngram2'] = assessment2.ngrams.apply(lambda row: ['_'.join(i) for i in row])
-
-        # Convert trigram and token lists to strings
-        assessment2['txt_tokenized2'] = assessment2['txt_tokenized'].apply(' '.join)
-        assessment2['ngram2'] = assessment2.ngram2.apply(lambda x: ' '.join([str(i) for i in x]))
-
+        assessment2 = pd.read_csv(self.data_path + 'assessments_diagnoses_join2.csv')
         # %% Pair down assessments table to columns of interest
-        assessment2 = assessment2[
-            ['person_id', 'enc_id', 'txt_description', 'txt_tokenized', 'ngrams', 'ngram2', 'txt_tokenized2']]
+        assessment2 = assessment2[[
+            'person_id', 
+            'enc_id', 
+            'txt_description', 
+            'txt_tokenized', 
+            'ngrams', 
+            'ngram2', 
+            'txt_tokenized2'
+            ]]
 
         return assessment2
+
+
+    def merge_assessments(self, rename=True):
+        assess_copy = self.assessments.copy()
+        if rename:
+            assess_copy = self.rename_cols(assess_copy, prefix='as_')
+        self.main = self.main.merge(assess_copy, on='enc_id', how='left')
+
 
     # return the main data output
     def create(self):
@@ -254,60 +291,53 @@ class DataLoader:
         self.encode_alzheimers()
 
         # step 2...add on cpt table
-        df_cpt_codes_encoded = pd.concat(
-            [self.cpt[['enc_id']], pd.get_dummies(self.cpt['CPT_Code'], drop_first=True, prefix='cpt')],
-            axis=1) \
-            .groupby('enc_id', as_index=False).max()
-
-        self.main = self.encounters.merge(df_cpt_codes_encoded, on='enc_id')
+        self.merge_cpt()
 
         # step 3...load vitals table onto main
-        # get average vital measurement per patient encounter
-        vitals_agg = self.vitals[['enc_id', 'BMI_calc', 'bp_diastolic', 'bp_systolic',
-                                  'height_cm', 'pulse_rate', 'respiration_rate', 'temp_deg_F',
-                                  'weight_lb']].groupby('enc_id', as_index=False).max()
-
-        self.main = self.main.merge(vitals_agg, on='enc_id')
+        self.merge_vitals()
 
         # step 4...encode medications to find current meds...join onto the main for medication list
         self.encode_meds()
-        # note that the meds table may or may not have columns depending on sample
-        meds_wide = pd.get_dummies(self.meds[['enc_id', 'medid', 'is_currently_taking']]
-                                   .query('is_currently_taking'), columns=['medid']) \
-            .groupby('enc_id', as_index=False).max()
-
-        self.main = self.main.merge(meds_wide, on='enc_id', how='left')
-
-        # not all patients have active meds...take care to fill those nulls
-        self.main[[col for col in meds_wide.columns if col != 'enc_id']].fillna(0, inplace=True)
+        self.merge_meds()
 
         # step 5...load labs onto the main dataframe
         self.format_labs(encoded=True)
-        labs_copy = self.labs.copy()
-        labs_copy.drop(columns=['person_id', 'lab_results'], inplace=True)
-        self.main = self.main.merge(labs_copy, on='enc_id', how='left')
-        # TODO: address null values col
-        self.main[[col for col in labs_copy.columns if col != 'enc_id']].fillna(0, inplace=True)
+        self.merge_labs()
 
         # step 6...load merged assessments + diagnoses onto main dataframe
-
-        
-        #TODO i haven't check counts to make sure this merge worked properly@@
-        self.main = self.main.merge(self.assessments, on='enc_id', how='left')
+        self.format_assessments()
+        self.merge_assessments()
 
         # write to pickle file
-        self.write(self.main)
+        self.write()
 
-    # helper function write main dataframe
-    def write(self, df, name='main'):
-        df.to_pickle(self.data_path + 'main2')
 
-    # helper function to return main dataframe
-    def load(self, name='main2'):
-        return pd.read_pickle(self.data_path + 'main2')
+    # helper function write entire class object
+    def write(self, name='main'):
+        with open(self.data_path + name + '.pickle', 'wb') as picklefile:
+            pickle.dump(self, picklefile)
+
+
+    # helper function to return entire class object
+    def load(self, name='main'):
+        with open(self.data_path + name + '.pickle', 'rb') as picklefile:
+            return pickle.load(picklefile)
+
+
+    # helper to add prefix to colnames:
+    def rename_cols(self, df, prefix=''):
+        new_cols = []
+        for c in list(df):
+            if c in ['person_id','enc_id']:
+                new_cols.append(c)
+            else:
+                new_cols.append(prefix+c)
+        df.columns = new_cols
+        return df
 
 
 if __name__ == "__main__":
     data = DataLoader(subset=1000)
     data.create()
     print(data.load())
+
