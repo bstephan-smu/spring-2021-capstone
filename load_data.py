@@ -5,9 +5,15 @@ import re
 import os
 import pickle
 import nltk
-from nltk.corpus import stopwords
-#os.environ["MODIN_ENGINE"] = "dask"  # Modin will use Dask
+import spacy
+import en_core_web_sm
 
+from nltk.corpus import stopwords
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
+
+#os.environ["MODIN_ENGINE"] = "dask"  # Modin will use Dask
 #import modin.pandas as pd
 
 class DataLoader:
@@ -237,7 +243,6 @@ class DataLoader:
             self.labs = abnormal_labs
 
         # Pandas get_dummies function will not parse lists, enter the multiLabelBinarizer
-        from sklearn.preprocessing import MultiLabelBinarizer
         mlb = MultiLabelBinarizer()
         encoded_labs = abnormal_labs.join(
             pd.DataFrame(mlb.fit_transform(abnormal_labs['lab_results']), columns=mlb.classes_))
@@ -258,29 +263,153 @@ class DataLoader:
 
     # function to transform assessments table to merge with encounters
     def format_assessments(self):
-        #TODO: replace this code block with Jeff's new code
+        assessment = self.assessments
+        # Filter for relevant enc_ids
+        assessment = assessment[assessment['enc_id'].isin(
+            set(assessment['enc_id']).intersection(
+                set(self.encounters.enc_id)))]
 
-        assessment2 = pd.read_csv(self.data_path + 'assessments_diagnoses_join2.csv')
-        # %% Pair down assessments table to columns of interest
-        #assessment2 = assessment2[[
-        #     'person_id', 
-        #     'enc_id', 
-        #     'txt_description', 
-        #     'txt_tokenized', 
-        #     'ngrams', 
-        #     'ngram2', 
-        #     'txt_tokenized2'
-        #     ]]
+        # Collapse data down by enc_id for assessment
 
-        self.assessments = assessment2
+        assessment_text = assessment.groupby(['person_id','enc_id'])['txt_description'].apply(list)
+        assessment_codeID = assessment.groupby(['person_id','enc_id'])['txt_diagnosis_code_id'].apply(list)
+
+        assessment_text = pd.DataFrame(assessment_text)
+        assessment_codeID = pd.DataFrame(assessment_codeID)
+
+        # Merge series data from text and codeID columns into one df for assessment
+        assessment2 = assessment_text.merge(assessment_codeID, how = 'left', on = ['person_id','enc_id'])
+        assessment2 = pd.DataFrame(assessment2)
+        assessment2.reset_index(inplace=True)
+
+        # Remove punctuation, convert all to lowercase, remove stopwords, tokenize, create bigrams
+
+        # Remove Punctuation and convert to lower
+        assessment2['txt_description'] = assessment2.txt_description.apply(
+            lambda x: ', '.join([str(i) for i in x]))
+        assessment2['txt_description'] = assessment2['txt_description'].str.replace('[^\w\s]','')
+        assessment2['txt_description'] = assessment2['txt_description'].str.lower()
+
+        #tokenize
+        assessment2['txt_tokenized'] = assessment2.apply(
+            lambda row: nltk.word_tokenize(row['txt_description']), axis=1)
+
+        #Remove Stopwords
+        stop = stopwords.words('english')
+        assessment2['txt_tokenized'] = assessment2['txt_tokenized'].apply(
+            lambda x: [item for item in x if item not in stop])
+
+        #Create ngrams
+        assessment2['ngrams'] = assessment2.apply(
+            lambda row: list(nltk.trigrams(row['txt_tokenized'])),axis=1) 
+
+        # Convert trigram lists to words joined by underscores
+        assessment2['ngram2'] = assessment2.ngrams.apply(lambda row:['_'.join(i) for i in row])
+
+        # Convert trigram and token lists to strings
+        assessment2['txt_tokenized2'] = assessment2['txt_tokenized'].apply(' '.join)
+        assessment2['ngram2'] = assessment2.ngram2.apply(lambda x: ' '.join([str(i) for i in x]))
+
+        # Get noun phrases
+        nlp = en_core_web_sm.load()
+
+        def getNounChunks(text_data):
+            doc = nlp(text_data)
+            noun_chunks = list(doc.noun_chunks)
+            noun_chunks_strlist = [chunk.text for chunk in noun_chunks]
+            noun_chunks_str = '_'.join(noun_chunks_strlist)
+            return noun_chunks_str
+
+        assessment2['np_chunks'] = assessment2['txt_tokenized2'].apply(getNounChunks)
+
+        # Pair down assessments table to columns of interest
+        #assessment2 = assessment2[['person_id','enc_id','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks']]
+
+        # DBSCAN Clusterin for trigrams and noun phrase chunks
+        tfidf = TfidfVectorizer()
+
+        tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
+        tfidf_data_np = tfidf.fit_transform(assessment2['np_chunks'])
+
+        cluster_model = KMeans(n_jobs=-1,n_clusters=15)
+
+        print("Starting ngram DBSCAN model fit...")
+        ngram_db_model = cluster_model.fit(tfidf_data_ngram)
+        print("ngram DBSCAN model fit COMPLETE...")
+
+        print("Starting ngram DBSCAN model fit on np chunks...")
+        np_db_model = cluster_model.fit(tfidf_data_np)
+        print("ngram DBSCAN model fit on np chunks COMPLETE...")
+
+
+        # KMeans cluster counts and labeling
+        assessment2['ngram_clusters'] = ngram_db_model.labels_
+        assessment2['np_chunk_clusters'] = np_db_model.labels_
+
+        print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
+        print("ngram DBSCAN Model Cluster Count:",assessment2['np_chunk_clusters'].nunique())
+
+        '''#%% LDA clustering
+        from sklearn.decomposition import LatentDirichletAllocation as LDA
+        from sklearn.feature_extraction.text import CountVectorizer
+
+        count_vectorizer =CountVectorizer()
+        count_data = count_vectorizer.fit_transform(assessment2['ngram2'].values.astype('U'))
+        lda = LDA(n_components = 20, n_jobs = -1,learning_method = 'online')
+        lda.fit(count_data)
+
+
+        # LDA Cluster labeling
+
+        topic_values = LDA.transform(count_data)
+        assessment2['topic_clusters'] = topic_values.argmax(axis=1)
+        '''
+
+
+        # Read in diagnosis table
+        diagnoses = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
+
+        diagnosis_icd9 = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['icd9cm_code_id'].apply(list))
+        diagnosis_dc = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['diagnosis_code_id'].apply(list))
+        diagnosis_desc = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['description'].apply(list))
+        diagnosis_datesymp = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['date_onset_sympt'].apply(list))
+        diagnosis_datediag = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['date_diagnosed'].apply(list))
+        diagnosis_dateresl = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['date_resolved'].apply(list))
+        diagnosis_statusid = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['status_id'].apply(list))
+        diagnosis_dx = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['dx_priority'].apply(list))
+        diagnosis_chronic = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['chronic_ind'].apply(list))
+        diagnosis_rcdelswhr = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['recorded_elsewhere_ind'].apply(list))
+
+        # Merge series data from text and codeID columns into one df for assessment
+        diagnoses2 = diagnosis_icd9 \
+            .merge(diagnosis_dc, how = 'left', on = ['person_id','enc_id']) \
+            .merge(diagnosis_desc, how = 'left', on = ['person_id','enc_id']) \
+            .merge(diagnosis_datesymp, how = 'left', on = ['person_id','enc_id']) \
+            .merge(diagnosis_datediag, how = 'left', on = ['person_id','enc_id']) \
+            .merge(diagnosis_dateresl, how = 'left', on = ['person_id','enc_id']) \
+            .merge(diagnosis_statusid, how = 'left', on = ['person_id','enc_id']) \
+            .merge(diagnosis_dx, how = 'left', on = ['person_id','enc_id']) \
+            .merge(diagnosis_chronic, how = 'left', on = ['person_id','enc_id']) \
+            .merge(diagnosis_rcdelswhr, how = 'left', on = ['person_id','enc_id'])
+
+        diagnoses2 = pd.DataFrame(diagnoses2)
+        diagnoses2.reset_index(inplace=True)
+
+        # Merge assements[txt_description] to ngd df
+        #Diagnosis occur after assessments, diagnosis table is smaller than assessments table
+        assessments_diagnoses = assessment2.merge(diagnoses2, how = 'left', on = ['person_id','enc_id'])
+
+        # Pair down assessments table to columns of interest
+        #assessment2 = assessment2[['person_id','enc_id','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks']]
+
+        self.asmt_diag = assessments_diagnoses
 
 
     def merge_assessments(self, rename=True):
-        assess_copy = self.assessments.copy()
-
+        assess_copy = self.asmt_diag.copy()
         if rename:
             assess_copy = self.rename_cols(assess_copy, prefix='asmt_')
-        self.main = self.main.merge(assess_copy, on='enc_id', how='left')
+        self.main = self.main.merge(assess_copy, on=['person_id','enc_id'], how='left')
         self.main.drop(columns=['person_id_y'], inplace=True)
 
 
