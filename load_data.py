@@ -404,6 +404,12 @@ class DataLoader:
         self.asmt_diag = self.asmt_diag[~self.asmt_diag['diagnosis_code_id'].isnull()]
 
 
+    def one_hot(self, df, col_name, prefix=''):
+        mlb = MultiLabelBinarizer()
+        df = df.join(pd.DataFrame(mlb.fit_transform(df[col_name]),columns=prefix+mlb.classes_))
+        df = df.drop(columns=[col_name])
+        return df
+
     def merge_assessments(self, rename=True):
         assess_copy = self.asmt_diag.copy().fillna(0)
 
@@ -420,11 +426,7 @@ class DataLoader:
         pass # TODO moar clean plz
 
 
-    def one_hot(self, df, col_name, prefix=''):
-        mlb = MultiLabelBinarizer()
-        df = df.join(pd.DataFrame(mlb.fit_transform(df[col_name]),columns=prefix+mlb.classes_))
-        df = df.drop(columns=[col_name])
-        return df
+
 
 
     # return the main data output
