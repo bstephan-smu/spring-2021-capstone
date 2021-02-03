@@ -114,6 +114,9 @@ class DataLoader:
             default='Normal'
         )
 
+        # Store in mainDF
+        self.main = self.encounters.copy()
+
 
     def merge_cpt(self):
         df_cpt_codes_encoded = pd.concat(
@@ -176,14 +179,13 @@ class DataLoader:
     def generate_csv_attributes(self):
         self.encounters = pd.read_csv(self.data_path + '1_BaseEncounters_Dempgraphics_Payers.csv')
         self.format_encounters()  # align encounters table columns...make sure columns are aligned as planned
-
+        
         self.cpt = pd.read_csv(self.data_path + '2_CPT_Codes.csv')
         self.vitals = pd.read_csv(self.data_path + '3_vitals_signs.csv')
         self.meds = pd.read_csv(self.data_path + '4_patient_medication.csv')
         self.labs = pd.read_csv(self.data_path + '5_lab_nor__lab_results_obr_p__lab_results_obx.csv')
         self.diagnosis = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
         self.assessments = pd.read_csv(self.data_path + '7_assessment_impression_plan_.csv')
-        self.main = self.encounters.copy()
 
 
     # createa a wide table out of the labs table...
