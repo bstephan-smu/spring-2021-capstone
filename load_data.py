@@ -399,18 +399,32 @@ class DataLoader:
         #Diagnosis occur after assessments, diagnosis table is smaller than assessments table
         assessments_diagnoses = assessment2.merge(diagnoses2, how = 'left', on = ['person_id','enc_id'])
 
-        # Pair down assessments table to columns of interest
-        #assessment2 = assessment2[['person_id','enc_id','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks']]
-
         self.asmt_diag = assessments_diagnoses
+        # drop 5 rows with missing diag data
+        self.asmt_diag = self.asmt_diag[~self.asmt_diag['diagnosis_code_id'].isnull()]
 
 
     def merge_assessments(self, rename=True):
-        assess_copy = self.asmt_diag.copy()
+        assess_copy = self.asmt_diag.copy().fillna(0)
+
+        # Pair down assessments table to columns of interest
+        assess_copy = assess_copy[['person_id','enc_id','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks','diagnosis_code_id','description']]
+        assess_copy = self.one_hot(assess_copy, 'diagnosis_code_id', prefix='icd_')
+
         if rename:
             assess_copy = self.rename_cols(assess_copy, prefix='asmt_')
         self.main = self.main.merge(assess_copy, on=['person_id','enc_id'], how='left')
-        self.main.drop(columns=['person_id_y'], inplace=True)
+
+
+    def clean(self):
+        pass # TODO moar clean plz
+
+
+    def one_hot(self, df, col_name, prefix=''):
+        mlb = MultiLabelBinarizer()
+        df = df.join(pd.DataFrame(mlb.fit_transform(df[col_name]),columns=prefix+mlb.classes_))
+        df = df.drop(columns=[col_name])
+        return df
 
 
     # return the main data output
@@ -438,6 +452,9 @@ class DataLoader:
         # step 6...load merged assessments + diagnoses onto main dataframe
         self.format_assessments()
         self.merge_assessments()
+
+        # step 7...clean data: drop NAs, rename cols etc
+        self.clean()
 
         # write to pickle file
         self.write()
