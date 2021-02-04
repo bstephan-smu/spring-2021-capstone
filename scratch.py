@@ -57,6 +57,9 @@ for df in dfs:
 
 
 # %% Plots
+from os import getcwd
+
+from nltk.tokenize import word_tokenize
 from load_data import DataLoader
 from numpy.core.numeric import NaN
 from numpy.lib.arraysetops import unique
@@ -71,21 +74,7 @@ ggplot(encounters) + geom_bar(aes(x='Race', fill='Cognition')) + coord_flip()
 
 
 
-
-
-
-# %% ETL codes:  NOT RUN!!
-# cpts = pd.read_csv('cpt_updated_full.csv')
-# cpts.to_csv('cpt_descriptions.csv', index=False)
-
-# icds = pd.read_csv('icd_updated.csv')
-# icds = icds.drop(columns=['Unnamed: 0', 'id','Freq','VALIDITY_x','STATUS_x','CODE_TYPE_x'])
-# icds.columns =  ['icd', 'short_description', 'long_description', 'full_description']
-# icds.to_csv('icd_descriptions.csv', index=False)
-
-
 # %% ETL
-
 
 # Drop columns with only one value, or contain all NAs:
 encounters = encounters.drop(columns=['place_of_service', 'CPT_Code_Seq'])
@@ -386,64 +375,6 @@ diagnoses.groupby('enc_id').agg({'diagnosis_code_id':'count'}).sort_values(by='d
 
 
 
-# %%
-from load_data import DataLoader
-capData = DataLoader(subset=10)
-capData.generate_csv_attributes()
-capData.encode_alzheimers()
-
-
-# %%
- 
-assessments = capData.assessments
-
-def format_assessment():
-        assessment_text = pd.DataFrame(assessments.groupby(['person_id', 'enc_id'])['txt_description'].apply(list))
-        assessment_codeID = pd.DataFrame(assessments.groupby(['person_id', 'enc_id'])['txt_diagnosis_code_id'].apply(list))
-
-        # %% Merge series data from text and codeID columns into one df for assessment
-        assessment2 = assessment_text.merge(assessment_codeID, how='left', on=['person_id', 'enc_id'])
-        assessment2 = pd.DataFrame(assessment2)
-        assessment2.reset_index(inplace=True)
-
-        # Remove Punctuation and convert to lower
-        assessment2['txt_description'] = assessment2.txt_description.apply(lambda x: ', '.join([str(i) for i in x]))
-        assessment2['txt_description'] = assessment2['txt_description'].str.replace('[^\w\s]', '')
-        assessment2['txt_description'] = assessment2['txt_description'].str.lower()
-
-        # tokenize
-        assessment2['txt_tokenized'] = assessment2.apply(lambda row: nltk.word_tokenize(row['txt_description']), axis=1)
-
-        # Remove Stopwords
-        stop = stopwords.words('english')
-        assessment2['txt_tokenized'] = assessment2['txt_tokenized'].apply(
-            lambda x: [item for item in x if item not in stop])
-
-        # Create ngrams
-        assessment2['ngrams'] = assessment2.apply(lambda row: list(nltk.trigrams(row['txt_tokenized'])), axis=1)
-        # Convert trigram lists to words joined by underscores
-        assessment2['ngram2'] = assessment2.ngrams.apply(lambda row: ['_'.join(i) for i in row])
-
-        # Convert trigram and token lists to strings
-        assessment2['txt_tokenized2'] = assessment2['txt_tokenized'].apply(' '.join)
-        assessment2['ngram2'] = assessment2.ngram2.apply(lambda x: ' '.join([str(i) for i in x]))
-
-        # %% Pair down assessments table to columns of interest
-        assessment2 = assessment2[
-            ['person_id', 'enc_id', 'txt_description', 'txt_tokenized', 'ngrams', 'ngram2', 'txt_tokenized2']]
-
-        return assessment2
-# %%
-import pandas as pd
-import nltk
-from nltk.corpus import stopwords
-format_assessment()
-
-
-# %%
-from load_data import DataLoader
-capData = DataLoader()
-capData.create()
 
 
 # %%
@@ -477,4 +408,68 @@ from load_data import DataLoader
 capData = DataLoader()
 capData.create()
 
+
+
+
 # %%
+
+capData.main.diagnosis_code_id
+
+# %%
+capData.main.to_csv(capData.data_path+'main.csv')
+# %%
+# Pandas get_dummies function will not parse lists, enter the multiLabelBinarizer 
+
+def one_hot(df, col_name, prefix=''):
+    from sklearn.preprocessing import MultiLabelBinarizer
+    mlb = MultiLabelBinarizer()
+    df = df.join(pd.DataFrame(mlb.fit_transform(df[col_name]),columns=prefix+mlb.classes_))
+    df = df.drop(columns=[col_name])
+    return df
+
+tmp = one_hot(capData.asmt_diag, 'diagnosis_code_id', prefix='icd_')
+#tmp.fillna(0, inplace=True)
+tmp
+
+
+# %%
+capData.asmt_diag[np.isnan(capData.asmt_diag['diagnosis_code_id'])]
+
+
+# %%
+import numpy as np
+import pandas as pd
+df = mlb.fit_transform(capData.main.asmt_diagnosis_code_id)
+columns='icd_'+mlb.classes_
+
+pd.DataFrame(df, columns=columns)
+
+# %%
+tmp[tmp['icd_Z98.89'] >0]
+# %% 
+def NA_dist(df):
+    s = df.isna().sum()
+    d = df.isnull().sum()/len(df)*100
+    result = pd.concat([s,d], axis=1)
+    result.columns = ['NA_Count','NA_Percent']
+    return result
+
+import pandas as pd
+NA_dist(capData.main).sort_values(by='NA_Percent')
+
+
+
+# %% dianosis
+
+import re
+def find_diag(lookup, return_val='description'):
+    print('Terms = ', lookup) 
+    result = list(capData.diagnosis[capData.diagnosis.description.str.contains(lookup, regex=True, flags=re.IGNORECASE)][return_val].unique())
+    return result
+# %%
+
+diag_codes = (code.lstrip('asmt_icd_') for code in iDF.nlargest(20, 'Feature_Importance').Feature)
+descriptions = find_diag('|'.join(diag_codes))
+
+print(descriptions)
+list(zip(diag_codes, descriptions))
