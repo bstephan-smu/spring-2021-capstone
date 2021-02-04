@@ -29,8 +29,9 @@ class DataLoader:
         # regex phrase to lookup alzheimers diagnosis
         self.alz_regex = 'alzh'
 
-        # store list of dementia icd codes here... TODO will be updated in later function
+        # store list of dementia and AD icd codes here... TODO will be updated in later function
         self.dementia_icd_codes = None
+        self.AD_icd_codes = None
 
         # list of common word codes for dementia diagnosis
         self.dementia_lookup = [
@@ -94,6 +95,8 @@ class DataLoader:
         dementia_output = [desc for desc in dementia_output if desc not in self.exclude_dementia_lookup]
         self.dementia_icd_codes = self.diagnosis[
             self.diagnosis.description.isin(dementia_output)].icd9cm_code_id.unique()
+
+        #TODO add self.AD_icd_codes
 
         # Collect response
         AD_people = self.diagnosis[
@@ -424,15 +427,63 @@ class DataLoader:
         self.main = self.main.merge(assess_copy, on=['person_id','enc_id'], how='left')
 
 
+    def encode_encounters(self):
+        self.main = pd.get_dummies(self.main, columns = [
+        'enc_Provider_id',
+        'enc_Race',
+        'enc_Ethnicity',
+        'enc_Gender',
+        'enc_VisitType',
+        'enc_ServiceDepartment',
+        'enc_LocationName',
+        'enc_Reason_for_Visit',
+        'enc_Encounter_Primary_payer',
+        'enc_Encounter_Secondary_Payer',
+        'enc_Encounter_Teritiary_Payer'
+    ])
+
+
     def clean(self):
-        pass # TODO moar clean plz
+        # Apply enc_ label to encounter columns
+        self.main.rename(columns = { 
+            'place_of_service':'enc_place_of_service',
+            'Provider_id':'enc_Provider_id',
+            'EncounterDate':'enc_EncounterDate',
+            'Race':'enc_Race',
+            'Ethnicity':'enc_Ethnicity',
+            'Gender':'enc_Gender',
+            'AgeAtEnc':'enc_AgeAtEnc',
+            'VisitType':'enc_VisitType',
+            'ServiceDepartment':'enc_ServiceDepartment',
+            'LocationName':'enc_LocationName',
+            'Reason_for_Visit':'enc_Reason_for_Visit',
+            'CPT_Code':'enc_CPT_Code',
+            'CPT_Code_Seq':'enc_CPT_Code_Seq',
+            'Encounter_Primary_payer':'enc_Primary_payer',
+            'Encounter_Secondary_Payer':'enc_Secondary_Payer',
+            'Encounter_Teritiary_Payer':'enc_Teritiary_Payer'
+            }, inplace=True)
 
+        # Update EncounterDate to be an ordinal date (see: pandas.Timestamp.toordinal)
+        self.main['enc_EncounterDate'] = self.main['enc_EncounterDate'].apply(lambda x: x.toordinal())
 
+        # Drop single value columns
+        single_val_columns = []
+        for col in self.main:
+            try:
+                if self.main[col].nunique() == 1:
+                    single_val_columns.append(col)
+            except TypeError:
+                pass # skip list cols
+        self.main.drop(columns=single_val_columns, inplace=True)
 
+        self.main.drop(columns='enc_CPT_Code', inplace=True)
+
+        # TODO moar clean plz
 
 
     # return the main data output
-    def create(self):
+    def create(self, name='main'):
         # generating data attributes
         self.generate_csv_attributes()
 
@@ -458,21 +509,22 @@ class DataLoader:
         self.merge_assessments()
 
         # step 7...clean data: drop NAs, rename cols etc
+        self.encode_encounters()
         self.clean()
 
         # write to pickle file
-        self.write()
+        self.write(filename=name)
 
 
     # helper function write entire class object
-    def write(self, name='main'):
-        with open(self.data_path + name + '.pickle', 'wb') as picklefile:
+    def write(self, filename='main'):
+        with open(self.data_path + filename + '.pickle', 'wb') as picklefile:
             pickle.dump(self, picklefile)
 
 
     # helper function to return entire class object
-    def load(self, name='main'):
-        with open(self.data_path + name + '.pickle', 'rb') as picklefile:
+    def load(self, filename='main'):
+        with open(self.data_path + filename + '.pickle', 'rb') as picklefile:
             return pickle.load(picklefile)
 
 
@@ -492,4 +544,5 @@ if __name__ == "__main__":
     data = DataLoader(subset=1000)
     data.create()
     print(data.load())
+
 
