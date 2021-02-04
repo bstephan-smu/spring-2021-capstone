@@ -460,9 +460,9 @@ class DataLoader:
             'enc_ServiceDepartment',
             'enc_LocationName',
             'enc_Reason_for_Visit',
-            'enc_Encounter_Primary_payer',
-            'enc_Encounter_Secondary_Payer',
-            'enc_Encounter_Teritiary_Payer'
+            'enc_Primary_payer',
+            'enc_Secondary_Payer',
+            'enc_Teritiary_Payer'
         ])
 
 
