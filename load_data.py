@@ -428,22 +428,6 @@ class DataLoader:
 
 
     def encode_encounters(self):
-        self.main = pd.get_dummies(self.main, columns = [
-        'enc_Provider_id',
-        'enc_Race',
-        'enc_Ethnicity',
-        'enc_Gender',
-        'enc_VisitType',
-        'enc_ServiceDepartment',
-        'enc_LocationName',
-        'enc_Reason_for_Visit',
-        'enc_Encounter_Primary_payer',
-        'enc_Encounter_Secondary_Payer',
-        'enc_Encounter_Teritiary_Payer'
-    ])
-
-
-    def clean(self):
         # Apply enc_ label to encounter columns
         self.main.rename(columns = { 
             'place_of_service':'enc_place_of_service',
@@ -462,11 +446,27 @@ class DataLoader:
             'Encounter_Primary_payer':'enc_Primary_payer',
             'Encounter_Secondary_Payer':'enc_Secondary_Payer',
             'Encounter_Teritiary_Payer':'enc_Teritiary_Payer'
-            }, inplace=True)
+        }, inplace=True)
 
         # Update EncounterDate to be an ordinal date (see: pandas.Timestamp.toordinal)
         self.main['enc_EncounterDate'] = self.main['enc_EncounterDate'].apply(lambda x: x.toordinal())
 
+        self.main = pd.get_dummies(self.main, columns = [
+            'enc_Provider_id',
+            'enc_Race',
+            'enc_Ethnicity',
+            'enc_Gender',
+            'enc_VisitType',
+            'enc_ServiceDepartment',
+            'enc_LocationName',
+            'enc_Reason_for_Visit',
+            'enc_Encounter_Primary_payer',
+            'enc_Encounter_Secondary_Payer',
+            'enc_Encounter_Teritiary_Payer'
+        ])
+
+
+    def clean(self):
         # Drop single value columns
         single_val_columns = []
         for col in self.main:
@@ -477,6 +477,7 @@ class DataLoader:
                 pass # skip list cols
         self.main.drop(columns=single_val_columns, inplace=True)
 
+        # CPT is already encoded via the CPT table
         self.main.drop(columns='enc_CPT_Code', inplace=True)
 
         # TODO moar clean plz
@@ -546,3 +547,5 @@ if __name__ == "__main__":
     print(data.load())
 
 
+
+# %%
