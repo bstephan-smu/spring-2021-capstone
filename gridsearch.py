@@ -7,7 +7,8 @@ from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold
 from sklearn.datasets import load_breast_cancer
 from itertools import combinations
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MaxAbsScaler
+from scipy.sparse import csc_matrix
 
 class GridSearch:
     def __init__(self):
@@ -104,7 +105,8 @@ class GridSearch:
         self.metric = metric
 
 
-    def run_grid(self, n_folds=5, splits=True, scale=True):
+    def run_grid(self, n_folds=5, splits=True, scale=True, sparse=False, \
+        verbose=False):
         """
         Runs a grid search for each classifier and each iteration of paramsets
         \nn_folds: number of kfolds for stratified cross validation
@@ -118,8 +120,13 @@ class GridSearch:
         clf_hypers = self.clf_hypers
         metric = self.metric
 
-        M, L = self.data  # unpack data container
-        scaler = MinMaxScaler()
+        M, L = self.data # unpack data container
+        if sparse:
+            M = csc_matrix(M)
+   
+        scaler = MaxAbsScaler()
+        if verbose:
+            print('scaling data...')
         scaled_data = scaler.fit_transform(M)
         if scale:
             M = scaled_data
@@ -143,12 +150,17 @@ class GridSearch:
             # for each parameter setting:
             clf_iterations = self._get_hypers(clf_hypers[a_clf])
             for model_id, iteration in enumerate(clf_iterations):
+                if verbose:
+                    print('training '+a_clf+' model_id: '+str(model_id))
+                    print('--params: '+str(iteration))
+
                 clf_params = iteration
-                clf = clf_dict[a_clf](**clf_params)  # unpack parameters
-                
+                clf = None
+
                 for split_id, (train_index, test_index) \
                         in enumerate(kf.split(M, L)):  # for each kfold
-                   
+                    clf = clf_dict[a_clf](**clf_params)  # unpack parameters
+
                     try:  # always set random and all processors
                         clf.set_params(random_state=86)
                         clf.set_params(n_jobs=-1)
@@ -158,7 +170,9 @@ class GridSearch:
                     clf.fit(M[train_index], L[train_index])
                     
                     preds = clf.predict(M[test_index])
-                    
+                    if verbose:
+                        print('----k_fold '+str(split_id+1)+' complete')
+
                     split_results[split_id] = {
                         'train_index': train_index,
                         'test_index': test_index,
@@ -272,7 +286,7 @@ def main():  # POC for the class
             # 'n_jobs': None,
             'penalty': ['l1', 'l2'],
             # 'random_state': None,
-            'solver': ['liblinear']
+            'solver': ['sag'] # sag needs scaled data, but runs well on large datasets
             # 'tol': 0.0001,
             # 'verbose': 0,
             # 'warm_start': False
@@ -303,7 +317,7 @@ def main():  # POC for the class
         param_grid=param_grid,
         metric='auc'
     )
-    results = gs.run_grid(n_folds=3, splits=False, scale=False)
+    results = gs.run_grid(n_folds=3, splits=False, scale=False, sparse=True)
     gs.plot_metrics(save=True)
 
     return results
