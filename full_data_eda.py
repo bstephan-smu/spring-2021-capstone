@@ -15,10 +15,15 @@ all_data.head()
 list(all_data)
 
 
-# %%
+# %% see data types
 
 pd.set_option('display.max_rows', None)
 all_data.dtypes
+
+
+#%%isolate one-hot-encoded features
+
+all_data[(all_data == 1 | all_data == 0).any(axis=1)]
 
 # %%
 correlation_matrix_data = all_data.select_dtypes(["int","float"])
@@ -108,6 +113,47 @@ def get_feature_correlation(df, top_n=None, corr_method='spearman',
     return sorted_correlated_features
 
 # %%
-top_corr = get_feature_correlation(corr,50000)
+top_corr = get_feature_correlation(corr,50000,remove_duplicates=True, remove_self_correlations=True)
 top_corr
-# %%
+
+
+# %% Identify
+
+high_corr_features = set(list(top_corr['Feature 2']))
+
+# %% Remove high correlation columns
+reduced_data = all_data.drop(high_corr_features,1)
+
+#%% One-hot-encode factors
+
+
+#%% DRop objects (text fields, dates, person_id, enc_id)
+
+#%% Model
+
+from sklearn.linear_model import LogisticRegression
+
+X = ""
+y = ""
+
+lr = LogisticRegression(penalty = 'l1', n_jobs= -1).fit(X, y)
+pred = lr.predict()
+
+
+#%% Preformance
+
+from sklearn.metrics import plot_confusion_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import roc_auc_score
+
+plot_confusion_matrix(clf, X_test, y_test)  
+plt.show()
+
+print("Accuracy: ", accuracy())
+print("F1_Score: ", f1_score())
+print("Recall: ", recall_score())
+print("Precision: ", precision_score())
+print("ROC_AUC: ", roc_auc_score())
