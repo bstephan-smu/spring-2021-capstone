@@ -70,6 +70,10 @@ class DataLoader:
         self.align_columns()  # ensure that encounters columns are properly aligned
         self.encounters['EncounterDate'] = pd.to_datetime(self.encounters['EncounterDate'], format='%Y%m%d')
 
+        dropcols = ['Encounter_Primary_Payer', 'Encounter_Secondary_Payer', 'Encounter_Teritiary_Payer', 
+                    'LocationName', 'ServiceDepartment', 'VisitType', 'CPT_Code', 'CPT_Code_Seq']
+        self.encounters.drop(columns=dropcols, inplace=True)
+
         # in event that you'd like to subset less than total appt in data
         if self.subset is not None:
             self.encounters = self.encounters.head(
