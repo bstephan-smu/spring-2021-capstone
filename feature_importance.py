@@ -181,96 +181,96 @@ data = get_data(capData, target_col='dem_person')
 
 # Choose classifiers to run
 classifiers = {
-    # 'Random_Forest': RandomForestClassifier,
-    # 'Logistic_Regression': LogisticRegression,
-    # 'SVM': SVC,
-    # 'SGD': SGDClassifier,
+    'Random_Forest': RandomForestClassifier,
+    'Logistic_Regression': LogisticRegression,
+    'SVM': SVC,
+    'SGD': SGDClassifier,
     'GBoost': GradientBoostingClassifier
 }
 
 # Edit grid params.
 # Hint: run RandomForestClassifier().get_params() to get param list.
 param_grid = {
-#    'Random_Forest': {
-#     #     'bootstrap': True,
-#     #     'ccp_alpha': 0.0,
-#     #     'class_weight': ['balanced', None],
-#     #     'criterion': ['gini', 'entropy'],
-#     #     'max_depth': None,
-#     #    'max_features': ['auto'],
-#     #     'max_leaf_nodes': None,
-#     #     'max_samples': None,
-#     #     'min_impurity_decrease': 0.0,
-#     #     'min_impurity_split': None,
-#     #     'min_samples_leaf': 1,
-#          'min_samples_split': [2,10],
-#     #     'min_weight_fraction_leaf': 0.0,
-#         'n_estimators': [100, 1000]
-#     #     'n_jobs': None,
-#     #     'oob_score': False,
-#     #     'random_state': None,
-#     #     'verbose': 0,
-#     #     'warm_start': False
-#         },
-#     'Logistic_Regression': {
-#          'C': [.0001, .01, 1],
-#     #     'class_weight': ['balanced', None],
-#     #     # 'dual': False,
-#     #     # 'fit_intercept': True,
-#     #     # 'intercept_scaling': [1, 10],
-#     #     # 'l1_ratio': None,
-#          'max_iter': [10,1000],
-#     #     # 'multi_class': 'auto',
-#     #     # 'n_jobs': None,
-#          'penalty': ['l2'], # sag requires L2 solver
-#     #     # 'random_state': None,
-#          'solver': ['sag'] # sag needs scaled data, but runs well on large datasets
-#     #     # 'tol': 0.0001,
-#     #     # 'verbose': 0,
-#     #     # 'warm_start': False
-#          },
+   'Random_Forest': {
+    #     'bootstrap': True,
+    #     'ccp_alpha': 0.0,
+    #     'class_weight': ['balanced', None],
+    #     'criterion': ['gini', 'entropy'],
+    #     'max_depth': None,
+    #    'max_features': ['auto'],
+    #     'max_leaf_nodes': None,
+    #     'max_samples': None,
+    #     'min_impurity_decrease': 0.0,
+    #     'min_impurity_split': None,
+    #     'min_samples_leaf': 1,
+         'min_samples_split': [2,10],
+    #     'min_weight_fraction_leaf': 0.0,
+         'n_estimators': [100, 1000]
+    #     'n_jobs': None,
+    #     'oob_score': False,
+    #     'random_state': None,
+    #     'verbose': 0,
+    #     'warm_start': False
+        },
+    'Logistic_Regression': {
+         'C': [.0001, .01, 1], # 1 performs vastly better than lesser nums
+    #     'class_weight': ['balanced', None],
+    #     # 'dual': False,
+    #     # 'fit_intercept': True,
+    #     # 'intercept_scaling': [1, 10],
+    #     # 'l1_ratio': None,
+         'max_iter': [10,1000],
+    #     # 'multi_class': 'auto',
+    #     # 'n_jobs': None,
+         'penalty': ['l2'], # sag requires L2 solver
+    #     # 'random_state': None,
+         'solver': ['sag'] # sag needs scaled data, but runs well on large datasets
+    #     # 'tol': 0.0001,
+    #     # 'verbose': 0,
+    #     # 'warm_start': False
+         },
 
-#     'SVM': {
-#          'C': [.01, .1],
-#     #     'break_ties': False,
-#     #     'cache_size': 200,
-#     #     'class_weight': ['balanced', None],
-#     #     'coef0': 0.0,
-#     #     'decision_function_shape': 'ovr',
-#     #     'degree': 3,
-#     #     'gamma': ['scale', 'auto'],
-#          'kernel': ['linear', 'rbf']
-#     #     'max_iter': -1,
-#     #     'probability': False,
-#     #     'random_state': None,
-#     #     'shrinking': True,
-#     #     'tol': 0.001,
-#     #     'verbose': False
-#         },
+    'SVM': {
+         'C': [.01, .1],
+    #     'break_ties': False,
+    #     'cache_size': 200,
+    #     'class_weight': ['balanced', None],
+    #     'coef0': 0.0,
+    #     'decision_function_shape': 'ovr',
+    #     'degree': 3,
+    #     'gamma': ['scale', 'auto'],
+         'kernel': ['linear', 'rbf']
+    #     'max_iter': -1,
+    #     'probability': False,
+    #     'random_state': None,
+    #     'shrinking': True,
+    #     'tol': 0.001,
+    #     'verbose': False
+        },
 
-#     'SGD': {
-#          'alpha':[0.0001, .00001],
-#         # 'average': False,
-#         # 'class_weight': None,
-#         # 'early_stopping': False,
-#         # 'epsilon': 0.1,
-#         # 'eta0': 0.0,
-#         # 'fit_intercept': True,
-#         # 'l1_ratio': 0.15,
-#         # 'learning_rate': 'optimal',
-#           'loss': ['hinge','log','modified_huber','perceptron','squared_hinge'],
-#           'max_iter': [10, 1000, 5000],
-#         # 'n_iter_no_change': 5,
-#         # 'n_jobs': None,
-#           'penalty': ['l1','l2','elasticnet']
-#         # 'power_t': 0.5,
-#         # 'random_state': None,
-#         # 'shuffle': True,
-#         # 'tol': 0.001,
-#         # 'validation_fraction': 0.1,
-#         # 'verbose': 0,
-#         # 'warm_start': False
-#          },
+    'SGD': {
+         'alpha':[0.0001, .00001],
+        # 'average': False,
+        # 'class_weight': None,
+        # 'early_stopping': False,
+        # 'epsilon': 0.1,
+        # 'eta0': 0.0,
+        # 'fit_intercept': True,
+        # 'l1_ratio': 0.15,
+        # 'learning_rate': 'optimal',
+          'loss': ['hinge','log','modified_huber','perceptron','squared_hinge'],
+          'max_iter': [5000], # Less than 1k will not resolve
+        # 'n_iter_no_change': 5,
+        # 'n_jobs': None,
+          'penalty': ['l1','l2','elasticnet']
+        # 'power_t': 0.5,
+        # 'random_state': None,
+        # 'shuffle': True,
+        # 'tol': 0.001,
+        # 'validation_fraction': 0.1,
+        # 'verbose': 0,
+        # 'warm_start': False
+         },
 
     'GBoost' : {
         # 'ccp_alpha': 0.0,
@@ -305,13 +305,13 @@ gs.set_params(
     param_grid=param_grid,
     metric='auc'
 )
-results = gs.run_grid(n_folds=3, splits=True, scale=True, sparse=True, verbose=True)
+results = gs.run_grid(n_folds=3, splits=False, scale=True, sparse=True, verbose=True)
 gs.plot_metrics(save=True)
 
 
-, 1# %%
+# %%
 # Get Logistic Regression Coefficients 
-
+import pandas as pd
 coefs = list(results['best_overall']['clf'].coef_[0])
 labels = list(data[0])
 LR_coefs = pd.DataFrame(zip(labels,coefs), columns = ['Feature', 'Coefficient']).sort_values(by='Coefficient', ascending=False)
@@ -321,3 +321,18 @@ LR_coefs
 
 #TODO add a section to grab RandomForest feature importance 
 # (same code as in the top cells)
+
+import pprint
+pprint.pp(results['SGD'])
+# %% Remove splits
+tmp = results.copy()
+
+for result in tmp:
+    print(result)
+    top = tmp[result]
+    top.pop('splits', None)
+    for iteration in top:
+        print(iteration)
+# %%
+capData.main
+# %%
