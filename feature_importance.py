@@ -1,12 +1,10 @@
 #%%
 from load_data import DataLoader
-capData = DataLoader()
-capData.create(name='main')
-#capData = capData.load('clean')
-#capData.encode_encounters()
-#capData.clean()
+capData = DataLoader().load()
+
 
 # %%
+
 def get_data(self, data_cols='all', target_col='AD_event', alt_data=None):
     """
     \ndata_cols: pass the table prefix to return only a table from main options: 
@@ -15,20 +13,36 @@ def get_data(self, data_cols='all', target_col='AD_event', alt_data=None):
     \ne.g. X, y = get_data(capData, data_cols='vit_')
     """
     df = self.main.copy()
-    column_list = ['enc_id','person_id', target_col]# + alt_data
+    column_list = [target_col]# + alt_data
 
     if alt_data != None:
         column_list += alt_data
 
     dropcols = [col for col in df if col.lstrip('asmt_icd_') in self.dementia_icd_codes]
+    extra_cols = ['Cognition',
+        'asmt_txt_description',
+        'asmt_txt_tokenized',
+        'asmt_ngrams',
+        'asmt_ngram2',
+        'asmt_txt_tokenized2',
+        'asmt_np_chunks',
+        'asmt_description',
+        'enc_id',
+        'person_id',
+        'AD_person',
+        'AD_event',
+        'dem_person',
+        'dem_event'
+        ]
+    
+    extra_cols.remove(target_col)
+    
+    dropcols += extra_cols
     X = df.drop(columns=dropcols)
     
     if data_cols != 'all':
-        if data_cols.startswith('enc'):
-            column_list = ['person_id', target_col]
         column_list += [col for col in X if col.startswith(data_cols)]
-        
-    X = X[column_list]
+        X = X[column_list]
 
     #X.dropna(inplace=True)
     X.fillna(0, inplace=True)
@@ -38,27 +52,23 @@ def get_data(self, data_cols='all', target_col='AD_event', alt_data=None):
     return (X,y)
 
 
-
-# %% Get Feature Importance
-
-def get_feature_importance(dataloader=capData, table=None, target='dem_event', alt_data=None):
+def get_feature_importance(dataloader=capData, table='all', target='dem_event', alt_data=None):
 
     import numpy as np
     import pandas as pd
     from sklearn.metrics import accuracy_score, f1_score, precision_score,\
         recall_score, roc_auc_score
-    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
     #from sklearn.linear_model import LogisticRegression
     #from sklearn.svm import SVC
     from sklearn.model_selection import StratifiedKFold
-
 
     X,y = get_data(dataloader, data_cols=table, target_col=target, alt_data=alt_data)
     skf = StratifiedKFold(n_splits=5)
     skf.get_n_splits(X, y)
 
     split_results = {}
-    M = X.drop(columns=['enc_id','person_id'])
+    M = csc_matrix(X)
     L = y
     for split_id, (train_index, test_index) in enumerate(skf.split(X, y)):
         #clf = LogisticRegression()
@@ -70,9 +80,11 @@ def get_feature_importance(dataloader=capData, table=None, target='dem_event', a
             clf.set_params(n_jobs=-1)
         except:
             pass
-        clf.fit(M.iloc[train_index],L.iloc[train_index])
+        #clf.fit(M.iloc[train_index],L.iloc[train_index])
+        clf.fit(M[train_index],L[train_index])
 
-        preds = clf.predict(M.iloc[test_index])
+        #preds = clf.predict(M.iloc[test_index])
+        preds = clf.predict(M[test_index])
         split_results[split_id] = {
             'train_index': train_index,
             'test_index': test_index,
@@ -100,15 +112,13 @@ def get_feature_importance(dataloader=capData, table=None, target='dem_event', a
     print(table, final_results)
 
     # Get Feature Importances
-    iDF = pd.DataFrame(zip(M,clf.feature_importances_), 
+    iDF = pd.DataFrame(zip(X,clf.feature_importances_), 
     columns=['Feature','Feature_Importance']).sort_values(
         by='Feature_Importance', ascending=False)
 
     print(iDF.nlargest(20, 'Feature_Importance'))
     
     return iDF
-
-
 
 
 # %% less biased feature importance
@@ -123,7 +133,6 @@ def get_feature_importance(dataloader=capData, table=None, target='dem_event', a
 #               f"{r.importances_mean[i]:.3f}"
 #               f" +/- {r.importances_std[i]:.3f}")
 
-# %%
 
 
 
@@ -136,17 +145,179 @@ FI_cpt = get_feature_importance(capData, table='cpt_')
 FI_lab = get_feature_importance(capData, table='lab_')
 
 
-import pandas as pd
-cols = [FI_enc, FI_vit, FI_med, FI_diag, FI_cpt, FI_lab]
-all_df = pd.DataFrame()
-for df in cols:
-    tab = df.Feature[0][:3]
-    df.to_csv('FI_'+tab+'.csv')
-    all_df = pd.concat([all_df, df[df['Feature_Importance'] > .001]])
+# import pandas as pd
+# cols = [FI_enc, FI_vit, FI_med, FI_diag, FI_cpt, FI_lab]
+# all_df = pd.DataFrame()
+# for df in cols:
+#     tab = df.Feature[0][:3]
+#     df.to_csv('FI_'+tab+'.csv')
+#     all_df = pd.concat([all_df, df[df['Feature_Importance'] > .001]])
 
-FI_all = get_feature_importance(capData, alt_data=list(all_df.Feature), table='all', target='dem_person')
-FI_all.to_csv('FI_all.csv')
+# FI_all = get_feature_importance(capData, alt_data=list(all_df.Feature), table='all', target='dem_person')
+# FI_all.to_csv('FI_all.csv')
 
-FI_all.nlargest(30, 'Feature_Importance')
+# FI_all.nlargest(30, 'Feature_Importance') 
 
 # %%
+FI_vit = get_feature_importance(capData, table='vit_')
+
+# %%
+get_feature_importance(capData)
+
+# %%
+# %% GridSearch
+from gridsearch import GridSearch
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+import warnings
+from scipy.sparse.csc import csc_matrix
+from sklearn.linear_model import SGDClassifier
+
+warnings.simplefilter(action="default")
+
+# Get Data:
+data = get_data(capData, target_col='dem_person')
+
+# Choose classifiers to run
+classifiers = {
+    # 'Random_Forest': RandomForestClassifier,
+    # 'Logistic_Regression': LogisticRegression,
+    # 'SVM': SVC,
+    # 'SGD': SGDClassifier,
+    'GBoost': GradientBoostingClassifier
+}
+
+# Edit grid params.
+# Hint: run RandomForestClassifier().get_params() to get param list.
+param_grid = {
+#    'Random_Forest': {
+#     #     'bootstrap': True,
+#     #     'ccp_alpha': 0.0,
+#     #     'class_weight': ['balanced', None],
+#     #     'criterion': ['gini', 'entropy'],
+#     #     'max_depth': None,
+#     #    'max_features': ['auto'],
+#     #     'max_leaf_nodes': None,
+#     #     'max_samples': None,
+#     #     'min_impurity_decrease': 0.0,
+#     #     'min_impurity_split': None,
+#     #     'min_samples_leaf': 1,
+#          'min_samples_split': [2,10],
+#     #     'min_weight_fraction_leaf': 0.0,
+#         'n_estimators': [100, 1000]
+#     #     'n_jobs': None,
+#     #     'oob_score': False,
+#     #     'random_state': None,
+#     #     'verbose': 0,
+#     #     'warm_start': False
+#         },
+#     'Logistic_Regression': {
+#          'C': [.0001, .01, 1],
+#     #     'class_weight': ['balanced', None],
+#     #     # 'dual': False,
+#     #     # 'fit_intercept': True,
+#     #     # 'intercept_scaling': [1, 10],
+#     #     # 'l1_ratio': None,
+#          'max_iter': [10,1000],
+#     #     # 'multi_class': 'auto',
+#     #     # 'n_jobs': None,
+#          'penalty': ['l2'], # sag requires L2 solver
+#     #     # 'random_state': None,
+#          'solver': ['sag'] # sag needs scaled data, but runs well on large datasets
+#     #     # 'tol': 0.0001,
+#     #     # 'verbose': 0,
+#     #     # 'warm_start': False
+#          },
+
+#     'SVM': {
+#          'C': [.01, .1],
+#     #     'break_ties': False,
+#     #     'cache_size': 200,
+#     #     'class_weight': ['balanced', None],
+#     #     'coef0': 0.0,
+#     #     'decision_function_shape': 'ovr',
+#     #     'degree': 3,
+#     #     'gamma': ['scale', 'auto'],
+#          'kernel': ['linear', 'rbf']
+#     #     'max_iter': -1,
+#     #     'probability': False,
+#     #     'random_state': None,
+#     #     'shrinking': True,
+#     #     'tol': 0.001,
+#     #     'verbose': False
+#         },
+
+#     'SGD': {
+#          'alpha':[0.0001, .00001],
+#         # 'average': False,
+#         # 'class_weight': None,
+#         # 'early_stopping': False,
+#         # 'epsilon': 0.1,
+#         # 'eta0': 0.0,
+#         # 'fit_intercept': True,
+#         # 'l1_ratio': 0.15,
+#         # 'learning_rate': 'optimal',
+#           'loss': ['hinge','log','modified_huber','perceptron','squared_hinge'],
+#           'max_iter': [10, 1000, 5000],
+#         # 'n_iter_no_change': 5,
+#         # 'n_jobs': None,
+#           'penalty': ['l1','l2','elasticnet']
+#         # 'power_t': 0.5,
+#         # 'random_state': None,
+#         # 'shuffle': True,
+#         # 'tol': 0.001,
+#         # 'validation_fraction': 0.1,
+#         # 'verbose': 0,
+#         # 'warm_start': False
+#          },
+
+    'GBoost' : {
+        # 'ccp_alpha': 0.0,
+        # 'criterion': 'friedman_mse',
+        # 'init': None,
+        # 'learning_rate': 0.1,
+        # 'loss': 'deviance',
+        # 'max_depth': 3,
+        # 'max_features': None,
+        # 'max_leaf_nodes': None,
+        # 'min_impurity_decrease': 0.0,
+        # 'min_impurity_split': None,
+         'min_samples_leaf': [1,10],
+         'min_samples_split': [2,10]
+        # 'min_weight_fraction_leaf': 0.0,
+        # 'n_estimators': 100,
+        # 'n_iter_no_change': None,
+        # 'presort': 'deprecated',
+        # 'random_state': None,
+        # 'subsample': 1.0,
+        # 'tol': 0.0001,
+        # 'validation_fraction': 0.1,
+        # 'verbose': 0,
+        # 'warm_start': False
+        }
+    }
+
+gs = GridSearch()
+gs.set_params(
+    data=data,
+    classifiers=classifiers,
+    param_grid=param_grid,
+    metric='auc'
+)
+results = gs.run_grid(n_folds=3, splits=True, scale=True, sparse=True, verbose=True)
+gs.plot_metrics(save=True)
+
+
+, 1# %%
+# Get Logistic Regression Coefficients 
+
+coefs = list(results['best_overall']['clf'].coef_[0])
+labels = list(data[0])
+LR_coefs = pd.DataFrame(zip(labels,coefs), columns = ['Feature', 'Coefficient']).sort_values(by='Coefficient', ascending=False)
+LR_coefs
+
+# %%
+
+#TODO add a section to grab RandomForest feature importance 
+# (same code as in the top cells)
