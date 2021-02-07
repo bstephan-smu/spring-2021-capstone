@@ -337,18 +337,18 @@ class DataLoader:
         # DBSCAN Clusterin for trigrams and noun phrase chunks
         tfidf = TfidfVectorizer()
 
-        tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
+        #tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
         tfidf_data_np = tfidf.fit_transform(assessment2['np_chunks'])
 
         cluster_model = KMeans(n_jobs=-1,n_clusters=15)
 
-        print("Starting ngram KMeans model fit...")
-        ngram_db_model = cluster_model.fit(tfidf_data_ngram)
-        print("ngram KMeans model fit COMPLETE...")
+        #print("Starting ngram KMeans model fit...")
+        #ngram_db_model = cluster_model.fit(tfidf_data_ngram)
+        #print("ngram KMeans model fit COMPLETE...")
 
-        print("Starting ngram KMeans model fit on np chunks...")
+        print("Starting NP Chunk Kmeans model fit on np chunks...")
         np_db_model = cluster_model.fit(tfidf_data_np)
-        print("ngram KMeans model fit on np chunks COMPLETE...")
+        print("NP Chunk Kmeans model fit on np chunks COMPLETE...")
 
 
         # KMeans cluster counts and labeling
@@ -374,9 +374,16 @@ class DataLoader:
 
 
         #%% FINAL ASSESSMENTS TABLE - One-hot-encode Kmeans and Topic Clusters
-        assessment2 = assessment2[['person_id','enc_id','np_chunk_clusters','topic_clusters']]
-        assessment2 = assessment2.get_dummies(assessment2.np_chunk_clusters, prefix='kmeans')
-        assessment2 = assessment2.get_dummies(assessment2.topic_clusters, prefix='topic')
+        #%% FINAL ASSESSMENTS TABLE
+        kmeans_cluster = pd.get_dummies(assessment2.np_chunk_clusters, prefix='kmeans')
+        topic_cluster = pd.get_dummies(assessment2.topic_clusters, prefix='topic')
+
+        # use pd.concat to join the new columns with your original dataframe
+        assessment2 = pd.concat([assessment2,kmeans_cluster, prefix='kmeans')],axis=1)
+        assessment2 = pd.concat([assessment2,topic_cluster, prefix='topic')],axis=1)
+
+        # now drop the original 'country' column (you don't need it anymore)
+        assessment2.drop(['np_chunk_clusters','topic_clusters','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks'],axis=1, inplace=True)
         
 
         # Read in diagnosis table
