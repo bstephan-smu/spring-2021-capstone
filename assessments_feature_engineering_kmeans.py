@@ -111,7 +111,6 @@ assessment2['person_id'].nunique()
 #%% Pair down assessments table to columns of interest
 assessment2 = assessment2[['person_id','enc_id','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks']]
 
-assessment2.head()
 
 #%% KMeans Clustering for trigrams and noun phrase chunks
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -119,13 +118,13 @@ from sklearn.cluster import KMeans
 
 tfidf = TfidfVectorizer()
 
-tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
+#tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
 tfidf_data_np = tfidf.fit_transform(assessment2['np_chunks'])
 
 cluster_model = KMeans(n_jobs=-1,n_clusters=50)
-print("Starting ngram Kmeans model fit...")
-ngram_db_model = cluster_model.fit(tfidf_data_ngram)
-print("ngram DBSCAN model fit COMPLETE...")
+#print("Starting ngram Kmeans model fit...")
+#ngram_db_model = cluster_model.fit(tfidf_data_ngram)
+#print("ngram DBSCAN model fit COMPLETE...")
 
 print("Starting ngram Kmeans model fit on np chunks...")
 np_db_model = cluster_model.fit(tfidf_data_np)
@@ -133,8 +132,8 @@ print("ngram DBSCAN model fit on np chunks COMPLETE...")
 
 
 #%% KMeans cluster counts and labeling
-print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
-print("ngram DBSCAN Model Cluster Count:",assessment2['np_chunk_clusters'].nunique())
+#print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
+#print("ngram DBSCAN Model Cluster Count:",assessment2['np_chunk_clusters'].nunique())
 
 
 
@@ -161,37 +160,13 @@ print_topics(lda,count_vectorizer,10)
 
 #%% Assign Cluster Labels
 #Kmeans Cluster Labels
-assessment2['ngram_clusters'] = ngram_db_model.labels_
+#assessment2['ngram_clusters'] = ngram_db_model.labels_
 assessment2['np_chunk_clusters'] = np_db_model.labels_
 
 #LDA Cluster labeling
 topic_values = lda.transform(count_data)
 assessment2['topic_clusters'] = topic_values.argmax(axis=1)
 print("Clustering Complete.")
-
-#%% Join ICD10 cods back in for EDA
-assessment2 = assessment2[['person_id','enc_id','np_chunk_clusters','topic_clusters']]
-
-assessment_codeID = pd.DataFrame(assessment.groupby(['person_id','enc_id'])['txt_diagnosis_code_id'].apply(list))
-assessment2eda = assessment_text.merge(assessment_codeID, how = 'left', on = ['person_id','enc_id'])
-assessment2eda.head()
-
-# Identify clusters associated with AD and dementia
-ngd_icd10 = 'F01|F02|F03|F10|F32|F68|G20|G30|G31|G91|Q05|S09|Z63|Z82|Z81'
-
-assessment2eda['txt_diagnosis_code_id'] = assessment2eda['txt_diagnosis_code_id'].astype(str)
-assessment2eda['txt_diagnosis_code_id'].str.contains(ngd_icd10,case = False).value_counts()
-ad_pos = assessment2eda.loc[(assessment2eda['txt_diagnosis_code_id'].str.contains(ngd_icd10,case = False))]
-
-#%% EDA of AD positive clusters (ngram)
-
-adp_ngram_cluster_count = pd.DataFrame(ad_pos['ngram_clusters'].value_counts())
-adp_np_cluster_count = pd.DataFrame(ad_pos['np_chunk_clusters'].value_counts())
-adp_topic_cluster_count = pd.DataFrame(ad_pos['topic_clusters'].value_counts())
-
-all_ngram_cluster_count = pd.DataFrame(assessment2['ngram_clusters'].value_counts())
-all_npc_counts = pd.DataFrame(assessment2['np_chunk_clusters'].value_counts())
-all_topic_cluster_count = pd.DataFrame(assessment2['topic_clusters'].value_counts())
 
 
 #%% FINAL ASSESSMENTS TABLE
@@ -230,5 +205,39 @@ assessments_diagnoses = assessment2.merge(diagnoses2, how = 'left', on = ['perso
 assessments_diagnoses.head()
 
 #%% Write to CSV
-assessments_diagnoses.to_csv("assessments_diagnoses_join2.csv")
 
+import pickle
+
+pickle.dump(assessments_diagnoses, open("assessments_diagnoses_table", "wb")) 
+
+#assessments_diagnoses.to_csv("assessments_diagnoses_join2.csv")
+
+
+
+
+
+
+
+#%% Join ICD10 cods back in for EDA
+assessment2 = assessment2[['person_id','enc_id','np_chunk_clusters','topic_clusters']]
+
+assessment_codeID = pd.DataFrame(assessment.groupby(['person_id','enc_id'])['txt_diagnosis_code_id'].apply(list))
+assessment2eda = assessment_text.merge(assessment_codeID, how = 'left', on = ['person_id','enc_id'])
+assessment2eda.head()
+
+# Identify clusters associated with AD and dementia
+ngd_icd10 = 'F01|F02|F03|F10|F32|F68|G20|G30|G31|G91|Q05|S09|Z63|Z82|Z81'
+
+assessment2eda['txt_diagnosis_code_id'] = assessment2eda['txt_diagnosis_code_id'].astype(str)
+assessment2eda['txt_diagnosis_code_id'].str.contains(ngd_icd10,case = False).value_counts()
+ad_pos = assessment2eda.loc[(assessment2eda['txt_diagnosis_code_id'].str.contains(ngd_icd10,case = False))]
+
+#%% EDA of AD positive clusters (ngram)
+
+adp_ngram_cluster_count = pd.DataFrame(ad_pos['ngram_clusters'].value_counts())
+adp_np_cluster_count = pd.DataFrame(ad_pos['np_chunk_clusters'].value_counts())
+adp_topic_cluster_count = pd.DataFrame(ad_pos['topic_clusters'].value_counts())
+
+all_ngram_cluster_count = pd.DataFrame(assessment2['ngram_clusters'].value_counts())
+all_npc_counts = pd.DataFrame(assessment2['np_chunk_clusters'].value_counts())
+all_topic_cluster_count = pd.DataFrame(assessment2['topic_clusters'].value_counts())
