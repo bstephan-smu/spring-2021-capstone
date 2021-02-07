@@ -1,42 +1,40 @@
-# %%
 
+# %%
+import pandas as pd
 from load_data import DataLoader
 from numpy.core import shape
 data=DataLoader().load()
 # %%
 data.main
 # %%
-
-# %%
-
-def drop_cpt(self ,prefix):   
-    #strip prefix and make a list of col names    
+def drop_cpt(self ,prefix): 
     self.columns = self.columns.str.lstrip(prefix)
-    old_n=self.columns.tolist()
-    #Read in the cpt desct_2 file and makea list of new cols name.  
-    #since we one hot encore the order of header to list remained the same 
-    file=pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/cpt_descriptions_2.csv')
-    new_n=file['short_description'].values.tolist()
-    #rename the columns of main
-    self.rename(columns=dict(zip(old_n, new_n)),  inplace=True)
-    #drop nan labeled columns
-    self= self.drop["nan"]
+    file=pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/cpt_updated_full.csv')
+    f_list=file['cpt'].values.tolist()
+    old_cpt=f_list
+    file=pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/cpt_updated_full.csv')
+    f_list=file['short_description'].values.tolist()
+    new_cpt=f_list
+    res_cpt = dict(zip(old_cpt,new_cpt))
+    self.rename(columns=res_cpt, inplace=True)
+
     
-def drop_icd(self ,prefix):   
-    #strip prefix and make a list of col names    
+#%%     
+def drop_icd(self ,prefix): 
     self.columns = self.columns.str.lstrip(prefix)
-    old_n=self.columns.tolist()
-    #Read in the cpt desct_2 file and makea list of new cols name.  
-    #since we one hot encore the order of header to list remained the same 
-    file=pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/icd_descriptions_2.csv')
-    new_n=file['short_description'].values.tolist()
-    #rename the columns of main
-    self.rename(columns=dict(zip(old_n, new_n)), inplace=True)
-    #drop nan labeled columns
-    self= self.drop["nan"]
+    file=pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/icd_updated_full.csv')
+    f_list=file['ICD_CODE'].values.tolist()
+    old_icd=f_list
+    file=pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/icd_updated_full.csv')
+    f_list=file['SHORT_DESCRIPTION'].values.tolist()
+    new_icd=f_list
+    res_icd = dict(zip(old_icd,new_icd))
+    self.rename(columns=res_icd, inplace=True)
 
 # %%
-drop(data.main,'cpt_')
-
+drop_cpt(data.main, 'cpt_')
+drop_icd(data.main, 'asmt_icd_')
 # %%
-data.main 
+for col in data.main.columns: 
+    print(col)
+
