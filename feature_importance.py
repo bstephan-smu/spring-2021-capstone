@@ -332,7 +332,25 @@ for result in tmp:
     top = tmp[result]
     top.pop('splits', None)
     for iteration in top:
-        print(iteration)
+        type(iteration)
+        inner = top.get(iteration)
+        
+        #inner.pop('splits', None)
+        #type(inner)
+
 # %%
 capData.main
 # %%
+import pickle
+with open(capData.data_path + 'model_results/20200205_results.pickle', 'wb') as picklefile:
+    pickle.dump(results, picklefile)
+# %%
+"""
+jefff's cluster stuff:
+join = dbscan clusters (500)
+join2 = knn clusters (20)
+ngram_clusters (from csvs) + npchunks
+
+
+
+"""
