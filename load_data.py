@@ -263,7 +263,7 @@ class DataLoader:
         labs_copy = self.labs.copy()
         labs_copy.drop(columns=['person_id', 'lab_results'], inplace=True)
         if rename:
-            labs_copy =  self.rename_cols(labs_copy, prefix='lab_')
+            labs_copy =  self.rename_cols(labs_copy, prefix='lab_flags_')
         self.main = self.main.merge(labs_copy, on='enc_id', how='left')
         
         # TODO: address null values col
@@ -470,6 +470,79 @@ class DataLoader:
         ])
 
 
+    def format_labs_continuous(self):
+        labs = pd.read_csv(self.data_path + '5_lab_nor__lab_results_obr_p__lab_results_obx.csv')
+
+        # Filter to applicable cols:
+        labs2 = labs[['lab_nor_enc_id','lab_results_obx_result_desc', 'lab_results_obx_observ_value', 'lab_results_obx_units']]
+
+        # Drop NAs
+        labs2.dropna(inplace = True)
+
+        # Create new features
+        labs2['lab_test'] = 'lab_'+labs['lab_results_obx_result_desc'] + ' (' + labs2['lab_results_obx_units'] + ')'
+        labs2['lab_test_results'] = labs2['lab_results_obx_observ_value']
+        labs2 = labs2[['lab_nor_enc_id', 'lab_test', 'lab_test_results']]
+
+        def parse_results(x):
+            try:
+                x = float(x)
+            except ValueError: # strings
+                if x in ['++POSITIVE++', 'POSITIVE', 'DETECTED']:
+                    return 1
+
+                if x in ['Negative', 'None Detected', 'None seen', 'Not Observed', 'NOT DETECTED', 
+                    'NEGATIVE', 'NEGATIVE CONFIRMED', '<20 NOT DETECTED', '<15 NOT DETECTED', '<1.30 NOT DETECTED', 
+                    '<1.18 NOT DETECTED', 'NONE DETECTED',  '<1.0 NEG', 'NONE SEEN',  '<1:10','<1:16', '<1:64',]: 
+                    return 0
+
+                if x in [ 'Comment','FEW', 'INTERFERENCE', 'MANY', 'MODERATE', 'NOT APPLICABLE',
+                    'NOT CALC','NOT CALCULATED','NOT GIVEN','NOTE','PACKED','PENDING','SEE BELOW',
+                    'SEE NOTE', 'See Final Results', 'TNP', 'UNABLE TO CALCULATE', 'B']:
+                    return None
+
+                if x.startswith('> OR = '):
+                    x = x.split('> OR = ')[1]
+
+                if x.startswith('<'):
+                    return float(x.split('<')[1]) - .1
+                    
+                if x.startswith('>'):
+                    return float(x.split('>')[1]) + .1
+
+                if x.endswith('%'):  # drop percentages (should be in lab_test description)
+                    return float(x.split('%')[0])
+
+                if '-' in x:  # take average of range
+                    x = x.split('-')
+                    return (float(x[0]) + float(x[1])) / 2
+
+                if x in [ '6.9 % +', '6.9% +', '6.9%+']:
+                    return 7
+
+                if x == '7.5%+':
+                    return 8
+
+                if x == '9.8 % +':
+                    return 10
+
+                if ':' in x:  # take average of range
+                    x = x.split(':')
+                    x = (float(x[0]) + float(x[1])) / 2
+
+            return float(x)
+
+        labs2['lab_test_results'] = labs2['lab_test_results'].apply(lambda x: parse_results(x))
+        labs2.dropna(inplace = True)
+        labs2.rename(columns = {'lab_nor_enc_id':'enc_id'}, inplace=True)
+        self.labs_cont = labs2
+
+
+    def merge_labs_continuous(self):
+        labs2_encoded = self.labs_cont.groupby(['enc_id', 'lab_test'])['lab_test_results'].aggregate('mean').unstack().reset_index()
+        self.main = self.main.merge(labs2_encoded, how='left', on='enc_id')
+
+
     def clean(self):
         # Drop single value columns
         single_val_columns = []
@@ -483,9 +556,11 @@ class DataLoader:
 
         # CPT is already encoded via the CPT table
         self.main.drop(columns='enc_CPT_Code', inplace=True)
+        
+
 
         # TODO moar clean plz
-
+        
 
     # return the main data output
     def create(self, name='main'):
@@ -509,12 +584,16 @@ class DataLoader:
         self.format_labs(encoded=True)
         self.merge_labs()
 
+        self.format_labs_continuous()
+        self.merge_labs_continuous()
+
         # step 6...load merged assessments + diagnoses onto main dataframe
         self.format_assessments()
         self.merge_assessments()
 
         # step 7...clean data: drop NAs, rename cols etc
         self.encode_encounters()
+
         self.clean()
 
         # write to pickle file
