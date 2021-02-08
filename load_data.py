@@ -352,7 +352,7 @@ class DataLoader:
 
 
         # KMeans cluster counts and labeling
-        assessment2['ngram_clusters'] = ngram_db_model.labels_
+        # assessment2['ngram_clusters'] = ngram_db_model.labels_
         assessment2['np_chunk_clusters'] = np_db_model.labels_
 
         print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
@@ -373,18 +373,16 @@ class DataLoader:
         assessment2['topic_clusters'] = topic_values.argmax(axis=1)
 
 
-        #%% FINAL ASSESSMENTS TABLE - One-hot-encode Kmeans and Topic Clusters
         #%% FINAL ASSESSMENTS TABLE
+        #assessment2.drop(['np_chunk_clusters','topic_clusters','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks'],axis=1, inplace=True)
+
         kmeans_cluster = pd.get_dummies(assessment2.np_chunk_clusters, prefix='kmeans')
         topic_cluster = pd.get_dummies(assessment2.topic_clusters, prefix='topic')
 
         # use pd.concat to join the new columns with your original dataframe
-        assessment2 = pd.concat([assessment2,kmeans_cluster, prefix='kmeans')],axis=1)
-        assessment2 = pd.concat([assessment2,topic_cluster, prefix='topic')],axis=1)
+        assessment2 = pd.concat([assessment2,kmeans_cluster],axis=1)
+        assessment2 = pd.concat([assessment2,topic_cluster],axis=1)
 
-        # now drop the original 'country' column (you don't need it anymore)
-        assessment2.drop(['np_chunk_clusters','topic_clusters','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks'],axis=1, inplace=True)
-        
 
         # Read in diagnosis table
         diagnoses = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
