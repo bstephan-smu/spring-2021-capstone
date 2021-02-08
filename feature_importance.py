@@ -52,7 +52,7 @@ def get_data(self, data_cols='all', target_col='AD_event', alt_data=None):
     return (X,y)
 
 
-def get_feature_importance(dataloader=capData, table='all', target='dem_event', alt_data=None):
+def get_feature_importance(dataloader=capData, table='all', target='dem_person', alt_data=None):
 
     import numpy as np
     import pandas as pd
@@ -62,6 +62,7 @@ def get_feature_importance(dataloader=capData, table='all', target='dem_event', 
     #from sklearn.linear_model import LogisticRegression
     #from sklearn.svm import SVC
     from sklearn.model_selection import StratifiedKFold
+    from scipy.sparse import csc_matrix
 
     X,y = get_data(dataloader, data_cols=table, target_col=target, alt_data=alt_data)
     skf = StratifiedKFold(n_splits=5)
@@ -159,7 +160,8 @@ FI_lab = get_feature_importance(capData, table='lab_')
 # FI_all.nlargest(30, 'Feature_Importance') 
 
 # %%
-FI_vit = get_feature_importance(capData, table='vit_')
+FI_lab = get_feature_importance(capData, table='lab')
+FI_lab
 
 # %%
 get_feature_importance(capData)
@@ -167,7 +169,7 @@ get_feature_importance(capData)
 # %%
 # %% GridSearch
 from gridsearch import GridSearch
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 import warnings
@@ -183,9 +185,10 @@ data = get_data(capData, target_col='dem_person')
 classifiers = {
     'Random_Forest': RandomForestClassifier,
     'Logistic_Regression': LogisticRegression,
-    'SVM': SVC,
-    'SGD': SGDClassifier,
-    'GBoost': GradientBoostingClassifier
+    # 'SVM': SVC,
+    # 'GBoost': GradientBoostingClassifier,
+    'AdaBoost': AdaBoostClassifier,
+    'SGD': SGDClassifier
 }
 
 # Edit grid params.
@@ -202,7 +205,7 @@ param_grid = {
     #     'max_samples': None,
     #     'min_impurity_decrease': 0.0,
     #     'min_impurity_split': None,
-    #     'min_samples_leaf': 1,
+         'min_samples_leaf': [1,10],
          'min_samples_split': [2,10],
     #     'min_weight_fraction_leaf': 0.0,
          'n_estimators': [100, 1000]
@@ -213,7 +216,7 @@ param_grid = {
     #     'warm_start': False
         },
     'Logistic_Regression': {
-         'C': [.0001, .01, 1], # 1 performs vastly better than lesser nums
+         'C': [1, 10], # 1 performs vastly better than lesser nums
     #     'class_weight': ['balanced', None],
     #     # 'dual': False,
     #     # 'fit_intercept': True,
@@ -230,22 +233,55 @@ param_grid = {
     #     # 'warm_start': False
          },
 
-    'SVM': {
-         'C': [.01, .1],
-    #     'break_ties': False,
-    #     'cache_size': 200,
-    #     'class_weight': ['balanced', None],
-    #     'coef0': 0.0,
-    #     'decision_function_shape': 'ovr',
-    #     'degree': 3,
-    #     'gamma': ['scale', 'auto'],
-         'kernel': ['linear', 'rbf']
-    #     'max_iter': -1,
-    #     'probability': False,
-    #     'random_state': None,
-    #     'shrinking': True,
-    #     'tol': 0.001,
-    #     'verbose': False
+    # 'SVM': {
+    #      'C': [.01, .1],
+    # #     'break_ties': False,
+    # #     'cache_size': 200,
+    # #     'class_weight': ['balanced', None],
+    # #     'coef0': 0.0,
+    # #     'decision_function_shape': 'ovr',
+    # #     'degree': 3,
+    # #     'gamma': ['scale', 'auto'],
+    #      'kernel': ['linear', 'rbf']
+    # #     'max_iter': -1,
+    # #     'probability': False,
+    # #     'random_state': None,
+    # #     'shrinking': True,
+    # #     'tol': 0.001,
+    # #     'verbose': False
+    #     },
+
+    # 'GBoost' : {
+    #     # 'ccp_alpha': 0.0,
+    #     # 'criterion': 'friedman_mse',
+    #     # 'init': None,
+    #     # 'learning_rate': 0.1,
+    #     # 'loss': 'deviance',
+    #     # 'max_depth': 3,
+    #     # 'max_features': None,
+    #     # 'max_leaf_nodes': None,
+    #     # 'min_impurity_decrease': 0.0,
+    #     # 'min_impurity_split': None,
+    #      'min_samples_leaf': [1,10],
+    #      'min_samples_split': [2,10]
+    #     # 'min_weight_fraction_leaf': 0.0,
+    #     # 'n_estimators': 100,
+    #     # 'n_iter_no_change': None,
+    #     # 'presort': 'deprecated',
+    #     # 'random_state': None,
+    #     # 'subsample': 1.0,
+    #     # 'tol': 0.0001,
+    #     # 'validation_fraction': 0.1,
+    #     # 'verbose': 0,
+    #     # 'warm_start': False
+    #     },
+
+    'AdaBoost': {
+       # 'algorithm': 'SAMME.R',
+       # 'base_estimator': None,
+        'learning_rate': [.1, 1.0, 10],
+        'n_estimators': [50, 100, 1000],
+       # 'random_state': None
         },
 
     'SGD': {
@@ -258,7 +294,7 @@ param_grid = {
         # 'fit_intercept': True,
         # 'l1_ratio': 0.15,
         # 'learning_rate': 'optimal',
-          'loss': ['hinge','log','modified_huber','perceptron','squared_hinge'],
+          'loss': ['hinge','log','squared_hinge'],
           'max_iter': [5000], # Less than 1k will not resolve
         # 'n_iter_no_change': 5,
         # 'n_jobs': None,
@@ -271,31 +307,6 @@ param_grid = {
         # 'verbose': 0,
         # 'warm_start': False
          },
-
-    'GBoost' : {
-        # 'ccp_alpha': 0.0,
-        # 'criterion': 'friedman_mse',
-        # 'init': None,
-        # 'learning_rate': 0.1,
-        # 'loss': 'deviance',
-        # 'max_depth': 3,
-        # 'max_features': None,
-        # 'max_leaf_nodes': None,
-        # 'min_impurity_decrease': 0.0,
-        # 'min_impurity_split': None,
-         'min_samples_leaf': [1,10],
-         'min_samples_split': [2,10]
-        # 'min_weight_fraction_leaf': 0.0,
-        # 'n_estimators': 100,
-        # 'n_iter_no_change': None,
-        # 'presort': 'deprecated',
-        # 'random_state': None,
-        # 'subsample': 1.0,
-        # 'tol': 0.0001,
-        # 'validation_fraction': 0.1,
-        # 'verbose': 0,
-        # 'warm_start': False
-        }
     }
 
 gs = GridSearch()
@@ -332,7 +343,31 @@ for result in tmp:
     top = tmp[result]
     top.pop('splits', None)
     for iteration in top:
-        print(iteration)
+        type(iteration)
+        inner = top.get(iteration)
+        
+        #inner.pop('splits', None)
+        #type(inner)
+
 # %%
 capData.main
+# %%
+import pickle
+with open(capData.data_path + 'model_results/20200205_results.pickle', 'wb') as picklefile:
+    pickle.dump(results, picklefile)
+# %%
+"""
+jefff's cluster stuff:
+join = dbscan clusters (500)
+join2 = knn clusters (20)
+ngram_clusters (from csvs) + npchunks
+
+
+
+"""
+
+from load_data import DataLoader
+
+capData = DataLoader()
+capData.create('clean')
 # %%

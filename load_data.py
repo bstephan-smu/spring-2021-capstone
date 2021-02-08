@@ -70,10 +70,6 @@ class DataLoader:
         self.align_columns()  # ensure that encounters columns are properly aligned
         self.encounters['EncounterDate'] = pd.to_datetime(self.encounters['EncounterDate'], format='%Y%m%d')
 
-        dropcols = ['Encounter_Primary_Payer', 'Encounter_Secondary_Payer', 'Encounter_Teritiary_Payer', 
-                    'LocationName', 'ServiceDepartment', 'VisitType', 'CPT_Code', 'CPT_Code_Seq']
-        self.encounters.drop(columns=dropcols, inplace=True)
-
         # in event that you'd like to subset less than total appt in data
         if self.subset is not None:
             self.encounters = self.encounters.head(
@@ -169,11 +165,19 @@ class DataLoader:
         # store output as boolean for that medication
         self.encounters.apply(check_meds, axis=1)
 
+        def get_med_name(med):
+            med = re.search('(\\D+)(.*)',med, flags=re.IGNORECASE).group(1).strip().lower()
+            if med.endswith('-'):
+                med = med[:-1]
+            return med
+            
+        self.meds['med'] = self.meds['medication_name'].apply(get_med_name)
+
 
     def merge_meds(self):
         # note that the meds table may or may not have columns depending on sample
-        meds_wide = pd.get_dummies(self.meds[['enc_id', 'medid', 'is_currently_taking']]
-                                   .query('is_currently_taking'), columns=['medid']) \
+        meds_wide = pd.get_dummies(self.meds[['enc_id', 'med', 'is_currently_taking']]
+                                   .query('is_currently_taking'), columns=['med']) \
             .groupby('enc_id', as_index=False).max()
 
         self.main = self.main.merge(meds_wide, on='enc_id', how='left')
@@ -263,7 +267,7 @@ class DataLoader:
         labs_copy = self.labs.copy()
         labs_copy.drop(columns=['person_id', 'lab_results'], inplace=True)
         if rename:
-            labs_copy =  self.rename_cols(labs_copy, prefix='lab_')
+            labs_copy =  self.rename_cols(labs_copy, prefix='lab_flags_')
         self.main = self.main.merge(labs_copy, on='enc_id', how='left')
         
         # TODO: address null values col
@@ -479,6 +483,201 @@ class DataLoader:
         ])
 
 
+    def format_labs_continuous(self):
+        labs = pd.read_csv(self.data_path + '5_lab_nor__lab_results_obr_p__lab_results_obx.csv')
+
+        # Filter to applicable cols:
+        labs2 = labs[['lab_nor_enc_id','lab_results_obx_result_desc', 'lab_results_obx_observ_value', 'lab_results_obx_units']]
+
+        # Drop NAs
+        labs2.dropna(inplace = True)
+
+        # Create new features
+        labs2['lab_test'] = 'lab_'+labs['lab_results_obx_result_desc'] + ' (' + labs2['lab_results_obx_units'] + ')'
+        labs2['lab_test_results'] = labs2['lab_results_obx_observ_value']
+        labs2 = labs2[['lab_nor_enc_id', 'lab_test', 'lab_test_results']]
+
+        def parse_results(x):
+            try:
+                x = float(x)
+            except ValueError: # strings
+                if x in ['++POSITIVE++', 'POSITIVE', 'DETECTED']:
+                    return 1
+
+                if x in ['Negative', 'None Detected', 'None seen', 'Not Observed', 'NOT DETECTED', 
+                    'NEGATIVE', 'NEGATIVE CONFIRMED', '<20 NOT DETECTED', '<15 NOT DETECTED', '<1.30 NOT DETECTED', 
+                    '<1.18 NOT DETECTED', 'NONE DETECTED',  '<1.0 NEG', 'NONE SEEN',  '<1:10','<1:16', '<1:64',]: 
+                    return 0
+
+                if x in [ 'Comment','FEW', 'INTERFERENCE', 'MANY', 'MODERATE', 'NOT APPLICABLE',
+                    'NOT CALC','NOT CALCULATED','NOT GIVEN','NOTE','PACKED','PENDING','SEE BELOW',
+                    'SEE NOTE', 'See Final Results', 'TNP', 'UNABLE TO CALCULATE', 'B']:
+                    return None
+
+                if x.startswith('> OR = '):
+                    x = x.split('> OR = ')[1]
+
+                if x.startswith('<'):
+                    return float(x.split('<')[1]) - .1
+
+                if x.startswith('>'):
+                    return float(x.split('>')[1]) + .1
+
+                if x.endswith('%'):  # drop percentages (should be in lab_test description)
+                    return float(x.split('%')[0])
+
+                if '-' in x:  # take average of range
+                    x = x.split('-')
+                    return (float(x[0]) + float(x[1])) / 2
+
+                if x in [ '6.9 % +', '6.9% +', '6.9%+']:
+                    return 7
+
+                if x == '7.5%+':
+                    return 8
+
+                if x == '9.8 % +':
+                    return 10
+
+                if ':' in x:  # take average of range
+                    x = x.split(':')
+                    x = (float(x[0]) + float(x[1])) / 2
+
+            return float(x)
+
+        labs2['lab_test_results'] = labs2['lab_test_results'].apply(lambda x: parse_results(x))
+        labs2.dropna(inplace = True)
+        labs2.rename(columns = {'lab_nor_enc_id':'enc_id'}, inplace=True)
+        self.labs_cont = labs2
+
+
+    def merge_labs_continuous(self):
+        labs2_encoded = self.labs_cont.groupby(['enc_id', 'lab_test'])['lab_test_results'].aggregate('mean').unstack().reset_index()
+        self.main = self.main.merge(labs2_encoded, how='left', on='enc_id')
+
+
+    # split number word combinations
+    def split_numbers(self, word_list):
+        output = []
+        word_number_sequences = "([0-9])([a-z]{1,})"
+        for row in word_list:
+            row_list = []
+            for word in row.split(" "):
+                # print(word)
+                extraction = re.search(word_number_sequences, word)
+                if extraction is not None:
+                    row_list.extend([extraction.group(1), extraction.group(2)])
+                    # output.extend(extraction.split(" "))
+                else:
+                    row_list.append(word)
+            output.append(' '.join(row_list))
+        return output
+
+
+    # lookup words from custom lexicon
+    def custom_lexicon(self, word_list):
+        reason_for_visit_lexicon = {
+            "mos": "month",
+            "yrl": "annual",
+            "yrly": "annual",
+            "yearly": "annual",
+            "mo": "month",
+            "months": "month",
+            "mnth": "month",
+            "mth": "month",
+            "mon": "month",
+            "fu": "",  # followup is sort of needless information here
+            "f/u": "",
+            "f/up": "",
+            "wk": "week",
+            "wks": "week",
+            "w": "week",
+            "m": "month",
+            "meds": "medications",
+            "med": "medications",
+            "weeks": "week",
+            "np": "new patient",
+            "inr": "international normalized ratio",
+            "bp": "blood pressure",
+            "htn": "high blood pressure",
+            "hypertension": "high blood pressure",
+            "r": "right",
+            "l": "left",
+            "lvm": "left ventricular mass",
+            "dx": "diagnosis",
+            "w/": "with",
+            "appt": "appointment",
+            "pcp": "primary care provider",
+            "dm": "diabetes",
+            "uti": "urinary tract infection",
+            "ms": "multiple sclerosis",
+            "ep": "electrophysiology (heart activity assessment)"
+        }
+        output = []
+        for row in word_list:
+            row_list = []
+            words = row.split(" ")
+            for word_ in words:
+                if word_ in reason_for_visit_lexicon.keys():
+                    word_ = reason_for_visit_lexicon.get(word_)
+                else:
+                    word_ = word_
+                row_list.append(word_)
+            # row_list.extend(words_list)
+            output.append(' '.join(row_list))
+        return output
+        # make sure to split lexicon definition by space and strip any non alpha numeric characters
+
+
+    def strip_non_alpha(self, word_list):
+        output = []
+        for row in word_list:
+            row_list = []
+            for word in row.split(" "):
+                search_ = re.search("[a-z0-9]{1,}", word)
+                if search_ is not None:
+                    word_ = search_.group(0)
+                else:
+                    word_ = word
+                row_list.append(word_)
+            output.append(' '.join(row_list))
+        return output
+
+
+    def porter_stemmer(self, word_list):
+        ps = nltk.PorterStemmer()
+        output = []
+        for row in word_list:
+            row_list = []
+            for word in row.split(" "):
+                word_ = ps.stem(word)
+                row_list.append(word_)
+            output.append(' '.join(row_list))
+        return output
+
+    def encode_reason_for_visit(self):
+        # making sure that blank inputs are encoded as "none provided"...setting default
+        self.encounters.loc[self.encounters['Reason_for_Visit'].isnull(), "Reason_for_Visit"] = "None Provided"
+        x = self.encounters['Reason_for_Visit']  # grabbing reason for visit and subsetting
+        x = x.str.lower().tolist()  # setting all text to lowercase
+
+        splits = self.split_numbers(x)
+        encoded = self.custom_lexicon(splits)
+        only_alpha = self.strip_non_alpha(encoded)
+        stemmed = self.porter_stemmer(only_alpha)
+        return stemmed
+
+    def run_reason_for_visit(self):
+        processed = self.encode_reason_for_visit()
+        tfidf_ = TfidfVectorizer(stop_words={'english'})
+        tfidf = tfidf_.fit_transform(processed)
+
+        # ask user for optimal values
+        km = KMeans(n_clusters=22, init='k-means++', max_iter=100, n_init=1)
+        km.fit(tfidf)
+        self.encounters['cluster'] = km.labels_
+
+
     def clean(self):
         # Drop single value columns
         single_val_columns = []
@@ -493,42 +692,58 @@ class DataLoader:
         # CPT is already encoded via the CPT table
         self.main.drop(columns='enc_CPT_Code', inplace=True)
 
-        # TODO moar clean plz
+        dropcols = ['Encounter_Primary_Payer', 'Encounter_Secondary_Payer', 'Encounter_Teritiary_Payer', 
+                    'LocationName', 'ServiceDepartment', 'VisitType', 'CPT_Code', 'CPT_Code_Seq']
+        
+        # TODO: drop the dropcols from main
 
+        # feature reduction...encode different columns as n_clusters
+        self.run_reason_for_visit()
 
     # return the main data output
     def create(self, name='main'):
         # generating data attributes
+        print('reading in csvs')
         self.generate_csv_attributes()
 
         # step 1...make sure alzheimers and dementia response is encoded
+        print('encoding alzheimers')
         self.encode_alzheimers()
 
         # step 2...add on cpt table
+        print('encoding cpt')
         self.merge_cpt()
 
         # step 3...load vitals table onto main
+        print('encoding vitals')
         self.merge_vitals()
 
         # step 4...encode medications to find current meds...join onto the main for medication list
+        print('encoding meds')
         self.encode_meds()
         self.merge_meds()
 
         # step 5...load labs onto the main dataframe
+        print('encoding labs')
         self.format_labs(encoded=True)
         self.merge_labs()
 
+        self.format_labs_continuous()
+        self.merge_labs_continuous()
+
         # step 6...load merged assessments + diagnoses onto main dataframe
+        print('encoding assessments')
         self.format_assessments()
         self.merge_assessments()
 
         # step 7...clean data: drop NAs, rename cols etc
+        print ('encoding encounters and cleaning data')
         self.encode_encounters()
         self.clean()
 
         # write to pickle file
         self.write(filename=name)
-
+        print('data load complete')
 
     # helper function write entire class object
     def write(self, filename='main'):
