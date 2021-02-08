@@ -510,7 +510,7 @@ class DataLoader:
 
                 if x.startswith('<'):
                     return float(x.split('<')[1]) - .1
-                    
+
                 if x.startswith('>'):
                     return float(x.split('>')[1]) + .1
 
