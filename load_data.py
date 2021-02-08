@@ -445,41 +445,31 @@ class DataLoader:
 
 
     def encode_encounters(self):
+
+        # CPT is already encoded via the CPT table, and drop cols unrelated to response:
+        dropcols = ['Encounter_Primary_Payer', 'Encounter_Secondary_Payer', 'Encounter_Teritiary_Payer', 
+                    'LocationName', 'ServiceDepartment', 'VisitType', 'CPT_Code', 'CPT_Code_Seq', 'Provider_id', 'place_of_service']
+        
+        self.main.drop(columns=dropcols, inplace=True)
+
+
         # Apply enc_ label to encounter columns
         self.main.rename(columns = { 
-            'place_of_service':'enc_place_of_service',
-            'Provider_id':'enc_Provider_id',
             'EncounterDate':'enc_EncounterDate',
             'Race':'enc_Race',
             'Ethnicity':'enc_Ethnicity',
             'Gender':'enc_Gender',
-            'AgeAtEnc':'enc_AgeAtEnc',
-            'VisitType':'enc_VisitType',
-            'ServiceDepartment':'enc_ServiceDepartment',
-            'LocationName':'enc_LocationName',
-            'Reason_for_Visit':'enc_Reason_for_Visit',
-            'CPT_Code':'enc_CPT_Code',
-            'CPT_Code_Seq':'enc_CPT_Code_Seq',
-            'Encounter_Primary_payer':'enc_Primary_payer',
-            'Encounter_Secondary_Payer':'enc_Secondary_Payer',
-            'Encounter_Teritiary_Payer':'enc_Teritiary_Payer'
+            'AgeAtEnc':'enc_AgeAtEnc'
         }, inplace=True)
 
         # Update EncounterDate to be an ordinal date (see: pandas.Timestamp.toordinal)
         self.main['enc_EncounterDate'] = self.main['enc_EncounterDate'].apply(lambda x: x.toordinal())
 
+        # Onehot encode 
         self.main = pd.get_dummies(self.main, columns = [
-            'enc_Provider_id',
             'enc_Race',
             'enc_Ethnicity',
-            'enc_Gender',
-            'enc_VisitType',
-            'enc_ServiceDepartment',
-            'enc_LocationName',
-            'enc_Reason_for_Visit',
-            'enc_Primary_payer',
-            'enc_Secondary_Payer',
-            'enc_Teritiary_Payer'
+            'enc_Gender'
         ])
 
 
@@ -688,14 +678,6 @@ class DataLoader:
             except TypeError:
                 pass # skip list cols
         self.main.drop(columns=single_val_columns, inplace=True)
-
-        # CPT is already encoded via the CPT table
-        self.main.drop(columns='enc_CPT_Code', inplace=True)
-
-        dropcols = ['Encounter_Primary_Payer', 'Encounter_Secondary_Payer', 'Encounter_Teritiary_Payer', 
-                    'LocationName', 'ServiceDepartment', 'VisitType', 'CPT_Code', 'CPT_Code_Seq']
-        
-        # TODO: drop the dropcols from main
 
         # feature reduction...encode different columns as n_clusters
         self.run_reason_for_visit()
