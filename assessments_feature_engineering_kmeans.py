@@ -60,6 +60,11 @@ assessment2['txt_description'] = assessment2.txt_description.apply(lambda x: ', 
 assessment2['txt_description'] = assessment2['txt_description'].str.replace('[^\w\s]','')
 assessment2['txt_description'] = assessment2['txt_description'].str.lower()
 
+#remove words that are directly correlated to positive AD or Dementia
+ad_pos = 'alzheimers disease|dementia|late onset alzheimers|alzh|lewy|frontotemporal|hydrocephalus|huntington|wernicke|creutzfeldt|vascular dementia|Huntingtons disease|Mixed dementia|Parkisons disease'
+
+assessment2['txt_description'] = assessment2['txt_description'].str.replace(ad_pos,'')
+
 #tokenize
 assessment2['txt_tokenized']= assessment2.apply(lambda row: nltk.word_tokenize(row['txt_description']), axis=1)
 
@@ -74,7 +79,6 @@ assessment2.head()
 
 
 #%% Convert lists to strings
-pd.set_option('display.max_rows', 100)
 
 # Convert trigram lists to words joined by underscores
 assessment2['ngram2'] = assessment2.ngrams.apply(lambda row:['_'.join(i) for i in row])
@@ -106,52 +110,74 @@ assessment2['person_id'].nunique()
 
 #%% Pair down assessments table to columns of interest
 assessment2 = assessment2[['person_id','enc_id','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks']]
-assessment2.head()
 
-#%% DBSCAN Clusterin for trigrams and noun phrase chunks
+
+#%% KMeans Clustering for trigrams and noun phrase chunks
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 
 tfidf = TfidfVectorizer()
 
-tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
+#tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
 tfidf_data_np = tfidf.fit_transform(assessment2['np_chunks'])
 
-cluster_model = KMeans(n_jobs=-1,n_clusters=15)
-print("Starting ngram DBSCAN model fit...")
-ngram_db_model = cluster_model.fit(tfidf_data_ngram)
-print("ngram DBSCAN model fit COMPLETE...")
+cluster_model = KMeans(n_jobs=-1,n_clusters=50)
+#print("Starting ngram Kmeans model fit...")
+#ngram_db_model = cluster_model.fit(tfidf_data_ngram)
+#print("ngram DBSCAN model fit COMPLETE...")
 
-print("Starting ngram DBSCAN model fit on np chunks...")
+print("Starting ngram Kmeans model fit on np chunks...")
 np_db_model = cluster_model.fit(tfidf_data_np)
 print("ngram DBSCAN model fit on np chunks COMPLETE...")
 
 
 #%% KMeans cluster counts and labeling
-assessment2['ngram_clusters'] = ngram_db_model.labels_
-assessment2['np_chunk_clusters'] = np_db_model.labels_
+#print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
+#print("ngram DBSCAN Model Cluster Count:",assessment2['np_chunk_clusters'].nunique())
 
-print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
-print("ngram DBSCAN Model Cluster Count:",assessment2['np_chunk_clusters'].nunique())
 
-'''#%% LDA clustering
+
+#%% LDA clustering
 from sklearn.decomposition import LatentDirichletAllocation as LDA
 from sklearn.feature_extraction.text import CountVectorizer
 
 count_vectorizer =CountVectorizer()
 count_data = count_vectorizer.fit_transform(assessment2['ngram2'].values.astype('U'))
-lda = LDA(n_components = 20, n_jobs = -1,learning_method = 'online')
+lda = LDA(n_components = 20,learning_method = 'online')
 lda.fit(count_data)
 
 
-#%% LDA Cluster labeling
+#%% take a look at top 20 topics
 
-topic_values = LDA.transform(count_data)
+def print_topics(model, count_vectorizer, n_top_words):
+    words = count_vectorizer.get_feature_names()
+    for topic_idx, topic in enumerate(model.components_):
+        print("\nTopic #%d:" % topic_idx)
+        print(" ".join([words[i] for i in topic.argsort()[:-n_top_words -1:-1]]))
+
+print_topics(lda,count_vectorizer,10)
+
+
+#%% Assign Cluster Labels
+#Kmeans Cluster Labels
+#assessment2['ngram_clusters'] = ngram_db_model.labels_
+assessment2['np_chunk_clusters'] = np_db_model.labels_
+
+#LDA Cluster labeling
+topic_values = lda.transform(count_data)
 assessment2['topic_clusters'] = topic_values.argmax(axis=1)
-'''
+print("Clustering Complete.")
 
+
+#%% FINAL ASSESSMENTS TABLE
+assessment2 = assessment2.get_dummies(assessment2.np_chunk_clusters, prefix='kmeans')
+assessment2 = assessment2.get_dummies(assessment2.topic_clusters, prefix='topic')
 
 #%% Read in diagnosis table
+
+### IT MAY BE WORTH GETTING RID OF THIS TABLE ENTIRELY SINCE ASSESSMENTS CONTAINS A LOT OF INFORMATION RELATED TO A DIAGNOSIS.  ADDITIONALLY NOT ALL PATIENTS HAVE ENTRIES IN THE DIAGNOSIS.
+############################################################################################################################################################################################
+
 diagnoses = pd.read_csv(data_path + '6_patient_diagnoses.csv')
 
 diagnosis_icd9 = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['icd9cm_code_id'].apply(list))
@@ -179,5 +205,39 @@ assessments_diagnoses = assessment2.merge(diagnoses2, how = 'left', on = ['perso
 assessments_diagnoses.head()
 
 #%% Write to CSV
-assessments_diagnoses.to_csv("assessments_diagnoses_join2.csv")
 
+import pickle
+
+pickle.dump(assessments_diagnoses, open("assessments_diagnoses_table", "wb")) 
+
+#assessments_diagnoses.to_csv("assessments_diagnoses_join2.csv")
+
+
+
+
+
+
+
+#%% Join ICD10 cods back in for EDA
+assessment2 = assessment2[['person_id','enc_id','np_chunk_clusters','topic_clusters']]
+
+assessment_codeID = pd.DataFrame(assessment.groupby(['person_id','enc_id'])['txt_diagnosis_code_id'].apply(list))
+assessment2eda = assessment_text.merge(assessment_codeID, how = 'left', on = ['person_id','enc_id'])
+assessment2eda.head()
+
+# Identify clusters associated with AD and dementia
+ngd_icd10 = 'F01|F02|F03|F10|F32|F68|G20|G30|G31|G91|Q05|S09|Z63|Z82|Z81'
+
+assessment2eda['txt_diagnosis_code_id'] = assessment2eda['txt_diagnosis_code_id'].astype(str)
+assessment2eda['txt_diagnosis_code_id'].str.contains(ngd_icd10,case = False).value_counts()
+ad_pos = assessment2eda.loc[(assessment2eda['txt_diagnosis_code_id'].str.contains(ngd_icd10,case = False))]
+
+#%% EDA of AD positive clusters (ngram)
+
+adp_ngram_cluster_count = pd.DataFrame(ad_pos['ngram_clusters'].value_counts())
+adp_np_cluster_count = pd.DataFrame(ad_pos['np_chunk_clusters'].value_counts())
+adp_topic_cluster_count = pd.DataFrame(ad_pos['topic_clusters'].value_counts())
+
+all_ngram_cluster_count = pd.DataFrame(assessment2['ngram_clusters'].value_counts())
+all_npc_counts = pd.DataFrame(assessment2['np_chunk_clusters'].value_counts())
+all_topic_cluster_count = pd.DataFrame(assessment2['topic_clusters'].value_counts())
