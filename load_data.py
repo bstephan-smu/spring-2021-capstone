@@ -572,22 +572,28 @@ class DataLoader:
     # return the main data output
     def create(self, name='main'):
         # generating data attributes
+        print('reading in csvs')
         self.generate_csv_attributes()
 
         # step 1...make sure alzheimers and dementia response is encoded
+        print('encoding alzheimers')
         self.encode_alzheimers()
 
         # step 2...add on cpt table
+        print('encoding cpt')
         self.merge_cpt()
 
         # step 3...load vitals table onto main
+        print('encoding vitals')
         self.merge_vitals()
 
         # step 4...encode medications to find current meds...join onto the main for medication list
+        print('encoding meds')
         self.encode_meds()
         self.merge_meds()
 
         # step 5...load labs onto the main dataframe
+        print('encoding labs')
         self.format_labs(encoded=True)
         self.merge_labs()
 
@@ -595,17 +601,18 @@ class DataLoader:
         self.merge_labs_continuous()
 
         # step 6...load merged assessments + diagnoses onto main dataframe
+        print('encoding assessments')
         self.format_assessments()
         self.merge_assessments()
 
         # step 7...clean data: drop NAs, rename cols etc
+        print ('encoding encounters and cleaning data')
         self.encode_encounters()
-
         self.clean()
 
         # write to pickle file
         self.write(filename=name)
-
+        print('data load complete')
 
     # helper function write entire class object
     def write(self, filename='main'):
