@@ -341,18 +341,18 @@ class DataLoader:
         # DBSCAN Clusterin for trigrams and noun phrase chunks
         tfidf = TfidfVectorizer()
 
-        tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
+        #tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
         tfidf_data_np = tfidf.fit_transform(assessment2['np_chunks'])
 
         cluster_model = KMeans(n_jobs=-1,n_clusters=15)
 
-        print("Starting ngram DBSCAN model fit...")
-        ngram_db_model = cluster_model.fit(tfidf_data_ngram)
-        print("ngram DBSCAN model fit COMPLETE...")
+        #print("Starting ngram KMeans model fit...")
+        #ngram_db_model = cluster_model.fit(tfidf_data_ngram)
+        #print("ngram KMeans model fit COMPLETE...")
 
-        print("Starting ngram DBSCAN model fit on np chunks...")
+        print("Starting NP Chunk Kmeans model fit on np chunks...")
         np_db_model = cluster_model.fit(tfidf_data_np)
-        print("ngram DBSCAN model fit on np chunks COMPLETE...")
+        print("NP Chunk Kmeans model fit on np chunks COMPLETE...")
 
 
         # KMeans cluster counts and labeling
@@ -362,22 +362,33 @@ class DataLoader:
         print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
         print("ngram DBSCAN Model Cluster Count:",assessment2['np_chunk_clusters'].nunique())
 
-        '''#%% LDA clustering
+        #%% LDA clustering
         from sklearn.decomposition import LatentDirichletAllocation as LDA
         from sklearn.feature_extraction.text import CountVectorizer
 
         count_vectorizer =CountVectorizer()
         count_data = count_vectorizer.fit_transform(assessment2['ngram2'].values.astype('U'))
-        lda = LDA(n_components = 20, n_jobs = -1,learning_method = 'online')
+        lda = LDA(n_components = 20,learning_method = 'online')
         lda.fit(count_data)
 
 
         # LDA Cluster labeling
-
-        topic_values = LDA.transform(count_data)
+        topic_values = lda.transform(count_data)
         assessment2['topic_clusters'] = topic_values.argmax(axis=1)
-        '''
 
+
+        #%% FINAL ASSESSMENTS TABLE - One-hot-encode Kmeans and Topic Clusters
+        #%% FINAL ASSESSMENTS TABLE
+        kmeans_cluster = pd.get_dummies(assessment2.np_chunk_clusters, prefix='kmeans')
+        topic_cluster = pd.get_dummies(assessment2.topic_clusters, prefix='topic')
+
+        # use pd.concat to join the new columns with your original dataframe
+        assessment2 = pd.concat([assessment2,kmeans_cluster, prefix='kmeans')],axis=1)
+        assessment2 = pd.concat([assessment2,topic_cluster, prefix='topic')],axis=1)
+
+        # now drop the original 'country' column (you don't need it anymore)
+        assessment2.drop(['np_chunk_clusters','topic_clusters','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks'],axis=1, inplace=True)
+        
 
         # Read in diagnosis table
         diagnoses = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
