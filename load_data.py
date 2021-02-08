@@ -165,11 +165,19 @@ class DataLoader:
         # store output as boolean for that medication
         self.encounters.apply(check_meds, axis=1)
 
+        def get_med_name(med):
+            med = re.search('(\\D+)(.*)',med, flags=re.IGNORECASE).group(1).strip().lower()
+            if med.endswith('-'):
+                med = med[:-1]
+            return med
+            
+        self.meds['med'] = self.meds['medication_name'].apply(get_med_name)
+
 
     def merge_meds(self):
         # note that the meds table may or may not have columns depending on sample
-        meds_wide = pd.get_dummies(self.meds[['enc_id', 'medid', 'is_currently_taking']]
-                                   .query('is_currently_taking'), columns=['medid']) \
+        meds_wide = pd.get_dummies(self.meds[['enc_id', 'med', 'is_currently_taking']]
+                                   .query('is_currently_taking'), columns=['med']) \
             .groupby('enc_id', as_index=False).max()
 
         self.main = self.main.merge(meds_wide, on='enc_id', how='left')
