@@ -13,8 +13,9 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 
-#os.environ["MODIN_ENGINE"] = "dask"  # Modin will use Dask
-#import modin.pandas as pd
+
+# os.environ["MODIN_ENGINE"] = "dask"  # Modin will use Dask
+# import modin.pandas as pd
 
 class DataLoader:
     def __init__(self, data_path='E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/',
@@ -96,7 +97,7 @@ class DataLoader:
         self.dementia_icd_codes = self.diagnosis[
             self.diagnosis.description.isin(dementia_output)].icd9cm_code_id.unique()
 
-        #TODO add self.AD_icd_codes
+        # TODO add self.AD_icd_codes
 
         # Collect response
         AD_people = self.diagnosis[
@@ -120,17 +121,15 @@ class DataLoader:
         # Store in mainDF
         self.main = self.encounters.copy()
 
-
     def merge_cpt(self):
         df_cpt_codes_encoded = pd.concat(
             [
-                self.cpt[['enc_id']], 
+                self.cpt[['enc_id']],
                 pd.get_dummies(self.cpt['CPT_Code'], drop_first=True, prefix='cpt')
             ], axis=1) \
-        .groupby('enc_id', as_index=False).max()
+            .groupby('enc_id', as_index=False).max()
 
         self.main = self.main.merge(df_cpt_codes_encoded, on='enc_id')
-
 
     def merge_vitals(self, rename=True):
         # get average vital measurement per patient encounter
@@ -166,13 +165,12 @@ class DataLoader:
         self.encounters.apply(check_meds, axis=1)
 
         def get_med_name(med):
-            med = re.search('(\\D+)(.*)',med, flags=re.IGNORECASE).group(1).strip().lower()
+            med = re.search('(\\D+)(.*)', med, flags=re.IGNORECASE).group(1).strip().lower()
             if med.endswith('-'):
                 med = med[:-1]
             return med
-            
-        self.meds['med'] = self.meds['medication_name'].apply(get_med_name)
 
+        self.meds['med'] = self.meds['medication_name'].apply(get_med_name)
 
     def merge_meds(self):
         # note that the meds table may or may not have columns depending on sample
@@ -185,19 +183,17 @@ class DataLoader:
         # not all patients have active meds...take care to fill those nulls
         self.main[[col for col in meds_wide.columns if col != 'enc_id']].fillna(0, inplace=True)
 
-
     # reading in raw data from all datasets
     def generate_csv_attributes(self):
         self.encounters = pd.read_csv(self.data_path + '1_BaseEncounters_Dempgraphics_Payers.csv')
         self.format_encounters()  # align encounters table columns...make sure columns are aligned as planned
-        
+
         self.cpt = pd.read_csv(self.data_path + '2_CPT_Codes.csv')
         self.vitals = pd.read_csv(self.data_path + '3_vitals_signs.csv')
         self.meds = pd.read_csv(self.data_path + '4_patient_medication.csv')
         self.labs = pd.read_csv(self.data_path + '5_lab_nor__lab_results_obr_p__lab_results_obx.csv')
         self.diagnosis = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
         self.assessments = pd.read_csv(self.data_path + '7_assessment_impression_plan_.csv')
-
 
     # createa a wide table out of the labs table...
     # perform encodings, etc...
@@ -262,17 +258,15 @@ class DataLoader:
 
         self.labs = encoded_labs
 
-
     def merge_labs(self, rename=True):
         labs_copy = self.labs.copy()
         labs_copy.drop(columns=['person_id', 'lab_results'], inplace=True)
         if rename:
-            labs_copy =  self.rename_cols(labs_copy, prefix='lab_flags_')
+            labs_copy = self.rename_cols(labs_copy, prefix='lab_flags_')
         self.main = self.main.merge(labs_copy, on='enc_id', how='left')
-        
+
         # TODO: address null values col
         self.main[[col for col in labs_copy.columns if col != 'enc_id']].fillna(0, inplace=True)
-
 
     # function to transform assessments table to merge with encounters
     def format_assessments(self):
@@ -284,14 +278,14 @@ class DataLoader:
 
         # Collapse data down by enc_id for assessment
 
-        assessment_text = assessment.groupby(['person_id','enc_id'])['txt_description'].apply(list)
-        assessment_codeID = assessment.groupby(['person_id','enc_id'])['txt_diagnosis_code_id'].apply(list)
+        assessment_text = assessment.groupby(['person_id', 'enc_id'])['txt_description'].apply(list)
+        assessment_codeID = assessment.groupby(['person_id', 'enc_id'])['txt_diagnosis_code_id'].apply(list)
 
         assessment_text = pd.DataFrame(assessment_text)
         assessment_codeID = pd.DataFrame(assessment_codeID)
 
         # Merge series data from text and codeID columns into one df for assessment
-        assessment2 = assessment_text.merge(assessment_codeID, how = 'left', on = ['person_id','enc_id'])
+        assessment2 = assessment_text.merge(assessment_codeID, how='left', on=['person_id', 'enc_id'])
         assessment2 = pd.DataFrame(assessment2)
         assessment2.reset_index(inplace=True)
 
@@ -300,24 +294,24 @@ class DataLoader:
         # Remove Punctuation and convert to lower
         assessment2['txt_description'] = assessment2.txt_description.apply(
             lambda x: ', '.join([str(i) for i in x]))
-        assessment2['txt_description'] = assessment2['txt_description'].str.replace('[^\w\s]','')
+        assessment2['txt_description'] = assessment2['txt_description'].str.replace('[^\w\s]', '')
         assessment2['txt_description'] = assessment2['txt_description'].str.lower()
 
-        #tokenize
+        # tokenize
         assessment2['txt_tokenized'] = assessment2.apply(
             lambda row: nltk.word_tokenize(row['txt_description']), axis=1)
 
-        #Remove Stopwords
+        # Remove Stopwords
         stop = stopwords.words('english')
         assessment2['txt_tokenized'] = assessment2['txt_tokenized'].apply(
             lambda x: [item for item in x if item not in stop])
 
-        #Create ngrams
+        # Create ngrams
         assessment2['ngrams'] = assessment2.apply(
-            lambda row: list(nltk.trigrams(row['txt_tokenized'])),axis=1) 
+            lambda row: list(nltk.trigrams(row['txt_tokenized'])), axis=1)
 
         # Convert trigram lists to words joined by underscores
-        assessment2['ngram2'] = assessment2.ngrams.apply(lambda row:['_'.join(i) for i in row])
+        assessment2['ngram2'] = assessment2.ngrams.apply(lambda row: ['_'.join(i) for i in row])
 
         # Convert trigram and token lists to strings
         assessment2['txt_tokenized2'] = assessment2['txt_tokenized'].apply(' '.join)
@@ -336,99 +330,101 @@ class DataLoader:
         assessment2['np_chunks'] = assessment2['txt_tokenized2'].apply(getNounChunks)
 
         # Pair down assessments table to columns of interest
-        #assessment2 = assessment2[['person_id','enc_id','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks']]
+        # assessment2 = assessment2[['person_id','enc_id','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks']]
 
         # DBSCAN Clusterin for trigrams and noun phrase chunks
         tfidf = TfidfVectorizer()
 
-        #tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
+        # tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
         tfidf_data_np = tfidf.fit_transform(assessment2['np_chunks'])
 
-        cluster_model = KMeans(n_jobs=-1,n_clusters=15)
+        cluster_model = KMeans(n_jobs=-1, n_clusters=15)
 
-        #print("Starting ngram KMeans model fit...")
-        #ngram_db_model = cluster_model.fit(tfidf_data_ngram)
-        #print("ngram KMeans model fit COMPLETE...")
+        # print("Starting ngram KMeans model fit...")
+        # ngram_db_model = cluster_model.fit(tfidf_data_ngram)
+        # print("ngram KMeans model fit COMPLETE...")
 
         print("Starting NP Chunk Kmeans model fit on np chunks...")
         np_db_model = cluster_model.fit(tfidf_data_np)
         print("NP Chunk Kmeans model fit on np chunks COMPLETE...")
 
-
         # KMeans cluster counts and labeling
         # assessment2['ngram_clusters'] = ngram_db_model.labels_
         assessment2['np_chunk_clusters'] = np_db_model.labels_
 
-        #print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
-        print("ngram DBSCAN Model Cluster Count:",assessment2['np_chunk_clusters'].nunique())
+        # print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
+        print("ngram DBSCAN Model Cluster Count:", assessment2['np_chunk_clusters'].nunique())
 
-        #%% LDA clustering
+        # %% LDA clustering
         from sklearn.decomposition import LatentDirichletAllocation as LDA
         from sklearn.feature_extraction.text import CountVectorizer
 
-        count_vectorizer =CountVectorizer()
+        count_vectorizer = CountVectorizer()
         count_data = count_vectorizer.fit_transform(assessment2['ngram2'].values.astype('U'))
-        lda = LDA(n_components = 20,learning_method = 'online')
+        lda = LDA(n_components=20, learning_method='online')
         lda.fit(count_data)
-
 
         # LDA Cluster labeling
         topic_values = lda.transform(count_data)
         assessment2['topic_clusters'] = topic_values.argmax(axis=1)
 
-
-        #%% FINAL ASSESSMENTS TABLE
-        #assessment2.drop(['np_chunk_clusters','topic_clusters','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks'],axis=1, inplace=True)
+        # %% FINAL ASSESSMENTS TABLE
+        # assessment2.drop(['np_chunk_clusters','topic_clusters','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks'],axis=1, inplace=True)
 
         kmeans_cluster = pd.get_dummies(assessment2.np_chunk_clusters, prefix='kmeans')
         topic_cluster = pd.get_dummies(assessment2.topic_clusters, prefix='topic')
 
         # use pd.concat to join the new columns with your original dataframe
-        assessment2 = pd.concat([assessment2,kmeans_cluster],axis=1)
-        assessment2 = pd.concat([assessment2,topic_cluster],axis=1)
-
+        assessment2 = pd.concat([assessment2, kmeans_cluster], axis=1)
+        assessment2 = pd.concat([assessment2, topic_cluster], axis=1)
 
         # Read in diagnosis table
         diagnoses = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
+        ccsr = pd.read_csv(self.data_path + 'ccsr_mapping.csv')
+        diagnoses['diagnosis_code_stripped'] = diagnoses['diagnosis_code_id'].str.replace(".", "")
+        diagnoses = diagnoses.merge(ccsr, left_on='diagnosis_code_stripped', right_on='ICD-10-CM Code', how='left')
 
-        diagnosis_icd9 = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['icd9cm_code_id'].apply(list))
-        diagnosis_dc = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['diagnosis_code_id'].apply(list))
-        diagnosis_desc = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['description'].apply(list))
-        diagnosis_datesymp = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['date_onset_sympt'].apply(list))
-        diagnosis_datediag = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['date_diagnosed'].apply(list))
-        diagnosis_dateresl = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['date_resolved'].apply(list))
-        diagnosis_statusid = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['status_id'].apply(list))
-        diagnosis_dx = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['dx_priority'].apply(list))
-        diagnosis_chronic = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['chronic_ind'].apply(list))
-        diagnosis_rcdelswhr = pd.DataFrame(diagnoses.groupby(['person_id','enc_id'])['recorded_elsewhere_ind'].apply(list))
+        diagnosis_icd9 = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['icd9cm_code_id'].apply(list))
+        diagnosis_dc = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['diagnosis_code_id'].apply(list))
+        diagnosis_desc = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['description'].apply(list))
+        diagnosis_datesymp = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['date_onset_sympt'].apply(list))
+        diagnosis_datediag = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['date_diagnosed'].apply(list))
+        diagnosis_dateresl = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['date_resolved'].apply(list))
+        diagnosis_statusid = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['status_id'].apply(list))
+        diagnosis_dx = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['dx_priority'].apply(list))
+        diagnosis_chronic = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['chronic_ind'].apply(list))
+        diagnosis_rcdelswhr = pd.DataFrame(
+            diagnoses.groupby(['person_id', 'enc_id'])['recorded_elsewhere_ind'].apply(list))
 
+        diagnosis_ccsr_category = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['CCSR Category'].apply(list))
         # Merge series data from text and codeID columns into one df for assessment
         diagnoses2 = diagnosis_icd9 \
-            .merge(diagnosis_dc, how = 'left', on = ['person_id','enc_id']) \
-            .merge(diagnosis_desc, how = 'left', on = ['person_id','enc_id']) \
-            .merge(diagnosis_datesymp, how = 'left', on = ['person_id','enc_id']) \
-            .merge(diagnosis_datediag, how = 'left', on = ['person_id','enc_id']) \
-            .merge(diagnosis_dateresl, how = 'left', on = ['person_id','enc_id']) \
-            .merge(diagnosis_statusid, how = 'left', on = ['person_id','enc_id']) \
-            .merge(diagnosis_dx, how = 'left', on = ['person_id','enc_id']) \
-            .merge(diagnosis_chronic, how = 'left', on = ['person_id','enc_id']) \
-            .merge(diagnosis_rcdelswhr, how = 'left', on = ['person_id','enc_id'])
+            .merge(diagnosis_dc, how='left', on=['person_id', 'enc_id']) \
+            .merge(diagnosis_desc, how='left', on=['person_id', 'enc_id']) \
+            .merge(diagnosis_datesymp, how='left', on=['person_id', 'enc_id']) \
+            .merge(diagnosis_datediag, how='left', on=['person_id', 'enc_id']) \
+            .merge(diagnosis_dateresl, how='left', on=['person_id', 'enc_id']) \
+            .merge(diagnosis_statusid, how='left', on=['person_id', 'enc_id']) \
+            .merge(diagnosis_dx, how='left', on=['person_id', 'enc_id']) \
+            .merge(diagnosis_chronic, how='left', on=['person_id', 'enc_id']) \
+            .merge(diagnosis_rcdelswhr, how='left', on=['person_id', 'enc_id']) \
+            .merge(diagnosis_ccsr_category, how='left', on=['person_id', 'enc_id'])
 
         diagnoses2 = pd.DataFrame(diagnoses2)
         diagnoses2.reset_index(inplace=True)
 
         # Merge assements[txt_description] to ngd df
-        #Diagnosis occur after assessments, diagnosis table is smaller than assessments table
-        assessments_diagnoses = assessment2.merge(diagnoses2, how = 'left', on = ['person_id','enc_id'])
+        # Diagnosis occur after assessments, diagnosis table is smaller than assessments table
+        assessments_diagnoses = assessment2.merge(diagnoses2, how='left', on=['person_id', 'enc_id'])
 
         self.asmt_diag = assessments_diagnoses
         # drop 5 rows with missing diag data
+        # TODO: fix this statement
         self.asmt_diag = self.asmt_diag[~self.asmt_diag['diagnosis_code_id'].isnull()]
-
 
     def one_hot(self, df, col_name, prefix=''):
         mlb = MultiLabelBinarizer()
-        df = df.join(pd.DataFrame(mlb.fit_transform(df[col_name]),columns=prefix+mlb.classes_))
+        df = df.join(pd.DataFrame(mlb.fit_transform(df[col_name]), columns=prefix + mlb.classes_))
         df = df.drop(columns=[col_name])
         return df
 
@@ -436,72 +432,73 @@ class DataLoader:
         assess_copy = self.asmt_diag.copy().fillna(0)
 
         # Pair down assessments table to columns of interest
-        assess_copy = assess_copy[['person_id','enc_id','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks','diagnosis_code_id','description']]
-        assess_copy = self.one_hot(assess_copy, 'diagnosis_code_id', prefix='icd_')
+        assess_copy = assess_copy[
+            ['person_id', 'enc_id', 'txt_description', 'txt_tokenized', 'ngrams', 'ngram2', 'txt_tokenized2',
+             'np_chunks', 'CCSR Category', 'description']]
+        assess_copy = self.one_hot(assess_copy, 'CCSR Category', prefix='icd_')
 
         if rename:
             assess_copy = self.rename_cols(assess_copy, prefix='asmt_')
-        self.main = self.main.merge(assess_copy, on=['person_id','enc_id'], how='left')
-
+        self.main = self.main.merge(assess_copy, on=['person_id', 'enc_id'], how='left')
 
     def encode_encounters(self):
 
         # CPT is already encoded via the CPT table, and drop cols unrelated to response:
-        dropcols = ['Encounter_Primary_Payer', 'Encounter_Secondary_Payer', 'Encounter_Teritiary_Payer', 
-                    'LocationName', 'ServiceDepartment', 'VisitType', 'CPT_Code', 'CPT_Code_Seq', 'Provider_id', 'place_of_service']
-        
+        dropcols = ['Encounter_Primary_Payer', 'Encounter_Secondary_Payer', 'Encounter_Teritiary_Payer',
+                    'LocationName', 'ServiceDepartment', 'VisitType', 'CPT_Code', 'CPT_Code_Seq', 'Provider_id',
+                    'place_of_service']
+
         self.main.drop(columns=dropcols, inplace=True)
 
-
         # Apply enc_ label to encounter columns
-        self.main.rename(columns = { 
-            'EncounterDate':'enc_EncounterDate',
-            'Race':'enc_Race',
-            'Ethnicity':'enc_Ethnicity',
-            'Gender':'enc_Gender',
-            'AgeAtEnc':'enc_AgeAtEnc'
+        self.main.rename(columns={
+            'EncounterDate': 'enc_EncounterDate',
+            'Race': 'enc_Race',
+            'Ethnicity': 'enc_Ethnicity',
+            'Gender': 'enc_Gender',
+            'AgeAtEnc': 'enc_AgeAtEnc'
         }, inplace=True)
 
         # Update EncounterDate to be an ordinal date (see: pandas.Timestamp.toordinal)
         self.main['enc_EncounterDate'] = self.main['enc_EncounterDate'].apply(lambda x: x.toordinal())
 
         # Onehot encode 
-        self.main = pd.get_dummies(self.main, columns = [
+        self.main = pd.get_dummies(self.main, columns=[
             'enc_Race',
             'enc_Ethnicity',
             'enc_Gender'
         ])
 
-
     def format_labs_continuous(self):
         labs = pd.read_csv(self.data_path + '5_lab_nor__lab_results_obr_p__lab_results_obx.csv')
 
         # Filter to applicable cols:
-        labs2 = labs[['lab_nor_enc_id','lab_results_obx_result_desc', 'lab_results_obx_observ_value', 'lab_results_obx_units']]
+        labs2 = labs[
+            ['lab_nor_enc_id', 'lab_results_obx_result_desc', 'lab_results_obx_observ_value', 'lab_results_obx_units']]
 
         # Drop NAs
-        labs2.dropna(inplace = True)
+        labs2.dropna(inplace=True)
 
         # Create new features
-        labs2['lab_test'] = 'lab_'+labs['lab_results_obx_result_desc'] + ' (' + labs2['lab_results_obx_units'] + ')'
+        labs2['lab_test'] = 'lab_' + labs['lab_results_obx_result_desc'] + ' (' + labs2['lab_results_obx_units'] + ')'
         labs2['lab_test_results'] = labs2['lab_results_obx_observ_value']
         labs2 = labs2[['lab_nor_enc_id', 'lab_test', 'lab_test_results']]
 
         def parse_results(x):
             try:
                 x = float(x)
-            except ValueError: # strings
+            except ValueError:  # strings
                 if x in ['++POSITIVE++', 'POSITIVE', 'DETECTED']:
                     return 1
 
-                if x in ['Negative', 'None Detected', 'None seen', 'Not Observed', 'NOT DETECTED', 
-                    'NEGATIVE', 'NEGATIVE CONFIRMED', '<20 NOT DETECTED', '<15 NOT DETECTED', '<1.30 NOT DETECTED', 
-                    '<1.18 NOT DETECTED', 'NONE DETECTED',  '<1.0 NEG', 'NONE SEEN',  '<1:10','<1:16', '<1:64',]: 
+                if x in ['Negative', 'None Detected', 'None seen', 'Not Observed', 'NOT DETECTED',
+                         'NEGATIVE', 'NEGATIVE CONFIRMED', '<20 NOT DETECTED', '<15 NOT DETECTED', '<1.30 NOT DETECTED',
+                         '<1.18 NOT DETECTED', 'NONE DETECTED', '<1.0 NEG', 'NONE SEEN', '<1:10', '<1:16', '<1:64', ]:
                     return 0
 
-                if x in [ 'Comment','FEW', 'INTERFERENCE', 'MANY', 'MODERATE', 'NOT APPLICABLE',
-                    'NOT CALC','NOT CALCULATED','NOT GIVEN','NOTE','PACKED','PENDING','SEE BELOW',
-                    'SEE NOTE', 'See Final Results', 'TNP', 'UNABLE TO CALCULATE', 'B']:
+                if x in ['Comment', 'FEW', 'INTERFERENCE', 'MANY', 'MODERATE', 'NOT APPLICABLE',
+                         'NOT CALC', 'NOT CALCULATED', 'NOT GIVEN', 'NOTE', 'PACKED', 'PENDING', 'SEE BELOW',
+                         'SEE NOTE', 'See Final Results', 'TNP', 'UNABLE TO CALCULATE', 'B']:
                     return None
 
                 if x.startswith('> OR = '):
@@ -520,7 +517,7 @@ class DataLoader:
                     x = x.split('-')
                     return (float(x[0]) + float(x[1])) / 2
 
-                if x in [ '6.9 % +', '6.9% +', '6.9%+']:
+                if x in ['6.9 % +', '6.9% +', '6.9%+']:
                     return 7
 
                 if x == '7.5%+':
@@ -536,15 +533,14 @@ class DataLoader:
             return float(x)
 
         labs2['lab_test_results'] = labs2['lab_test_results'].apply(lambda x: parse_results(x))
-        labs2.dropna(inplace = True)
-        labs2.rename(columns = {'lab_nor_enc_id':'enc_id'}, inplace=True)
+        labs2.dropna(inplace=True)
+        labs2.rename(columns={'lab_nor_enc_id': 'enc_id'}, inplace=True)
         self.labs_cont = labs2
 
-
     def merge_labs_continuous(self):
-        labs2_encoded = self.labs_cont.groupby(['enc_id', 'lab_test'])['lab_test_results'].aggregate('mean').unstack().reset_index()
+        labs2_encoded = self.labs_cont.groupby(['enc_id', 'lab_test'])['lab_test_results'].aggregate(
+            'mean').unstack().reset_index()
         self.main = self.main.merge(labs2_encoded, how='left', on='enc_id')
-
 
     # split number word combinations
     def split_numbers(self, word_list):
@@ -562,7 +558,6 @@ class DataLoader:
                     row_list.append(word)
             output.append(' '.join(row_list))
         return output
-
 
     # lookup words from custom lexicon
     def custom_lexicon(self, word_list):
@@ -618,7 +613,6 @@ class DataLoader:
         return output
         # make sure to split lexicon definition by space and strip any non alpha numeric characters
 
-
     def strip_non_alpha(self, word_list):
         output = []
         for row in word_list:
@@ -632,7 +626,6 @@ class DataLoader:
                 row_list.append(word_)
             output.append(' '.join(row_list))
         return output
-
 
     def porter_stemmer(self, word_list):
         ps = nltk.PorterStemmer()
@@ -667,7 +660,6 @@ class DataLoader:
         km.fit(tfidf)
         self.encounters['cluster'] = km.labels_
 
-
     def clean(self):
         # Drop single value columns
         single_val_columns = []
@@ -676,7 +668,7 @@ class DataLoader:
                 if self.main[col].nunique() == 1:
                     single_val_columns.append(col)
             except TypeError:
-                pass # skip list cols
+                pass  # skip list cols
         self.main.drop(columns=single_val_columns, inplace=True)
 
         # feature reduction...encode different columns as n_clusters
@@ -719,7 +711,7 @@ class DataLoader:
         self.merge_assessments()
 
         # step 7...clean data: drop NAs, rename cols etc
-        print ('encoding encounters and cleaning data')
+        print('encoding encounters and cleaning data')
         self.encode_encounters()
         self.clean()
 
@@ -732,30 +724,28 @@ class DataLoader:
         with open(self.data_path + filename + '.pickle', 'wb') as picklefile:
             pickle.dump(self, picklefile)
 
-
     # helper function to return entire class object
     def load(self, filename='main'):
         with open(self.data_path + filename + '.pickle', 'rb') as picklefile:
             return pickle.load(picklefile)
 
-
     # helper to add prefix to colnames:
     def rename_cols(self, df, prefix=''):
         new_cols = []
         for c in list(df):
-            if c in ['person_id','enc_id']:
+            if c in ['person_id', 'enc_id']:
                 new_cols.append(c)
             else:
-                new_cols.append(prefix+c)
+                new_cols.append(prefix + c)
         df.columns = new_cols
         return df
 
 
 if __name__ == "__main__":
     data = DataLoader(subset=1000)
-    data.create()
+    data.generate_csv_attributes()
+    data.format_assessments()
+    #data.create()
     print(data.load())
-
-
 
 # %%
