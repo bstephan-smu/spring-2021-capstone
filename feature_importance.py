@@ -1,6 +1,6 @@
 #%%
 from load_data import DataLoader
-capData = DataLoader().load()
+capData = DataLoader()#.create()
 
 
 # %%
