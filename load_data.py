@@ -118,9 +118,6 @@ class DataLoader:
             default='Normal'
         )
 
-        # Store in mainDF
-        self.main = self.encounters.copy()
-
     def merge_cpt(self):
         df_cpt_codes_encoded = pd.concat(
             [
@@ -456,7 +453,8 @@ class DataLoader:
             'Race': 'enc_Race',
             'Ethnicity': 'enc_Ethnicity',
             'Gender': 'enc_Gender',
-            'AgeAtEnc': 'enc_AgeAtEnc'
+            'AgeAtEnc': 'enc_AgeAtEnc',
+            'rfv_cluster':'enc_rfv_cluster'
         }, inplace=True)
 
         # Update EncounterDate to be an ordinal date (see: pandas.Timestamp.toordinal)
@@ -466,7 +464,8 @@ class DataLoader:
         self.main = pd.get_dummies(self.main, columns=[
             'enc_Race',
             'enc_Ethnicity',
-            'enc_Gender'
+            'enc_Gender',
+            'enc_rfv_cluster'
         ])
 
     def format_labs_continuous(self):
@@ -658,7 +657,7 @@ class DataLoader:
         # ask user for optimal values
         km = KMeans(n_clusters=22, init='k-means++', max_iter=100, n_init=1)
         km.fit(tfidf)
-        self.encounters['cluster'] = km.labels_
+        self.encounters['rfv_cluster'] = km.labels_
 
     def clean(self):
         # Drop single value columns
@@ -671,8 +670,9 @@ class DataLoader:
                 pass  # skip list cols
         self.main.drop(columns=single_val_columns, inplace=True)
 
-        # feature reduction...encode different columns as n_clusters
-        self.run_reason_for_visit()
+    def generate_main(self):
+        self.main = self.encounters.copy()
+
 
     # return the main data output
     def create(self, name='main'):
@@ -684,6 +684,9 @@ class DataLoader:
         print('encoding alzheimers')
         self.encode_alzheimers()
 
+        # feature reduction...encode different columns as n_clusters
+        self.run_reason_for_visit()
+        self.generate_main()
         # step 2...add on cpt table
         print('encoding cpt')
         self.merge_cpt()
