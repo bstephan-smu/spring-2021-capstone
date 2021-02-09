@@ -81,7 +81,7 @@ class DataLoader:
         self.encounters.columns = ['person_id', 'enc_id', 'place_of_service', 'Provider_id', 'EncounterDate', 'Race',
                                    'Ethnicity', 'Gender', 'AgeAtEnc', 'VisitType', 'ServiceDepartment',
                                    'LocationName',
-                                   'Reason_for_Visit', 'CPT_Code', 'CPT_Code_Seq', 'Encounter_Primary_payer',
+                                   'Reason_for_Visit', 'CPT_Code', 'CPT_Code_Seq', 'Encounter_Primary_Payer',
                                    'Encounter_Secondary_Payer', 'Encounter_Teritiary_Payer']
 
     # function to classify as True/False Alzheimers Disease in the encounter dataset
@@ -359,7 +359,7 @@ class DataLoader:
         # assessment2['ngram_clusters'] = ngram_db_model.labels_
         assessment2['np_chunk_clusters'] = np_db_model.labels_
 
-        print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
+        #print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
         print("ngram DBSCAN Model Cluster Count:",assessment2['np_chunk_clusters'].nunique())
 
         #%% LDA clustering
