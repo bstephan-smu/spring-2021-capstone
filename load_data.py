@@ -781,8 +781,8 @@ def stripNA(lst_col):
             lst_col.remove(item)
     return lst_col
 
-assess_copy['CCSR Category'] = assess_copy['CCSR Category'].apply(stripNA)
-assess_encoded = one_hot(assess_copy, 'CCSR Category', prefix='ccsr_')
+assess_copy['CCSR Category2'] = assess_copy['CCSR Category'].apply(stripNA)
+assess_encoded = one_hot(assess_copy, 'CCSR Category2', prefix='ccsr_')
 
 assess_encoded.rename(columns={
     'txt_description': 'asmt_txt_description',
@@ -794,7 +794,9 @@ assess_encoded.rename(columns={
     'description': 'asmt_description'
 }, inplace=True)
 
-capData.main = capData.main.merge(assess_copy, on=['person_id', 'enc_id'], how='left')
+capData.main.drop(columns=['CCSR Category'], inplace = True)
+
+capData.main = capData.main.merge(assess_encoded, on=['person_id', 'enc_id'], how='left')
 
 capData.encode_encounters()
 
@@ -804,6 +806,7 @@ capData.write()
 
 # %%
 from load_data import DataLoader
-tmp = DataLoader().load()
-tmp.main
+capData = DataLoader().load('partial')
+# %%
+capData.main
 # %%
