@@ -683,6 +683,14 @@ class DataLoader:
     def generate_main(self):
         self.main = self.encounters.copy()
 
+    def merge_clusters(self):
+        # Add in clusters:
+        assess_copy = self.asmt_diag.copy()
+        assess_cluster_cols = [col for col in assess_copy if col.startswith('topic') or col.startswith('kmeans')]
+        assess_cluster_cols += ['person_id','enc_id','np_chunk_clusters']
+        clusters = assess_copy[assess_cluster_cols]
+        clusters = self.rename_cols(assess_copy, prefix='asmt_')
+        self.main = self.main.merge(clusters, on=['person_id', 'enc_id'], how='left')
 
     # return the main data output
     def create(self, name='main'):
@@ -729,6 +737,9 @@ class DataLoader:
         # step 7...clean data: drop NAs, rename cols etc
         print('encoding encounters and cleaning data')
         self.encode_encounters()
+
+        self.merge_clusters()
+
         self.clean()
 
         # write to pickle file

@@ -48,3 +48,15 @@ capData.encode_encounters()
 capData.clean()
 
 capData.write()
+
+
+# %% Patch 1.1: add clusters
+
+from load_data import DataLoader
+capData = DataLoader().load()
+
+capData.merge_clusters()
+
+capData.write()
+
+# %%
