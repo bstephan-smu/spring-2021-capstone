@@ -59,4 +59,17 @@ capData.merge_clusters()
 
 capData.write()
 
+# %% Patch 1.2: fix extra cols brought in with merge
+
+from load_data import DataLoader
+capData = DataLoader().load()
+
+dropcols = [col for col in capData.main if col.endswith('_y')]
+capData.main.drop(columns = dropcols, inplace=True)
+
+dropcols = [col for col in capData.main if col.endswith('_x')]
+newcols = [col.strip('_x') for col in capData.main if col.endswith('_x')]
+capData.main.rename(columns=dict(zip(dropcols, newcols)), inplace=True)
+
+capData.write()
 # %%
