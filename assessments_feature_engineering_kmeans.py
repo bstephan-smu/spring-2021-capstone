@@ -126,9 +126,9 @@ cluster_model = KMeans(n_jobs=-1,n_clusters=50)
 #ngram_db_model = cluster_model.fit(tfidf_data_ngram)
 #print("ngram DBSCAN model fit COMPLETE...")
 
-print("Starting ngram Kmeans model fit on np chunks...")
+print("Starting NP Chunk Kmeans model fit on np chunks...")
 np_db_model = cluster_model.fit(tfidf_data_np)
-print("ngram DBSCAN model fit on np chunks COMPLETE...")
+print("NP Chunk Kmeans model fit on np chunks COMPLETE...")
 
 
 #%% KMeans cluster counts and labeling
@@ -170,8 +170,19 @@ print("Clustering Complete.")
 
 
 #%% FINAL ASSESSMENTS TABLE
-assessment2 = assessment2.get_dummies(assessment2.np_chunk_clusters, prefix='kmeans')
-assessment2 = assessment2.get_dummies(assessment2.topic_clusters, prefix='topic')
+#assessment2.drop(['np_chunk_clusters','topic_clusters','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks'],axis=1, inplace=True)
+
+kmeans_cluster = pd.get_dummies(assessment2.np_chunk_clusters, prefix='kmeans')
+topic_cluster = pd.get_dummies(assessment2.topic_clusters, prefix='topic')
+
+# use pd.concat to join the new columns with your original dataframe
+assessment2 = pd.concat([assessment2,kmeans_cluster],axis=1)
+assessment2 = pd.concat([assessment2,topic_cluster],axis=1)
+
+#%% Pickle assessments_one_hot
+import pickle
+
+pickle.dump(assessment2, open("assessments_one_hot", "wb")) 
 
 #%% Read in diagnosis table
 
@@ -206,9 +217,8 @@ assessments_diagnoses.head()
 
 #%% Write to CSV
 
-import pickle
 
-pickle.dump(assessments_diagnoses, open("assessments_diagnoses_table", "wb")) 
+pickle.dump(assessments_diagnoses, open("assessments_diagnoses_table.pickle", "wb")) 
 
 #assessments_diagnoses.to_csv("assessments_diagnoses_join2.csv")
 
