@@ -1,6 +1,7 @@
 #%%
 from load_data import DataLoader
-capData = DataLoader()#.create()
+capData = DataLoader().load()
+#pd.set_option('display.max_columns', None)
 
 
 # %%
@@ -19,25 +20,28 @@ def get_data(self, data_cols='all', target_col='AD_event', alt_data=None):
         column_list += alt_data
 
     dropcols = [col for col in df if col.lstrip('asmt_icd_') in self.dementia_icd_codes]
-    extra_cols = ['Cognition',
-        'asmt_txt_description',
-        'asmt_txt_tokenized',
-        'asmt_ngrams',
-        'asmt_ngram2',
-        'asmt_txt_tokenized2',
-        'asmt_np_chunks',
-        'asmt_description',
+        
+    response_cols = [
+        'Cognition',
         'enc_id',
         'person_id',
         'AD_person',
         'AD_event',
         'dem_person',
-        'dem_event'
+        'dem_event',
+        'ccsr_NVS011'
         ]
     
-    extra_cols.remove(target_col)
+    response_cols.remove(target_col)
     
-    dropcols += extra_cols
+    dropcols += response_cols
+
+    # Drop str cols
+    dropcols += [col for col in capData.main if type(capData.main[col][0]) == str]
+
+    # Drop list cols
+    dropcols += [col for col in capData.main if type(capData.main[col][0]) == list]
+
     X = df.drop(columns=dropcols)
     
     if data_cols != 'all':
@@ -140,24 +144,28 @@ def get_feature_importance(dataloader=capData, table='all', target='dem_person',
 # %% get all feature importance
 FI_enc = get_feature_importance(capData, table='enc_')
 FI_vit = get_feature_importance(capData, table='vit_')
-FI_med = get_feature_importance(capData, table='medid_')
-FI_diag = get_feature_importance(capData, table='asmt_icd_')
+FI_med = get_feature_importance(capData, table='med_')
 FI_cpt = get_feature_importance(capData, table='cpt_')
 FI_lab = get_feature_importance(capData, table='lab_')
+FI_CCSR = get_feature_importance(capData, table='ccsr_')
+FI_diag = get_feature_importance(capData, table='asmt_')
+FI_all = get_feature_importance(capData)
 
 
-# import pandas as pd
-# cols = [FI_enc, FI_vit, FI_med, FI_diag, FI_cpt, FI_lab]
-# all_df = pd.DataFrame()
-# for df in cols:
-#     tab = df.Feature[0][:3]
-#     df.to_csv('FI_'+tab+'.csv')
-#     all_df = pd.concat([all_df, df[df['Feature_Importance'] > .001]])
+# %%
 
-# FI_all = get_feature_importance(capData, alt_data=list(all_df.Feature), table='all', target='dem_person')
-# FI_all.to_csv('FI_all.csv')
+import pandas as pd
+cols = [FI_enc, FI_vit, FI_med, FI_diag, FI_cpt, FI_lab, FI_CCSR]
+all_df = pd.DataFrame()
+for df in cols:
+    tab = df.Feature[0][:3]
+    df.to_csv('FI_'+tab+'.csv')
+    all_df = pd.concat([all_df, df[df['Feature_Importance'] > .001]])
 
-# FI_all.nlargest(30, 'Feature_Importance') 
+FI_all = get_feature_importance(capData, alt_data=list(all_df.Feature), table='all', target='dem_person')
+FI_all.to_csv('FI_all.csv')
+
+FI_all.nlargest(30, 'Feature_Importance') 
 
 # %%
 FI_lab = get_feature_importance(capData, table='lab')
@@ -185,8 +193,8 @@ data = get_data(capData, target_col='dem_person')
 classifiers = {
     'Random_Forest': RandomForestClassifier,
     'Logistic_Regression': LogisticRegression,
-    # 'SVM': SVC,
-    # 'GBoost': GradientBoostingClassifier,
+    'SVM': SVC,
+    'GBoost': GradientBoostingClassifier,
     'AdaBoost': AdaBoostClassifier,
     'SGD': SGDClassifier
 }
@@ -205,8 +213,8 @@ param_grid = {
     #     'max_samples': None,
     #     'min_impurity_decrease': 0.0,
     #     'min_impurity_split': None,
-         'min_samples_leaf': [1,10],
-         'min_samples_split': [2,10],
+         'min_samples_leaf': [1,10,100],
+         'min_samples_split': [2,30,500],
     #     'min_weight_fraction_leaf': 0.0,
          'n_estimators': [100, 1000]
     #     'n_jobs': None,
@@ -233,48 +241,48 @@ param_grid = {
     #     # 'warm_start': False
          },
 
-    # 'SVM': {
-    #      'C': [.01, .1],
-    # #     'break_ties': False,
-    # #     'cache_size': 200,
-    # #     'class_weight': ['balanced', None],
-    # #     'coef0': 0.0,
-    # #     'decision_function_shape': 'ovr',
-    # #     'degree': 3,
-    # #     'gamma': ['scale', 'auto'],
-    #      'kernel': ['linear', 'rbf']
-    # #     'max_iter': -1,
-    # #     'probability': False,
-    # #     'random_state': None,
-    # #     'shrinking': True,
-    # #     'tol': 0.001,
-    # #     'verbose': False
-    #     },
+    'SVM': {
+         'C': [.01, .1],
+    #     'break_ties': False,
+    #     'cache_size': 200,
+    #     'class_weight': ['balanced', None],
+    #     'coef0': 0.0,
+    #     'decision_function_shape': 'ovr',
+    #     'degree': 3,
+    #     'gamma': ['scale', 'auto'],
+         'kernel': ['linear', 'rbf']
+    #     'max_iter': -1,
+    #     'probability': False,
+    #     'random_state': None,
+    #     'shrinking': True,
+    #     'tol': 0.001,
+    #     'verbose': False
+        },
 
-    # 'GBoost' : {
-    #     # 'ccp_alpha': 0.0,
-    #     # 'criterion': 'friedman_mse',
-    #     # 'init': None,
-    #     # 'learning_rate': 0.1,
-    #     # 'loss': 'deviance',
-    #     # 'max_depth': 3,
-    #     # 'max_features': None,
-    #     # 'max_leaf_nodes': None,
-    #     # 'min_impurity_decrease': 0.0,
-    #     # 'min_impurity_split': None,
-    #      'min_samples_leaf': [1,10],
-    #      'min_samples_split': [2,10]
-    #     # 'min_weight_fraction_leaf': 0.0,
-    #     # 'n_estimators': 100,
-    #     # 'n_iter_no_change': None,
-    #     # 'presort': 'deprecated',
-    #     # 'random_state': None,
-    #     # 'subsample': 1.0,
-    #     # 'tol': 0.0001,
-    #     # 'validation_fraction': 0.1,
-    #     # 'verbose': 0,
-    #     # 'warm_start': False
-    #     },
+    'GBoost' : {
+        # 'ccp_alpha': 0.0,
+        # 'criterion': 'friedman_mse',
+        # 'init': None,
+        # 'learning_rate': 0.1,
+        # 'loss': 'deviance',
+        # 'max_depth': 3,
+        # 'max_features': None,
+        # 'max_leaf_nodes': None,
+        # 'min_impurity_decrease': 0.0,
+        # 'min_impurity_split': None,
+         'min_samples_leaf': [1,10],
+         'min_samples_split': [2,10]
+        # 'min_weight_fraction_leaf': 0.0,
+        # 'n_estimators': 100,
+        # 'n_iter_no_change': None,
+        # 'presort': 'deprecated',
+        # 'random_state': None,
+        # 'subsample': 1.0,
+        # 'tol': 0.0001,
+        # 'validation_fraction': 0.1,
+        # 'verbose': 0,
+        # 'warm_start': False
+        },
 
     'AdaBoost': {
        # 'algorithm': 'SAMME.R',
@@ -323,10 +331,26 @@ gs.plot_metrics(save=True)
 # %%
 # Get Logistic Regression Coefficients 
 import pandas as pd
-coefs = list(results['best_overall']['clf'].coef_[0])
+coefs = list(results.get('Logistic_Regression')['best_Logistic_Regression']['clf'].coef_[0])
 labels = list(data[0])
 LR_coefs = pd.DataFrame(zip(labels,coefs), columns = ['Feature', 'Coefficient']).sort_values(by='Coefficient', ascending=False)
-LR_coefs
+
+LR_coefs[abs(LR_coefs.Coefficient) >  2]
+
+
+
+
+# %% Get Random Forest Coefficients
+coefs = results.get('Random_Forest')['best_Random_Forest']['clf'].feature_importances_
+labels = list(data[0])
+
+RF_coefs = pd.DataFrame(zip(labels,coefs), 
+columns=['Feature','Feature_Importance']).sort_values(
+    by='Feature_Importance', ascending=False)
+
+RF_coefs[RF_coefs.Feature_Importance >  .001]
+
+
 
 # %%
 
@@ -353,7 +377,7 @@ for result in tmp:
 capData.main
 # %%
 import pickle
-with open(capData.data_path + 'model_results/20200205_results.pickle', 'wb') as picklefile:
+with open(capData.data_path + 'model_results/20210210_results.pickle', 'wb') as picklefile:
     pickle.dump(results, picklefile)
 # %%
 """
