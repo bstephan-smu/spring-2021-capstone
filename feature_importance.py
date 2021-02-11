@@ -11,6 +11,7 @@ def get_data(self, data_cols='all', target_col='AD_event', alt_data=None):
     \ndata_cols: pass the table prefix to return only a table from main options: 
     \n{'cpt_','lab_','vit_','medid_','asmt_icd', 'enc_'}
     \ntarget_col: pass AD_event or dem_event for target
+    \nalt_data: pass in a list of columns to run grid on
     \ne.g. X, y = get_data(capData, data_cols='vit_')
     """
     df = self.main.copy()
@@ -187,7 +188,7 @@ from sklearn.linear_model import SGDClassifier
 warnings.simplefilter(action="default")
 
 # Get Data:
-data = get_data(capData, target_col='dem_person')
+data = get_data(capData, data_cols='xxx', target_col='dem_person', alt_data=list(LR_coefs['Feature']))
 
 # Choose classifiers to run
 classifiers = {
@@ -224,14 +225,14 @@ param_grid = {
     #     'warm_start': False
         },
     'Logistic_Regression': {
-         'C': [1, 10], # 1 performs vastly better than lesser nums
+         'C': [.001,.01,.1,1,10,100], 
     #     'class_weight': ['balanced', None],
     #     # 'dual': False,
     #     # 'fit_intercept': True,
     #     # 'intercept_scaling': [1, 10],
     #     # 'l1_ratio': None,
-         'max_iter': [10,1000],
-    #     # 'multi_class': 'auto',
+         'max_iter': [1000],
+         'multi_class': ['auto', 'ovr'],
     #     # 'n_jobs': None,
          'penalty': ['l2'], # sag requires L2 solver
     #     # 'random_state': None,
@@ -242,7 +243,7 @@ param_grid = {
          },
 
     'SVM': {
-         'C': [.01, .1],
+         'C': [.001,.01,.1,1,10,100],
     #     'break_ties': False,
     #     'cache_size': 200,
     #     'class_weight': ['balanced', None],
@@ -270,8 +271,8 @@ param_grid = {
         # 'max_leaf_nodes': None,
         # 'min_impurity_decrease': 0.0,
         # 'min_impurity_split': None,
-         'min_samples_leaf': [1,10],
-         'min_samples_split': [2,10]
+         'min_samples_leaf': [1,10,300],
+         'min_samples_split': [3,30,100]
         # 'min_weight_fraction_leaf': 0.0,
         # 'n_estimators': 100,
         # 'n_iter_no_change': None,
@@ -285,15 +286,15 @@ param_grid = {
         },
 
     'AdaBoost': {
-       # 'algorithm': 'SAMME.R',
+        'algorithm': ['SAMME.R','SAMME'],
        # 'base_estimator': None,
-        'learning_rate': [.1, 1.0, 10],
+        'learning_rate': [.1, 1, 10],
         'n_estimators': [50, 100, 1000],
        # 'random_state': None
         },
 
     'SGD': {
-         'alpha':[0.0001, .00001],
+         'alpha':[.0001,.001,.01,.1,1],
         # 'average': False,
         # 'class_weight': None,
         # 'early_stopping': False,
@@ -302,7 +303,7 @@ param_grid = {
         # 'fit_intercept': True,
         # 'l1_ratio': 0.15,
         # 'learning_rate': 'optimal',
-          'loss': ['hinge','log','squared_hinge'],
+          'loss': ['squared_hinge', 'perceptron'],
           'max_iter': [5000], # Less than 1k will not resolve
         # 'n_iter_no_change': 5,
         # 'n_jobs': None,
@@ -328,6 +329,7 @@ results = gs.run_grid(n_folds=3, splits=False, scale=True, sparse=True, verbose=
 gs.plot_metrics(save=True)
 
 
+
 # %%
 # Get Logistic Regression Coefficients 
 import pandas as pd
@@ -351,47 +353,15 @@ columns=['Feature','Feature_Importance']).sort_values(
 RF_coefs[RF_coefs.Feature_Importance >  .001]
 
 
+# %% Save Results Dict to pickle in your local dir
 
-# %%
-
-#TODO add a section to grab RandomForest feature importance 
-# (same code as in the top cells)
-
-import pprint
-pprint.pp(results['SGD'])
-# %% Remove splits
-tmp = results.copy()
-
-for result in tmp:
-    print(result)
-    top = tmp[result]
-    top.pop('splits', None)
-    for iteration in top:
-        type(iteration)
-        inner = top.get(iteration)
-        
-        #inner.pop('splits', None)
-        #type(inner)
-
-# %%
-capData.main
-# %%
 import pickle
-with open(capData.data_path + 'model_results/20210210_results.pickle', 'wb') as picklefile:
+with open('20210211results.pickle', 'wb') as picklefile:
     pickle.dump(results, picklefile)
-# %%
-"""
-jefff's cluster stuff:
-join = dbscan clusters (500)
-join2 = knn clusters (20)
-ngram_clusters (from csvs) + npchunks
 
 
-
-"""
-
-from load_data import DataLoader
-
-capData = DataLoader()
-capData.create('clean')
-# %%
+# %% Print metrics per param setting:
+for clf in results:
+    print(clf)
+    for x in results[clf]['iterations']:
+        print(x['set_params'], '\nAUC: ', x['auc'],'\n F1: ', x['f1_score']'\nPrecision: ',x['precision'],'\nRecall: ',x['recall'],'\nAcc: ',x['accuracy'])
