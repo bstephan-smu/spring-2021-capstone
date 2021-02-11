@@ -473,3 +473,66 @@ descriptions = find_diag('|'.join(diag_codes))
 
 print(descriptions)
 list(zip(diag_codes, descriptions))
+
+
+# %% Meds exploration
+
+df = capData.meds
+
+set(sorted(df['medication_name'].str.lower()))
+
+
+# %%
+
+x = 'ferrous sulfate 324 mg (65 mg iron) tablet,delayed release'
+#x = 'Co Q-10 300 mg capsule'
+#x = 'Detrol 2 mg tablet'
+#x = 'Doc-Q-Lax 8.6 mg-50 mg tablet'
+
+import re
+y = re.search('(\\D)(.*)',x, flags=re.IGNORECASE).groups()
+y
+
+# %%
+
+
+sorted(df['short_name'].unique())
+# %%
+df['med'].nunique() #2784
+df['medid'].nunique() #4547
+df['medication_name'].nunique() #5151
+
+# %%
+sorted(df['medication_name'].unique())
+
+# %%
+def get_med_name(med):
+    med = re.search('(\\D+)(.*)',med, flags=re.IGNORECASE).group(1).strip().lower()
+    if med.endswith('-'):
+        med = med[:-1]
+    return med
+
+
+# %%
+
+capData.meds['med'] = capData.meds['medication_name'].apply(get_med_name)
+
+
+
+# %%
+medcols_old = [col for col in capData.main if col.startswith('med')]
+
+df = capData.meds[['medid', 'med']]
+dic = df.to_dict()
+
+medcols_new = []
+
+for col in medcols_old:
+    id = col.split('medid_')[1]
+    print(dic.get(id))
+
+# %%
+df[df['medid']=='825']
+# %%
+df
+# %%
