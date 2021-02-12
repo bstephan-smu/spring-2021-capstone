@@ -151,7 +151,7 @@ class GridSearch:
             clf_iterations = self._get_hypers(clf_hypers[a_clf])
             for model_id, iteration in enumerate(clf_iterations):
                 if verbose:
-                    print('training '+a_clf+' model_id: '+str(model_id))
+                    print('\n\ntraining '+a_clf+' model_id: '+str(model_id))
                     print('--params: '+str(iteration))
 
                 clf_params = iteration
@@ -204,6 +204,9 @@ class GridSearch:
                 if not splits:
                     del iteration_results['splits']
 
+                if verbose:
+                    print(iteration_results)
+                                    
                 clf_results.append(iteration_results)
                 
                 if iteration_results[metric] > best_iteration[metric]:
@@ -216,9 +219,6 @@ class GridSearch:
 
             if best_iteration[metric] > grid_dict['best_overall'][metric]:
                 grid_dict['best_overall'] = best_iteration
-
-        if not splits:
-            del grid_dict['best_overall']['splits']
 
         print('Grid Search complete!\n\nBest Model:')
         print(grid_dict['best_overall'])
