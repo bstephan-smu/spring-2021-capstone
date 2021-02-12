@@ -180,12 +180,16 @@ get_feature_importance(capData)
 from gridsearch import GridSearch
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 import warnings
 from scipy.sparse.csc import csc_matrix
 from sklearn.linear_model import SGDClassifier
-
+from sklearn.naive_bayes import BernoulliNB
 warnings.simplefilter(action="default")
+
+import pandas as pd
+#LR_coefs = pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/model_results/20210210/LR_Coefs.csv')
+LR_coefs = LR_coefs[abs(LR_coefs.Coefficient) >  2]
 
 # Get Data:
 data = get_data(capData, data_cols='xxx', target_col='dem_person', alt_data=list(LR_coefs['Feature']))
@@ -194,9 +198,10 @@ data = get_data(capData, data_cols='xxx', target_col='dem_person', alt_data=list
 classifiers = {
     'Random_Forest': RandomForestClassifier,
     'Logistic_Regression': LogisticRegression,
-    'SVM': SVC,
-    'GBoost': GradientBoostingClassifier,
-    'AdaBoost': AdaBoostClassifier,
+    'SVM': LinearSVC,
+    #'GBoost': GradientBoostingClassifier,
+    #'AdaBoost': AdaBoostClassifier,
+    'Naive_Bayes': BernoulliNB,
     'SGD': SGDClassifier
 }
 
@@ -206,7 +211,7 @@ param_grid = {
    'Random_Forest': {
     #     'bootstrap': True,
     #     'ccp_alpha': 0.0,
-    #     'class_weight': ['balanced', None],
+         'class_weight': [{1:6},{1:11}],
     #     'criterion': ['gini', 'entropy'],
     #     'max_depth': None,
     #    'max_features': ['auto'],
@@ -214,10 +219,10 @@ param_grid = {
     #     'max_samples': None,
     #     'min_impurity_decrease': 0.0,
     #     'min_impurity_split': None,
-         'min_samples_leaf': [1,10,100],
-         'min_samples_split': [2,30,500],
+         'min_samples_leaf': [10,25,50],
+         'min_samples_split': [25,75],
     #     'min_weight_fraction_leaf': 0.0,
-         'n_estimators': [100, 1000]
+         'n_estimators': [1000]
     #     'n_jobs': None,
     #     'oob_score': False,
     #     'random_state': None,
@@ -225,13 +230,13 @@ param_grid = {
     #     'warm_start': False
         },
     'Logistic_Regression': {
-         'C': [.001,.01,.1,1,10,100], 
-    #     'class_weight': ['balanced', None],
+         'C': [.001,.01,.1,1,10], 
+         'class_weight': [{1:6},{1:11}],
     #     # 'dual': False,
     #     # 'fit_intercept': True,
     #     # 'intercept_scaling': [1, 10],
     #     # 'l1_ratio': None,
-         'max_iter': [1000],
+         'max_iter': [5000],
          'multi_class': ['auto', 'ovr'],
     #     # 'n_jobs': None,
          'penalty': ['l2'], # sag requires L2 solver
@@ -242,23 +247,20 @@ param_grid = {
     #     # 'warm_start': False
          },
 
-    'SVM': {
-         'C': [.001,.01,.1,1,10,100],
-    #     'break_ties': False,
-    #     'cache_size': 200,
-    #     'class_weight': ['balanced', None],
-    #     'coef0': 0.0,
-    #     'decision_function_shape': 'ovr',
-    #     'degree': 3,
-    #     'gamma': ['scale', 'auto'],
-         'kernel': ['linear', 'rbf']
-    #     'max_iter': -1,
-    #     'probability': False,
-    #     'random_state': None,
-    #     'shrinking': True,
-    #     'tol': 0.001,
-    #     'verbose': False
-        },
+    'SVM' :{
+        'C': [1, 10, 50],
+        'class_weight': [{1:6},{1:11}], # 1/6 = dem_person, 1/11 = AD_person
+        'dual': [False],
+        # 'fit_intercept': True,
+        # 'intercept_scaling': 1,
+        'loss': ['squared_hinge'],
+        'max_iter': [5000],
+        # 'multi_class': 'ovr',
+        'penalty': ['l1','l2'],
+        # 'random_state': None,
+        # 'tol': 0.0001,
+        # 'verbose': 0
+         },
 
     'GBoost' : {
         # 'ccp_alpha': 0.0,
@@ -288,26 +290,26 @@ param_grid = {
     'AdaBoost': {
         'algorithm': ['SAMME.R','SAMME'],
        # 'base_estimator': None,
-        'learning_rate': [.1, 1, 10],
+        'learning_rate': [.1, .5, 1],
         'n_estimators': [50, 100, 1000],
        # 'random_state': None
         },
 
     'SGD': {
-         'alpha':[.0001,.001,.01,.1,1],
+         'alpha':[.00001,.0001,.001,.01],
         # 'average': False,
-        # 'class_weight': None,
+         'class_weight': [{1:6},{1:11}],
         # 'early_stopping': False,
         # 'epsilon': 0.1,
         # 'eta0': 0.0,
         # 'fit_intercept': True,
         # 'l1_ratio': 0.15,
         # 'learning_rate': 'optimal',
-          'loss': ['squared_hinge', 'perceptron'],
+          'loss': ['perceptron'],
           'max_iter': [5000], # Less than 1k will not resolve
         # 'n_iter_no_change': 5,
         # 'n_jobs': None,
-          'penalty': ['l1','l2','elasticnet']
+          'penalty': ['l2']
         # 'power_t': 0.5,
         # 'random_state': None,
         # 'shuffle': True,
@@ -316,7 +318,14 @@ param_grid = {
         # 'verbose': 0,
         # 'warm_start': False
          },
+
+    'Naive_Bayes' : {
+        'alpha':[.01,.1,1],
+        'binarize':[.1,1],
+        'fit_prior':[True,False],
+        # 'class_prior':
     }
+}
 
 gs = GridSearch()
 gs.set_params(
@@ -361,7 +370,8 @@ with open('20210211results.pickle', 'wb') as picklefile:
 
 
 # %% Print metrics per param setting:
-for clf in results:
-    print(clf)
-    for x in results[clf]['iterations']:
-        print(x['set_params'], '\nAUC: ', x['auc'],'\n F1: ', x['f1_score']'\nPrecision: ',x['precision'],'\nRecall: ',x['recall'],'\nAcc: ',x['accuracy'])
+# for clf in results:
+#     print(clf)
+#     for x in results[clf]['iteration']:
+#         print(x['set_params'], '\nAUC: ', x['auc'],'\n F1: ', x['f1_score'],'\nPrecision: ',x['precision'],'\nRecall: ',x['recall'],'\nAcc: ',x['accuracy'])
+# %%
