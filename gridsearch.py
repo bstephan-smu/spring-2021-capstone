@@ -45,12 +45,12 @@ class GridSearch:
 
         if save:
             try:
-                plt.savefig('./GridSearch/'+metric+'.png', format='png')
+                plt.savefig('./GridSearch/'+metric+'.png', format='png', dpi=400)
         
             except(FileNotFoundError):
                 from os import mkdir
                 mkdir('GridSearch')
-                plt.savefig('./GridSearch/'+metric+'.png', format='png')
+                plt.savefig('./GridSearch/'+metric+'.png', format='png', dpi=400)
 
 
     def _get_hypers(self, clf_params):
@@ -201,7 +201,11 @@ class GridSearch:
                     'auc': split_avg('split_auc', split_results)
                     }
 
+                if not splits:
+                    del iteration_results['splits']
+
                 clf_results.append(iteration_results)
+                
                 if iteration_results[metric] > best_iteration[metric]:
                     best_iteration = iteration_results
 
