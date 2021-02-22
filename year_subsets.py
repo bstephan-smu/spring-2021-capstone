@@ -23,17 +23,27 @@ cols=df_jeff.columns.tolist()
 cols = cols[-1:] + cols[:-1]
 df_jeff=df_jeff[cols]
 
+#%%Create Subsets and oversmaple minorty class
+
+from imblearn.over_sampling import SMOTE
+sm = SMOTE(sampling_strategy='not majority')
+
+
 # First Year
 year1 = df_jeff[df_jeff['visit_number']==1]
+X1_sm, y1_sm = sm.fit_sample(X, y)# correct X and y for response and feature space
 
 # Second Year
 year2 = df_jeff[df_jeff['visit_number']==2]
+X2_sm, y2_sm = sm.fit_sample(X, y)
 
 # Third Year
 year3 = df_jeff[df_jeff['visit_number']==3]
+X3_sm, y3_sm = sm.fit_sample(X, y)
 
 # Fourth Year Plus
 year4 = df_jeff[df_jeff['visit_number']>=4]
+X4_sm, y4_sm = sm.fit_sample(X, y)
 
 
 
