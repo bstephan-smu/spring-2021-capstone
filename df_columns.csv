@@ -1,0 +1,1699 @@
+0,person_id
+1,enc_id
+2,enc_EncounterDate
+3,enc_AgeAtEnc
+4,Reason_for_Visit
+5,AD_event
+6,AD_person
+7,dem_event
+8,dem_person
+9,Cognition
+10,cpt_10060
+11,cpt_10061
+12,cpt_10080
+13,cpt_10120
+14,cpt_11000
+15,cpt_11055
+16,cpt_11056
+17,cpt_11100
+18,cpt_11101
+19,cpt_11102
+20,cpt_11104
+21,cpt_11200
+22,cpt_1125F
+23,cpt_1126F
+24,cpt_11300
+25,cpt_11301
+26,cpt_11302
+27,cpt_11303
+28,cpt_11306
+29,cpt_11307
+30,cpt_11312
+31,cpt_11401
+32,cpt_11402
+33,cpt_11403
+34,cpt_11421
+35,cpt_1157F
+36,cpt_1159F
+37,cpt_11719
+38,cpt_11730
+39,cpt_11740
+40,cpt_11750
+41,cpt_11765
+42,cpt_12001
+43,cpt_12004
+44,cpt_12031
+45,cpt_12345
+46,cpt_15851
+47,cpt_17000
+48,cpt_17003
+49,cpt_17110
+50,cpt_17111
+51,cpt_2028F
+52,cpt_20526
+53,cpt_20550
+54,cpt_20551
+55,cpt_20552
+56,cpt_20553
+57,cpt_20600
+58,cpt_20604
+59,cpt_20605
+60,cpt_20606
+61,cpt_20610
+62,cpt_20611
+63,cpt_20612
+64,cpt_20615
+65,cpt_21011
+66,cpt_23931
+67,cpt_27096
+68,cpt_29125
+69,cpt_29425
+70,cpt_29700
+71,cpt_3008F
+72,cpt_3044F
+73,cpt_3045F
+74,cpt_3046F
+75,cpt_3074F
+76,cpt_3075F
+77,cpt_3077F
+78,cpt_3078F
+79,cpt_3079F
+80,cpt_3080F
+81,cpt_30901
+82,cpt_3120F
+83,cpt_46611
+84,cpt_51701
+85,cpt_58100
+86,cpt_62282
+87,cpt_62311
+88,cpt_64405
+89,cpt_65210
+90,cpt_65220
+91,cpt_69200
+92,cpt_69209
+93,cpt_69210
+94,cpt_76536
+95,cpt_76604
+96,cpt_76700
+97,cpt_76882
+98,cpt_76942
+99,cpt_77002
+100,cpt_80299
+101,cpt_81001
+102,cpt_81002
+103,cpt_81003
+104,cpt_82270
+105,cpt_82271
+106,cpt_82272
+107,cpt_82274
+108,cpt_82607
+109,cpt_82947
+110,cpt_82962
+111,cpt_83036
+112,cpt_83037
+113,cpt_83518
+114,cpt_83986
+115,cpt_85610
+116,cpt_86580
+117,cpt_87210
+118,cpt_87220
+119,cpt_87400
+120,cpt_87804
+121,cpt_87880
+122,cpt_88164
+123,cpt_90471
+124,cpt_90472
+125,cpt_90630
+126,cpt_90632
+127,cpt_90653
+128,cpt_90662
+129,cpt_90670
+130,cpt_90674
+131,cpt_90685
+132,cpt_90686
+133,cpt_90688
+134,cpt_90707
+135,cpt_90715
+136,cpt_90732
+137,cpt_90739
+138,cpt_90746
+139,cpt_90756
+140,cpt_90833
+141,cpt_92551
+142,cpt_92552
+143,cpt_92553
+144,cpt_93000
+145,cpt_93005
+146,cpt_93015
+147,cpt_93784
+148,cpt_93922
+149,cpt_93971
+150,cpt_94010
+151,cpt_94016
+152,cpt_94060
+153,cpt_94200
+154,cpt_94618
+155,cpt_94620
+156,cpt_94640
+157,cpt_94664
+158,cpt_94729
+159,cpt_96127
+160,cpt_96136
+161,cpt_96160
+162,cpt_96372
+163,cpt_97032
+164,cpt_97035
+165,cpt_97110
+166,cpt_97112
+167,cpt_97116
+168,cpt_97140
+169,cpt_97161
+170,cpt_97162
+171,cpt_97163
+172,cpt_97164
+173,cpt_97530
+174,cpt_97535
+175,cpt_97597
+176,cpt_97750
+177,cpt_98925
+178,cpt_98926
+179,cpt_98927
+180,cpt_98928
+181,cpt_98929
+182,cpt_99000
+183,cpt_99024
+184,cpt_99058
+185,cpt_99078
+186,cpt_99080
+187,cpt_99173
+188,cpt_99201
+189,cpt_99202
+190,cpt_99203
+191,cpt_99204
+192,cpt_99205
+193,cpt_99211
+194,cpt_99212
+195,cpt_99213
+196,cpt_99214
+197,cpt_99215
+198,cpt_99244
+199,cpt_99245
+200,cpt_99354
+201,cpt_99355
+202,cpt_99358
+203,cpt_99387
+204,cpt_99397
+205,cpt_99406
+206,cpt_99407
+207,cpt_99483
+208,cpt_99495
+209,cpt_99496
+210,cpt_99497
+211,cpt_99498
+212,cpt_A4550
+213,cpt_A4557
+214,cpt_A6450
+215,cpt_A7003
+216,cpt_CASEM
+217,cpt_CCMRX
+218,cpt_CHRON
+219,cpt_CURBS
+220,cpt_G0008
+221,cpt_G0009
+222,cpt_G0010
+223,cpt_G0101
+224,cpt_G0123
+225,cpt_G0127
+226,cpt_G0268
+227,cpt_G0402
+228,cpt_G0403
+229,cpt_G0404
+230,cpt_G0438
+231,cpt_G0439
+232,cpt_G0442
+233,cpt_G0443
+234,cpt_G0444
+235,cpt_G0447
+236,cpt_G0505
+237,cpt_G0506
+238,cpt_G8978
+239,cpt_G8979
+240,cpt_G8980
+241,cpt_G8981
+242,cpt_G8982
+243,cpt_G8983
+244,cpt_G8984
+245,cpt_G8985
+246,cpt_J0171
+247,cpt_J0561
+248,cpt_J0696
+249,cpt_J0702
+250,cpt_J0715
+251,cpt_J0897
+252,cpt_J1020
+253,cpt_J1030
+254,cpt_J1040
+255,cpt_J1071
+256,cpt_J1094
+257,cpt_J1100
+258,cpt_J1200
+259,cpt_J1885
+260,cpt_J1940
+261,cpt_J2001
+262,cpt_J2405
+263,cpt_J2680
+264,cpt_J2930
+265,cpt_J3301
+266,cpt_J3420
+267,cpt_J7325
+268,cpt_J7613
+269,cpt_J7620
+270,cpt_L3300
+271,cpt_L3908
+272,cpt_L4386
+273,cpt_NURSH
+274,cpt_PHARM
+275,cpt_PHRHV
+276,cpt_PRISK
+277,cpt_PSAFE
+278,cpt_PTHER
+279,cpt_Q0091
+280,cpt_Q2037
+281,cpt_Q2038
+282,cpt_S0630
+283,cpt_WELLE
+284,vit_BMI_calc
+285,vit_bp_diastolic
+286,vit_bp_systolic
+287,vit_height_cm
+288,vit_pulse_rate
+289,vit_respiration_rate
+290,vit_temp_deg_F
+291,vit_weight_lb
+292,med_acid reducer (ranitidine)
+293,med_acidophilus capsule
+294,med_acyclovir
+295,med_advair diskus
+296,med_advair hfa
+297,med_advil
+298,med_allopurinol
+299,med_alprazolam
+300,med_amiodarone
+301,med_amitriptyline
+302,med_amlodipine
+303,med_aspir
+304,med_aspirin
+305,med_aspirin low dose
+306,med_atenolol
+307,med_atorvastatin
+308,med_azithromycin
+309,med_benicar hct
+310,med_betamethasone dipropionate
+311,med_bystolic
+312,med_calcium
+313,med_carvedilol
+314,med_cephalexin
+315,med_citalopram
+316,med_claritin
+317,med_clindamycin
+318,med_cloderm
+319,med_clonazepam
+320,med_clonidine hcl
+321,med_clopidogrel
+322,med_co q
+323,med_cod liver oil capsule
+324,med_cozaar
+325,med_cranberry
+326,med_detrol la
+327,med_divalproex
+328,med_dorzolamide
+329,med_eliquis
+330,med_erythromycin
+331,med_escitalopram
+332,med_exelon patch
+333,med_fexofenadine
+334,med_fish oil
+335,med_flomax
+336,med_fluticasone
+337,med_furosemide
+338,med_gabapentin
+339,med_garlic capsule
+340,med_glipizide
+341,med_glipizide er
+342,med_glucoten
+343,med_hydralazine
+344,med_hydrochlorothiazide
+345,med_hydrocodone
+346,med_hydroxyzine hcl
+347,med_isosorbide mononitrate er
+348,med_lancets
+349,med_lantus
+350,med_lantus solostar
+351,med_lasix
+352,med_levaquin
+353,med_levemir flextouch
+354,med_levoxyl
+355,med_lidoderm
+356,med_lipitor
+357,med_lisinopril
+358,med_loratadine
+359,med_losartan
+360,med_magnesium
+361,med_memantine
+362,med_methotrexate sodium
+363,med_metoprolol succinate er
+364,med_metoprolol tartrate
+365,med_ms contin
+366,med_msm
+367,med_multivitamin tablet
+368,med_norvasc
+369,med_omega
+370,med_omeprazole
+371,med_onetouch ultra test strips
+372,med_pantoprazole
+373,med_pentoxifylline er
+374,med_permethrin
+375,med_plavix
+376,med_potassium chloride er
+377,med_prednisone
+378,med_proair hfa
+379,med_protonix
+380,med_proventil hfa
+381,med_qvar
+382,med_spironolactone
+383,med_toprol xl
+384,med_triamcinolone acetonide
+385,med_trileptal
+386,med_trulicity
+387,med_tums
+388,med_vesicare
+389,med_vitamin b
+390,med_vitamin c
+391,med_vitamin d
+392,med_voltaren
+393,med_xalatan
+394,med_xopenex
+395,lab_flags_Abnormal 30 Kd (Igg) Band
+396,lab_flags_Abnormal 41 Kd (Igg) Band
+397,lab_flags_Abnormal 58 Kd (Igg) Band
+398,lab_flags_Abnormal 84110700
+399,lab_flags_Abnormal 84122200
+400,lab_flags_Abnormal Abnormal Protein Band 1
+401,lab_flags_Abnormal Acetaminophen
+402,lab_flags_Abnormal Alcohol Metabolites
+403,lab_flags_Abnormal Amorphous Sediment
+404,lab_flags_Abnormal Amphetamines
+405,lab_flags_Abnormal Ana Pattern
+406,"lab_flags_Abnormal Ana Screen, Ifa"
+407,lab_flags_Abnormal Ana Titer
+408,lab_flags_Abnormal Appearance
+409,lab_flags_Abnormal Bacteria
+410,lab_flags_Abnormal Benzodiazepines
+411,lab_flags_Abnormal Bilirubin
+412,lab_flags_Abnormal Bv Category:
+413,"lab_flags_Abnormal C. Albicans, Dna"
+414,"lab_flags_Abnormal C. Difficile Toxin B, Ql Real Time Pcr, Isolate"
+415,"lab_flags_Abnormal C. Glabrata, Dna"
+416,lab_flags_Abnormal Calcium Oxalate Crystals
+417,lab_flags_Abnormal Clostridium Difficile Culture
+418,lab_flags_Abnormal Clostridium Difficile Cytotoxicity Assay
+419,lab_flags_Abnormal Cocaine Metabolite
+420,lab_flags_Abnormal Codeine
+421,lab_flags_Abnormal Color
+422,lab_flags_Abnormal Comments/Recommendations
+423,lab_flags_Abnormal Crystals
+424,"lab_flags_Abnormal Culture, Aerobic Bacteria"
+425,"lab_flags_Abnormal Culture, Sputum/Lower Respiratory"
+426,"lab_flags_Abnormal Culture, Urine, Routine"
+427,"lab_flags_Abnormal Drug Screen, Comprehensive (Urine)"
+428,lab_flags_Abnormal Epithelial Cells (Non Renal)
+429,lab_flags_Abnormal Ethanol
+430,lab_flags_Abnormal F010-Ige Sesame Seed
+431,lab_flags_Abnormal F011-Ige Buckwheat
+432,lab_flags_Abnormal F013-Ige Peanut
+433,lab_flags_Abnormal F015-Ige White Bean
+434,lab_flags_Abnormal F023-Ige Crab
+435,lab_flags_Abnormal F025-Ige Tomato
+436,"lab_flags_Abnormal F035-Ige Potato, White"
+437,lab_flags_Abnormal F096-Ige Avocado
+438,lab_flags_Abnormal F270-Ige Ginger
+439,lab_flags_Abnormal F299-Ige Sweet Chestnut
+440,lab_flags_Abnormal Fecal Globin By Immunochemistry
+441,lab_flags_Abnormal Fta-Abs
+442,lab_flags_Abnormal General Categorization:
+443,lab_flags_Abnormal Glucose
+444,lab_flags_Abnormal Granular Cast
+445,lab_flags_Abnormal Hcv Rna Naa Qualitative
+446,"lab_flags_Abnormal Helicobacter Pylori, Urea Breath Test"
+447,"lab_flags_Abnormal Hepatitis A Ab, Total"
+448,"lab_flags_Abnormal Hepatitis A Ab, Total W/Refl Igm"
+449,lab_flags_Abnormal Hepatitis B Core Ab Total
+450,lab_flags_Abnormal Hepatitis B Surface Antibody Ql
+451,lab_flags_Abnormal Hepatitis C Antibody
+452,lab_flags_Abnormal Hyaline Cast
+453,lab_flags_Abnormal Hydrocodone
+454,lab_flags_Abnormal Hydromorphone
+455,lab_flags_Abnormal Interpretation/Result:
+456,lab_flags_Abnormal Ketones
+457,lab_flags_Abnormal Ldl Pattern
+458,lab_flags_Abnormal Leukocyte Esterase
+459,lab_flags_Abnormal Marijuana
+460,lab_flags_Abnormal Marijuana Metabolite
+461,lab_flags_Abnormal Medmatch Benzoylecgonine
+462,lab_flags_Abnormal Medmatch Etg
+463,lab_flags_Abnormal Medmatch Ets
+464,lab_flags_Abnormal Medmatch Hydrocodone
+465,lab_flags_Abnormal Medmatch Hydromorphone
+466,lab_flags_Abnormal Medmatch Marijuana Metab
+467,lab_flags_Abnormal Medmatch Norhydrocodone
+468,lab_flags_Abnormal Medmatch Oxazepam
+469,lab_flags_Abnormal Medmatch Temazepam
+470,lab_flags_Abnormal Methadone
+471,"lab_flags_Abnormal Microalbumin/Creatinine Ratio, Random Urine"
+472,lab_flags_Abnormal Morphine
+473,lab_flags_Abnormal Nitrite
+474,"lab_flags_Abnormal Nitrite, Urine"
+475,lab_flags_Abnormal Occult Blood
+476,lab_flags_Abnormal Opiates
+477,"lab_flags_Abnormal Opiates, Ia"
+478,"lab_flags_Abnormal Ova And Parasites, Stool Conc And Perm Smear"
+479,lab_flags_Abnormal Ph
+480,lab_flags_Abnormal Platelet Estimation
+481,lab_flags_Abnormal Plts
+482,lab_flags_Abnormal Propoxyphene
+483,lab_flags_Abnormal Protein
+484,lab_flags_Abnormal Rbc
+485,lab_flags_Abnormal Result 1
+486,lab_flags_Abnormal Rpr (Dx) W/Refl Titer And Confirmatory Testing
+487,lab_flags_Abnormal Rpr (Monitor) W/Refl Titer
+488,lab_flags_Abnormal Serum Results
+489,lab_flags_Abnormal Specific Gravity
+490,lab_flags_Abnormal Squamous Epithelial Cells
+491,"lab_flags_Abnormal Sureswab(R) Trichomonas Vaginalis Rna, Ql, Tma"
+492,lab_flags_Abnormal Triple Phosphate Crystals
+493,"lab_flags_Abnormal Urine Culture, Routine"
+494,"lab_flags_Abnormal Urine Culture,Comprehensive"
+495,lab_flags_Abnormal Urine Results
+496,lab_flags_Abnormal Wbc
+497,lab_flags_Abnormal Wbc Esterase
+498,lab_flags_Abnormal Yeast
+499,lab_flags_High % Saturation
+500,lab_flags_High A/G Ratio
+501,lab_flags_High Abnormal Protein Band 1
+502,lab_flags_High Absolute Band Neutrophils
+503,lab_flags_High Absolute Basophils
+504,lab_flags_High Absolute Blasts
+505,lab_flags_High Absolute Eosinophils
+506,lab_flags_High Absolute Lymphocytes
+507,lab_flags_High Absolute Metamyelocytes
+508,lab_flags_High Absolute Monocytes
+509,lab_flags_High Absolute Myelocytes
+510,lab_flags_High Absolute Neutrophils
+511,lab_flags_High Absolute Nucleated Rbc
+512,lab_flags_High Alb/Creat Ratio
+513,lab_flags_High Albumin
+514,"lab_flags_High Albumin, Serum"
+515,"lab_flags_High Albumin/Creatinine Ratio, Random Urine"
+516,lab_flags_High Albumin/Globulin Ratio
+517,lab_flags_High Aldo/Pra Ratio
+518,lab_flags_High Alkaline Phosphatase
+519,"lab_flags_High Alkaline Phosphatase, S"
+520,lab_flags_High Alpha 2 Globulin
+521,"lab_flags_High Alpha Fetoprotein, Tumor Marker"
+522,lab_flags_High Alphahydroxyalprazolam
+523,lab_flags_High Alt
+524,lab_flags_High Alt (Sgpt)
+525,lab_flags_High Ammonia (P)
+526,"lab_flags_High Ammonia, Plasma"
+527,lab_flags_High Amphetamine
+528,"lab_flags_High Amylase, Serum"
+529,lab_flags_High Ana Titer
+530,lab_flags_High Anti-Dna (Ds) Ab Qn
+531,lab_flags_High Antithrombin Iii Activity
+532,lab_flags_High Aptt
+533,lab_flags_High Ast
+534,lab_flags_High Ast (Sgot)
+535,lab_flags_High B Type Natriuretic Peptide (Bnp)
+536,lab_flags_High B-Type Natriuretic Peptide
+537,lab_flags_High Benzoylecgonine
+538,lab_flags_High Beta 2 Globulin
+539,lab_flags_High Beta-Lactoglobulin (F77) Ige
+540,"lab_flags_High Bilirubin, Direct"
+541,"lab_flags_High Bilirubin, Indirect"
+542,"lab_flags_High Bilirubin, Total"
+543,lab_flags_High Blasts
+544,lab_flags_High Bun
+545,lab_flags_High Bun/Creatinine Ratio
+546,lab_flags_High C-Reactive Protein
+547,"lab_flags_High C-Reactive Protein, Quant"
+548,lab_flags_High C. Pneumoniae Iga
+549,lab_flags_High C. Pneumoniae Igg
+550,"lab_flags_High Calcitriol(1,25 Di-Oh Vit D)"
+551,lab_flags_High Calcium
+552,"lab_flags_High Calcium, Ionized"
+553,"lab_flags_High Calcium, Ionized, Serum"
+554,"lab_flags_High Calcium, Serum"
+555,lab_flags_High Carbon Dioxide
+556,"lab_flags_High Carbon Dioxide, Total"
+557,"lab_flags_High Chlamydia Antibodies, Igg"
+558,lab_flags_High Chloride
+559,"lab_flags_High Chloride, Serum"
+560,lab_flags_High Chol/Hdlc Ratio
+561,"lab_flags_High Cholesterol, Total"
+562,lab_flags_High Codeine
+563,"lab_flags_High Complement, Total (Ch50)"
+564,lab_flags_High Cow'S Milk (F2) Ige
+565,lab_flags_High Crab (F23) Ige
+566,"lab_flags_High Creatine Kinase, Total"
+567,lab_flags_High Creatinine
+568,"lab_flags_High Creatinine, 24 Hour Urine"
+569,"lab_flags_High Creatinine, Random Urine"
+570,"lab_flags_High Creatinine, Serum"
+571,lab_flags_High Cyclic Citrullinated Peptide (Ccp) Ab (Igg)
+572,"lab_flags_High D-Dimer, Quantitative"
+573,lab_flags_High Desmethyltramadol
+574,lab_flags_High Digoxin
+575,lab_flags_High Direct Ldl
+576,lab_flags_High Dna (Ds) Antibody
+577,lab_flags_High Drvvt Screen
+578,lab_flags_High Ebv Nuclear Ag (Ebna) Ab (Igg)
+579,lab_flags_High Ebv Viral Capsid Ag (Vca) Ab (Igg)
+580,lab_flags_High Egg White (F1) Ige
+581,lab_flags_High Elm (T8) Ige
+582,lab_flags_High Eos (Absolute)
+583,lab_flags_High Ethyl Glucuronide (Etg)
+584,lab_flags_High Ethyl Sulfate (Ets)
+585,lab_flags_High Fasting Specimen
+586,lab_flags_High Ferritin
+587,"lab_flags_High Ferritin, Serum"
+588,lab_flags_High Free T4 Index (T7)
+589,lab_flags_High Free Testosterone
+590,lab_flags_High Gamma Globulin
+591,lab_flags_High Gastric Parietal Cell Ab
+592,lab_flags_High Ggt
+593,lab_flags_High Globulin
+594,lab_flags_High Glucose
+595,"lab_flags_High Glucose, Serum"
+596,lab_flags_High Hcv Ab
+597,"lab_flags_High Hcv Rna, Quantitative Real Time Pcr"
+598,lab_flags_High Hematocrit
+599,lab_flags_High Hemoglobin
+600,lab_flags_High Hemoglobin A1C
+601,lab_flags_High Hep C Virus Ab
+602,lab_flags_High Hepatitis B Virus Dna
+603,lab_flags_High Homocysteine
+604,lab_flags_High Hs Crp
+605,lab_flags_High Hydrocodone
+606,lab_flags_High Hydromorphone
+607,lab_flags_High Immunoglobulin A
+608,lab_flags_High Immunoglobulin E
+609,lab_flags_High Immunoglobulin G
+610,lab_flags_High Inr
+611,lab_flags_High Intestinal Isoenzymes
+612,lab_flags_High Iron
+613,lab_flags_High Iron Binding Capacity
+614,"lab_flags_High Iron, Total"
+615,lab_flags_High Kappa
+616,"lab_flags_High Kappa Light Chain, Free, Serum"
+617,lab_flags_High Lambda
+618,"lab_flags_High Lambda Light Chain, Free, Serum"
+619,lab_flags_High Ldl Cholesterol Calc
+620,lab_flags_High Ldl-Cholesterol
+621,lab_flags_High Ldl/Hdl Ratio
+622,lab_flags_High Levetiracetam
+623,lab_flags_High Lipase
+624,"lab_flags_High Lipase, Serum"
+625,lab_flags_High Lipoprotein (A)
+626,lab_flags_High Lithium
+627,"lab_flags_High Lymphocytes, %"
+628,lab_flags_High Lymphs (Absolute)
+629,lab_flags_High Magnesium
+630,"lab_flags_High Magnesium, Serum"
+631,lab_flags_High Marijuana Metabolite
+632,lab_flags_High Mch
+633,lab_flags_High Mchc
+634,lab_flags_High Mcv
+635,lab_flags_High Metamyelocytes
+636,lab_flags_High Methamphetamine
+637,lab_flags_High Microalb/Creat Ratio
+638,"lab_flags_High Microalbumin, Urine"
+639,"lab_flags_High Microalbumin/Creatinine Ratio, Random Urine"
+640,lab_flags_High Monocytes(Absolute)
+641,lab_flags_High Morphine
+642,lab_flags_High Mpv
+643,lab_flags_High Myelocytes
+644,lab_flags_High Neutrophils (Absolute)
+645,lab_flags_High Non Hdl Cholesterol
+646,lab_flags_High Norhydrocodone
+647,lab_flags_High Nrbc
+648,lab_flags_High Nucleated Rbc
+649,lab_flags_High Oak (T7) Ige
+650,lab_flags_High Ovalbumin (F232) Ige
+651,lab_flags_High Oxazepam
+652,"lab_flags_High Parathyroid Hormone, Intact"
+653,"lab_flags_High Partial Thromboplastin Time, Activated"
+654,lab_flags_High Ph
+655,lab_flags_High Phenytoin
+656,lab_flags_High Phosphate (As Phosphorus)
+657,"lab_flags_High Phosphorus, Serum"
+658,lab_flags_High Platelet Count
+659,lab_flags_High Platelets
+660,lab_flags_High Potassium
+661,"lab_flags_High Potassium, Serum"
+662,lab_flags_High Prealbumin
+663,lab_flags_High Prolactin
+664,"lab_flags_High Prostate Specific Ag, Serum"
+665,"lab_flags_High Protein C, Activity"
+666,"lab_flags_High Protein S, Activity"
+667,"lab_flags_High Protein, Total"
+668,"lab_flags_High Protein, Total, 24 Hr Ur"
+669,"lab_flags_High Protein, Total, Random Ur"
+670,"lab_flags_High Protein,Total,Urine"
+671,lab_flags_High Protein/Creat Ratio
+672,lab_flags_High Protein/Creatinine Ratio
+673,lab_flags_High Prothrombin Time
+674,"lab_flags_High Psa, Total"
+675,lab_flags_High Pt
+676,"lab_flags_High Pth, Intact"
+677,lab_flags_High Ptt-La Screen
+678,lab_flags_High Rbc
+679,lab_flags_High Rdw
+680,lab_flags_High Red Blood Cell Count
+681,"lab_flags_High Reticulocyte, Absolute"
+682,lab_flags_High Rheumatoid Factor
+683,lab_flags_High Rough Marsh Elder (W16) Ige
+684,lab_flags_High Rpr Titer
+685,lab_flags_High Rye (F5) Ige
+686,lab_flags_High Sed Rate By Modified Westergren
+687,lab_flags_High Sedimentation Rate-Westergren
+688,lab_flags_High Sex Hormone Binding Globulin
+689,lab_flags_High Shrimp (F24) Ige
+690,lab_flags_High Signal To Cut-Off
+691,lab_flags_High Sodium
+692,"lab_flags_High Sodium, Serum"
+693,lab_flags_High Specific Gravity
+694,"lab_flags_High T3 Reverse, Lc/Ms/Ms"
+695,lab_flags_High T3 Uptake
+696,"lab_flags_High T4 (Thyroxine), Total"
+697,"lab_flags_High T4, Free"
+698,"lab_flags_High T4,Free(Direct)"
+699,lab_flags_High Temazepam
+700,"lab_flags_High Testosterone, Free"
+701,"lab_flags_High Testosterone, Total, Lc/Ms/Ms"
+702,lab_flags_High Thyroglobulin Antibodies
+703,lab_flags_High Thyroid Peroxidase Antibodies
+704,lab_flags_High Total Nucleated Cell Ct
+705,lab_flags_High Tramadol
+706,lab_flags_High Transferrin
+707,lab_flags_High Triglycerides
+708,"lab_flags_High Triiodothyronine, Free, Serum"
+709,lab_flags_High Tsh
+710,lab_flags_High Tsh W/Reflex To Ft4
+711,lab_flags_High Uibc
+712,lab_flags_High Urea Nitrogen (Bun)
+713,lab_flags_High Uric Acid
+714,"lab_flags_High Vitamin B1 (Thiamine), Blood, Lc/Ms/Ms"
+715,"lab_flags_High Vitamin B1 (Thiamine), Lc/Ms/Ms"
+716,lab_flags_High Vitamin B12
+717,"lab_flags_High Vitamin B2 (Riboflavin), Plasma"
+718,"lab_flags_High Vitamin D, 1,25 (Oh)2, Total"
+719,"lab_flags_High Vitamin D, 25-Oh, Total"
+720,"lab_flags_High Vitamin D,25-Oh,Total,Ia"
+721,lab_flags_High Vldl Cholesterol Cal
+722,lab_flags_High Wbc
+723,lab_flags_High White Blood Cell Count
+724,lab_flags_Low % Saturation
+725,"lab_flags_Low 25-Hydroxy, Vitamin D"
+726,lab_flags_Low A/G Ratio
+727,lab_flags_Low Absolute Eosinophils
+728,lab_flags_Low Absolute Lymphocytes
+729,lab_flags_Low Absolute Monocytes
+730,lab_flags_Low Absolute Neutrophils
+731,lab_flags_Low Albumin
+732,"lab_flags_Low Albumin, Serum"
+733,lab_flags_Low Albumin/Globulin Ratio
+734,lab_flags_Low Alkaline Phosphatase
+735,"lab_flags_Low Alkaline Phosphatase, S"
+736,lab_flags_Low Alt
+737,lab_flags_Low Amylase
+738,lab_flags_Low Apolipoprotein B
+739,lab_flags_Low Ast
+740,"lab_flags_Low Bilirubin, Indirect"
+741,lab_flags_Low Bone Isoenzymes
+742,lab_flags_Low Bun
+743,lab_flags_Low Bun/Creatinine Ratio
+744,lab_flags_Low Calcium
+745,"lab_flags_Low Calcium, Ionized"
+746,"lab_flags_Low Calcium, Serum"
+747,lab_flags_Low Carbon Dioxide
+748,"lab_flags_Low Carbon Dioxide, Total"
+749,lab_flags_Low Chloride
+750,"lab_flags_Low Chloride, Serum"
+751,"lab_flags_Low Cholesterol, Total"
+752,"lab_flags_Low Creatine Kinase, Total"
+753,lab_flags_Low Creatinine
+754,"lab_flags_Low Creatinine, Random Urine"
+755,"lab_flags_Low Creatinine, Serum"
+756,lab_flags_Low Digoxin
+757,"lab_flags_Low Digoxin, Serum"
+758,lab_flags_Low Egfr African American
+759,lab_flags_Low Egfr If Africn Am
+760,lab_flags_Low Egfr If Nonafricn Am
+761,lab_flags_Low Egfr Non-Afr. American
+762,lab_flags_Low Ferritin
+763,"lab_flags_Low Folate, Serum"
+764,lab_flags_Low Free T4 Index (T7)
+765,lab_flags_Low Free Testosterone
+766,lab_flags_Low Free Testosterone(Direct)
+767,lab_flags_Low Free Thyroxine Index
+768,lab_flags_Low Globulin
+769,lab_flags_Low Glucose
+770,"lab_flags_Low Glucose, Serum"
+771,lab_flags_Low Hdl Cholesterol
+772,lab_flags_Low Hematocrit
+773,lab_flags_Low Hemoglobin
+774,lab_flags_Low Hemoglobin A1C
+775,lab_flags_Low Hemoglobin A2 (Quant)
+776,"lab_flags_Low Hepatitis B Surface Ab Immunity, Qn"
+777,lab_flags_Low Immunoglobulin M
+778,lab_flags_Low Iron Bind.Cap.(Tibc)
+779,lab_flags_Low Iron Binding Capacity
+780,lab_flags_Low Iron Saturation
+781,"lab_flags_Low Iron, Total"
+782,lab_flags_Low Ld
+783,lab_flags_Low Ldl Particle Number
+784,lab_flags_Low Ldl Peak Size
+785,lab_flags_Low Levetiracetam
+786,lab_flags_Low Lipase
+787,lab_flags_Low Lymphs (Absolute)
+788,lab_flags_Low Magnesium
+789,lab_flags_Low Mch
+790,lab_flags_Low Mchc
+791,lab_flags_Low Mcv
+792,lab_flags_Low Monocytes(Absolute)
+793,lab_flags_Low Mpv
+794,lab_flags_Low Neutrophils (Absolute)
+795,lab_flags_Low Osmolality (Serum)
+796,lab_flags_Low Ph
+797,lab_flags_Low Phenytoin
+798,"lab_flags_Low Phenytoin, Serum"
+799,"lab_flags_Low Plasma Renin Activity, Lc/Ms/Ms"
+800,lab_flags_Low Platelet Count
+801,lab_flags_Low Platelets
+802,lab_flags_Low Potassium
+803,"lab_flags_Low Potassium, Serum"
+804,lab_flags_Low Prealbumin
+805,lab_flags_Low Prolactin
+806,"lab_flags_Low Protein, Total"
+807,"lab_flags_Low Protein, Total, Random Ur"
+808,"lab_flags_Low Protein, Total, Serum"
+809,"lab_flags_Low Psa, % Free"
+810,lab_flags_Low Pth-Rp
+811,lab_flags_Low Rbc
+812,lab_flags_Low Rdw
+813,lab_flags_Low Red Blood Cell Count
+814,"lab_flags_Low Reticulocyte, Absolute"
+815,lab_flags_Low Sodium
+816,"lab_flags_Low Sodium, Random Urine"
+817,"lab_flags_Low Sodium, Serum"
+818,lab_flags_Low T3 Uptake
+819,"lab_flags_Low T3, Free"
+820,"lab_flags_Low T3, Total"
+821,"lab_flags_Low T4 (Thyroxine), Total"
+822,"lab_flags_Low T4, Free"
+823,"lab_flags_Low Testosterone, Free"
+824,"lab_flags_Low Testosterone, Serum"
+825,"lab_flags_Low Testosterone, Total, Lc/Ms"
+826,"lab_flags_Low Testosterone, Total, Lc/Ms/Ms"
+827,"lab_flags_Low Testosterone, Total, Males (Adult), Ia"
+828,"lab_flags_Low Testosterone, Total, Ms"
+829,"lab_flags_Low Theophylline, Serum"
+830,lab_flags_Low Transferrin
+831,lab_flags_Low Tsh
+832,lab_flags_Low Tsh W/Reflex To Ft4
+833,lab_flags_Low Urea Nitrogen (Bun)
+834,lab_flags_Low Uric Acid
+835,lab_flags_Low Valproic Acid
+836,"lab_flags_Low Vitamin B1 (Thiamine), Serum/Plasma, Lc/Ms/Ms"
+837,lab_flags_Low Vitamin B12
+838,"lab_flags_Low Vitamin B2 (Riboflavin), Plasma"
+839,"lab_flags_Low Vitamin C, Lc/Ms/Ms"
+840,"lab_flags_Low Vitamin D, 1,25 (Oh)2, Total"
+841,"lab_flags_Low Vitamin D, 25-Hydroxy"
+842,"lab_flags_Low Vitamin D, 25-Oh, Total"
+843,"lab_flags_Low Vitamin D,25-Oh,Total,Ia"
+844,lab_flags_Low Wbc
+845,lab_flags_Low White Blood Cell Count
+846,lab_flags_Low Zinc
+847,"lab_flags_Very High Ammonia, Plasma"
+848,lab_flags_Very High Wbc
+849,lab_flags_Very Low Hemoglobin
+850,lab_flags_Very Low Iron Saturation
+851,lab_flags_Very Low Platelets
+852,lab_flags_Very Low Rbc
+853,lab_% Free PSA (%)
+854,lab_% SATURATION (% (calc))
+855,"lab_25-Hydroxy, Vitamin D (ng/mL)"
+856,"lab_25-Hydroxy, Vitamin D-2 (ng/mL)"
+857,"lab_25-Hydroxy, Vitamin D-3 (ng/mL)"
+858,lab_ABNORMAL PROTEIN BAND 1 (g/dL)
+859,lab_ABSOLUTE BAND NEUTROPHILS (cells/uL)
+860,lab_ABSOLUTE BASOPHILS (cells/uL)
+861,lab_ABSOLUTE BLASTS (cells/uL)
+862,lab_ABSOLUTE EOSINOPHILS (cells/uL)
+863,lab_ABSOLUTE LYMPHOCYTES (cells/uL)
+864,lab_ABSOLUTE METAMYELOCYTES (cells/uL)
+865,lab_ABSOLUTE MONOCYTES (cells/uL)
+866,lab_ABSOLUTE MYELOCYTES (cells/uL)
+867,lab_ABSOLUTE NEUTROPHILS (cells/uL)
+868,lab_ALBUMIN (g/dL)
+869,"lab_ALBUMIN, URINE (mg/dL)"
+870,"lab_ALBUMIN/CREATININE RATIO, RANDOM URINE (mcg/mg creat)"
+871,lab_ALBUMIN/GLOBULIN RATIO ((calc))
+872,lab_ALKALINE PHOSPHATASE (U/L)
+873,lab_ALPHA 2 GLOBULIN (g/dL)
+874,"lab_ALPHA FETOPROTEIN, TUMOR MARKER (ng/mL)"
+875,lab_ALT (SGPT) (IU/L)
+876,lab_ALT (U/L)
+877,lab_AMMONIA (P) (umol/L)
+878,lab_AMYLASE (U/L)
+879,lab_ANA TITER (titer)
+880,lab_APOLIPOPROTEIN B (mg/dL)
+881,lab_AST (SGOT) (IU/L)
+882,lab_AST (U/L)
+883,lab_ATOPOBIUM VAGINAE (Log (cells/mL))
+884,lab_Alb/Creat Ratio (mg/g creat)
+885,lab_Albumin (g/dL)
+886,"lab_Albumin, Serum (g/dL)"
+887,"lab_Albumin, Urine (ug/mL)"
+888,lab_Alcohol Metabolites (ng/mL)
+889,lab_Alkaline Phosphatase (IU/L)
+890,"lab_Alkaline Phosphatase, S (IU/L)"
+891,lab_Alphahydroxyalprazolam (ng/mL)
+892,"lab_Ammonia, Plasma (ug/dL)"
+893,lab_Amphetamines (ng/mL)
+894,"lab_Amylase, Serum (U/L)"
+895,lab_B TYPE NATRIURETIC PEPTIDE (BNP) (pg/mL)
+896,lab_B-Type Natriuretic Peptide (pg/mL)
+897,lab_BAND NEUTROPHILS (%)
+898,lab_BASOPHILS (%)
+899,lab_BETA 1 GLOBULIN (g/dL)
+900,lab_BETA 2 GLOBULIN (g/dL)
+901,"lab_BILIRUBIN, DIRECT (mg/dL)"
+902,"lab_BILIRUBIN, INDIRECT (mg/dL (calc))"
+903,"lab_BILIRUBIN, TOTAL (mg/dL)"
+904,lab_BLASTS (%)
+905,lab_BUN (mg/dL)
+906,lab_BUN/CREATININE RATIO ((calc))
+907,lab_Baso (Absolute) (x10E3/uL)
+908,lab_Basos (%)
+909,lab_Benzodiazepines (ng/mL)
+910,lab_Benzoylecgonine (ng/mL)
+911,"lab_Bilirubin, Total (mg/dL)"
+912,lab_C-REACTIVE PROTEIN (mg/L)
+913,lab_C-REACTIVE PROTEIN (mg/dL)
+914,"lab_C-Reactive Protein, Quant (mg/L)"
+915,lab_C. PNEUMONIAE IGA (titer)
+916,lab_CA 125 (U/mL)
+917,lab_CALCIUM (mg/dL)
+918,"lab_CALCIUM, IONIZED (mg/dL)"
+919,"lab_CARBAMAZEPINE, TOTAL (mg/L)"
+920,lab_CARBON DIOXIDE (mmol/L)
+921,lab_CEA (ng/mL)
+922,lab_CHLORIDE (mmol/L)
+923,lab_CHOL/HDLC RATIO ((calc))
+924,lab_CHOL/HDLC RATIO (calc)
+925,"lab_CHOLESTEROL, TOTAL (mg/dL)"
+926,lab_CK-MM (% of total)
+927,lab_COMPLEMENT COMPONENT C3C (mg/dL)
+928,lab_COMPLEMENT COMPONENT C4C (mg/dL)
+929,lab_COW'S MILK (F2) IGE (kU/L)
+930,"lab_CREATINE KINASE, TOTAL (U/L)"
+931,lab_CREATININE (mg/dL)
+932,"lab_CREATININE, 24 HOUR URINE (g/24 h)"
+933,"lab_CREATININE, RANDOM URINE (mg/dL)"
+934,lab_CYCLIC CITRULLINATED PEPTIDE (CCP) AB (IGG) (UNITS)
+935,"lab_Calcitriol(1,25 di-OH Vit D) (pg/mL)"
+936,lab_Calcium (mg/dL)
+937,"lab_Calcium, Ionized, Serum (mg/dL)"
+938,"lab_Calcium, Serum (mg/dL)"
+939,"lab_Carbon Dioxide, Total (mmol/L)"
+940,lab_Chloride (mmol/L)
+941,"lab_Chloride, Serum (mmol/L)"
+942,"lab_Cholesterol, Total (mg/dL)"
+943,lab_Cocaine Metabolite (ng/mL)
+944,lab_Codeine (ng/mL)
+945,lab_Creatinine (mg/dL)
+946,"lab_Creatinine, Serum (mg/dL)"
+947,"lab_Creatinine, Urine (mg/dL)"
+948,"lab_D-DIMER, QUANTITATIVE (mcg/mL FEU)"
+949,lab_DIGOXIN (mcg/L)
+950,lab_DIRECT LDL (mg/dL)
+951,lab_DNA (DS) ANTIBODY (IU/mL)
+952,lab_DRVVT SCREEN (seconds)
+953,lab_Desmethyltramadol (ng/mL)
+954,"lab_Digoxin, Serum (ng/mL)"
+955,lab_EBV NUCLEAR AG (EBNA) AB (IGG) (U/mL)
+956,lab_EBV VIRAL CAPSID AG (VCA) AB (IGG) (U/mL)
+957,lab_EGG WHITE (F1) IGE (kU/L)
+958,lab_ELM (T8) IGE (kU/L)
+959,lab_EOSINOPHILS (%)
+960,lab_ERYTHROPOIETIN (mIU/mL)
+961,lab_ESTRADIOL (pg/mL)
+962,lab_Eos (%)
+963,lab_Eos (Absolute) (x10E3/uL)
+964,lab_Epithelial Cells (non renal) (/hpf)
+965,lab_Estim. Avg Glu (eAG) (mg/dL)
+966,lab_Ethyl Glucuronide (ETG) (ng/mL)
+967,lab_Ethyl Sulfate (ETS) (ng/mL)
+968,lab_FERRITIN (ng/mL)
+969,"lab_FOLATE, RBC (ng/mL RBC)"
+970,"lab_FOLATE, SERUM (ng/mL)"
+971,lab_FREE TESTOSTERONE (pg/mL)
+972,"lab_Ferritin, Serum (ng/mL)"
+973,"lab_Folate (Folic Acid), Serum (ng/mL)"
+974,lab_Free Testosterone(Direct) (pg/mL)
+975,lab_GAMMA GLOBULIN (g/dL)
+976,lab_GARDNERELLA VAGINALIS (Log (cells/mL))
+977,lab_GASTRIC PARIETAL CELL AB (U)
+978,lab_GGT (U/L)
+979,lab_GLOBULIN (g/dL (calc))
+980,lab_GLUCOSE (mg/dL)
+981,"lab_Globulin, Total (g/dL)"
+982,lab_Glucose (mg/dL)
+983,"lab_Glucose, Serum (mg/dL)"
+984,"lab_HCV RNA, QUANTITATIVE REAL TIME PCR (IU/mL)"
+985,"lab_HCV RNA, QUANTITATIVE REAL TIME PCR (Log IU/mL)"
+986,"lab_HCV RNA, QUANTITATIVE REAL TIME PCR (LogIU/mL)"
+987,lab_HDL CHOLESTEROL (mg/dL)
+988,lab_HDL Cholesterol (mg/dL)
+989,lab_HDL LARGE (nmol/L)
+990,lab_HEMATOCRIT (%)
+991,lab_HEMOGLOBIN (g/dL)
+992,lab_HEMOGLOBIN A (%)
+993,lab_HEMOGLOBIN A1c (% of total Hgb)
+994,lab_HEMOGLOBIN A2 (QUANT) (%)
+995,"lab_HEPATITIS B SURFACE AB IMMUNITY, QN (mIU/mL)"
+996,lab_HEPATITIS B VIRUS DNA (IU/mL)
+997,lab_HOMOCYSTEINE (umol/L)
+998,lab_HS CRP (mg/L)
+999,lab_HYALINE CAST (/LPF)
+1000,lab_HYDROCODONE (ng/mL)
+1001,lab_Hematocrit (%)
+1002,lab_Hemoglobin (g/dL)
+1003,lab_Hemoglobin A1c (% of total Hgb)
+1004,lab_Hemoglobin A1c (%)
+1005,lab_Hep C Virus Ab (s/co ratio)
+1006,lab_Hydrocodone (ng/mL)
+1007,lab_Hydromorphone (ng/mL)
+1008,lab_IMMUNOGLOBULIN A (mg/dL)
+1009,lab_IMMUNOGLOBULIN G (mg/dL)
+1010,lab_IMMUNOGLOBULIN M (mg/dL)
+1011,lab_INSULIN (uIU/mL)
+1012,lab_IRON BINDING CAPACITY (mcg/dL (calc))
+1013,lab_IRON BINDING CAPACITY (mcg/dL)
+1014,"lab_IRON, TOTAL (mcg/dL)"
+1015,lab_Immature Grans (Abs) (x10E3/uL)
+1016,lab_Immature Granulocytes (%)
+1017,lab_Iron (ug/dL)
+1018,lab_Iron Bind.Cap.(TIBC) (ug/dL)
+1019,lab_Iron Saturation (%)
+1020,"lab_Iron, Serum (ug/dL)"
+1021,"lab_KAPPA LIGHT CHAIN, FREE, SERUM (mg/L)"
+1022,lab_LACTOBACILLUS SPECIES (Log (cells/mL))
+1023,lab_LAMOTRIGINE (mcg/mL)
+1024,lab_LD (U/L)
+1025,lab_LDL Cholesterol Calc (mg/dL)
+1026,lab_LDL MEDIUM (nmol/L)
+1027,lab_LDL PARTICLE NUMBER (nmol/L)
+1028,lab_LDL PEAK SIZE (Angstrom)
+1029,lab_LDL SMALL (nmol/L)
+1030,lab_LDL-CHOLESTEROL (mg/dL (calc))
+1031,lab_LDL-CHOLESTEROL (mg/dL)
+1032,lab_LDL/HDL RATIO ((calc))
+1033,lab_LDL/HDL Ratio (ratio units)
+1034,lab_LDL/HDL Ratio (ratio)
+1035,lab_LEVETIRACETAM (mcg/mL)
+1036,lab_LIPASE (U/L)
+1037,lab_LIPOPROTEIN (a) (nmol/L)
+1038,lab_LITHIUM (mmol/L)
+1039,lab_LYMPHOCYTES (%)
+1040,"lab_Lipase, Serum (U/L)"
+1041,lab_Lymphs (%)
+1042,lab_Lymphs (Absolute) (x10E3/uL)
+1043,lab_MAGNESIUM (mg/dL)
+1044,lab_MCH (pg)
+1045,lab_MCHC (g/dL)
+1046,lab_MCV (fL)
+1047,lab_MEAN PLASMA GLUCOSE (mg/dL (calc))
+1048,lab_METAMYELOCYTES (%)
+1049,lab_METHYLMALONIC ACID (nmol/L)
+1050,lab_MICROALBUMIN (mg/dL)
+1051,"lab_MICROALBUMIN/CREATININE RATIO, RANDOM URINE (mcg/mg creat)"
+1052,"lab_MONOCYTE/MACROPHAGE, % (%)"
+1053,lab_MONOCYTES (%)
+1054,lab_MPV (fL)
+1055,lab_MYELOCYTES (%)
+1056,"lab_Magnesium, Serum (mg/dL)"
+1057,lab_Marijuana Metabolite (ng/mL)
+1058,lab_Microalb/Creat Ratio (mg/g creat)
+1059,"lab_Microalbumin, Urine (ug/mL)"
+1060,lab_Monocytes (%)
+1061,lab_Monocytes(Absolute) (x10E3/uL)
+1062,lab_Morphine (ng/mL)
+1063,lab_NEUTROPHILS (%)
+1064,"lab_NEUTROPHILS, % (%)"
+1065,lab_NON HDL CHOLESTEROL (mg/dL (calc))
+1066,lab_Neutrophils (%)
+1067,lab_Neutrophils (Absolute) (x10E3/uL)
+1068,lab_Norhydrocodone (ng/mL)
+1069,lab_OAK (T7) IGE (kU/L)
+1070,lab_OSMOLALITY (U) (mOsm/kg)
+1071,lab_Opiates (ng/mL)
+1072,lab_Oxazepam (ng/mL)
+1073,"lab_PARATHYROID HORMONE, INTACT (pg/mL)"
+1074,"lab_PARTIAL THROMBOPLASTIN TIME, ACTIVATED (sec)"
+1075,lab_PHENYTOIN (mg/L)
+1076,lab_PHOSPHATE (AS PHOSPHORUS) (mg/dL)
+1077,lab_PLATELET COUNT (Thousand/uL)
+1078,lab_POTASSIUM (mmol/L)
+1079,lab_PREALBUMIN (mg/dL)
+1080,lab_PROLACTIN (ng/mL)
+1081,"lab_PROTEIN C, ACTIVITY (% normal)"
+1082,"lab_PROTEIN S ANTIGEN, FREE (% normal)"
+1083,"lab_PROTEIN S, ACTIVITY (% normal)"
+1084,"lab_PROTEIN, TOTAL (g/dL)"
+1085,"lab_PROTEIN, TOTAL, 24 HR UR (mg/24 h)"
+1086,"lab_PROTEIN, TOTAL, RANDOM UR (mg/dL)"
+1087,lab_PROTEIN/CREATININE RATIO (mg/g creat)
+1088,"lab_PSA, % FREE (% (calc))"
+1089,"lab_PSA, FREE (ng/mL)"
+1090,"lab_PSA, Free (ng/mL)"
+1091,"lab_PSA, TOTAL (ng/mL)"
+1092,lab_PT (sec)
+1093,"lab_PTH, Intact (pg/mL)"
+1094,lab_PTH-RP (pg/mL)
+1095,"lab_Phenytoin, Serum (ug/mL)"
+1096,"lab_Phosphorus, Serum (mg/dL)"
+1097,lab_Platelets (x10E3/uL)
+1098,lab_Potassium (mmol/L)
+1099,"lab_Potassium, Serum (mmol/L)"
+1100,lab_Prealbumin (mg/dL)
+1101,"lab_Prostate Specific Ag, Serum (ng/mL)"
+1102,"lab_Protein, Total (g/dL)"
+1103,"lab_Protein, Total, Serum (g/dL)"
+1104,"lab_Protein,Total,Urine (mg/dL)"
+1105,lab_Protein/Creat Ratio (mg/g creat)
+1106,lab_Prothrombin Time (sec)
+1107,lab_RBC (/HPF)
+1108,lab_RBC (/hpf)
+1109,lab_RBC (x10E6/uL)
+1110,lab_RDW (%)
+1111,lab_RED BLOOD CELL COUNT (Million/uL)
+1112,"lab_RETICULOCYTE COUNT, AUTOMATED (%)"
+1113,"lab_RETICULOCYTE, ABSOLUTE (cells/uL)"
+1114,lab_RHEUMATOID FACTOR (IU/mL)
+1115,lab_Reticulocyte Count (%)
+1116,lab_SED RATE BY MODIFIED WESTERGREN (mm/h)
+1117,lab_SEX HORMONE BINDING GLOBULIN (nmol/L)
+1118,lab_SODIUM (mmol/L)
+1119,"lab_SODIUM, RANDOM URINE (mmol/L)"
+1120,lab_SODIUM/CREAT RATIO (mmol/g creat)
+1121,lab_SQUAMOUS EPITHELIAL CELLS (/HPF)
+1122,lab_SYSTOLIC BLOOD PRESSURE (mmHg)
+1123,lab_Sedimentation Rate-Westergren (mm/hr)
+1124,lab_Sodium (mmol/L)
+1125,"lab_Sodium, Serum (mmol/L)"
+1126,"lab_T3 REVERSE, LC/MS/MS (ng/dL)"
+1127,lab_T3 UPTAKE (%)
+1128,lab_T3 Uptake (%)
+1129,"lab_T3, FREE (pg/mL)"
+1130,"lab_T3, TOTAL (ng/dL)"
+1131,"lab_T4 (THYROXINE), TOTAL (mcg/dL)"
+1132,"lab_T4, FREE (ng/dL)"
+1133,"lab_T4, TOTAL (THYROXINE) (mcg/dL)"
+1134,"lab_T4,Free (Direct) (ng/dL)"
+1135,"lab_T4,Free(Direct) (ng/dL)"
+1136,"lab_TESTOSTERONE, FREE (pg/mL)"
+1137,"lab_TESTOSTERONE, TOTAL, LC/MS/MS (ng/dL)"
+1138,"lab_TESTOSTERONE, TOTAL, MALES (ADULT), IA (ng/dL)"
+1139,"lab_TESTOSTERONE, TOTAL, MS (ng/dL)"
+1140,lab_THYROGLOBULIN ANTIBODIES (IU/mL)
+1141,lab_THYROID PEROXIDASE ANTIBODIES (IU/mL)
+1142,"lab_TISSUE TRANSGLUTAMINASE AB, IGA (U/mL)"
+1143,lab_TOTAL NUCLEATED CELL CT (cells/uL)
+1144,lab_TRANSFERRIN (mg/dL)
+1145,lab_TRIGLYCERIDES (mg/dL)
+1146,lab_TROPONIN I (ng/mL)
+1147,lab_TSH (REFL) (mIU/L)
+1148,lab_TSH (mIU/L)
+1149,lab_TSH (uIU/mL)
+1150,lab_TSH W/REFLEX TO FT4 (mIU/L)
+1151,lab_Temazepam (ng/mL)
+1152,"lab_Testosterone, Serum (ng/dL)"
+1153,lab_Thyroxine (T4) (ug/dL)
+1154,lab_Transferrin (mg/dL)
+1155,lab_Triglycerides (mg/dL)
+1156,lab_Triiodothyronine (T3) (ng/dL)
+1157,"lab_Triiodothyronine, Free, Serum (pg/mL)"
+1158,lab_UIBC (ug/dL)
+1159,lab_UREA NITROGEN (BUN) (mg/dL)
+1160,lab_URIC ACID (mg/dL)
+1161,lab_Uric Acid (mg/dL)
+1162,"lab_Urobilinogen,Semi-Qn (mg/dL)"
+1163,lab_VALPROIC ACID (mg/L)
+1164,"lab_VITAMIN B1 (THIAMINE), BLOOD, LC/MS/MS (nmol/L)"
+1165,"lab_VITAMIN B1 (THIAMINE), LC/MS/MS (nmol/L)"
+1166,"lab_VITAMIN B1 (THIAMINE), SERUM/PLASMA, LC/MS/MS (nmol/L)"
+1167,lab_VITAMIN B12 (pg/mL)
+1168,"lab_VITAMIN B2 (RIBOFLAVIN), PLASMA (nmol/L)"
+1169,"lab_VITAMIN B6, PLASMA (ng/mL)"
+1170,"lab_VITAMIN D, 1,25 (OH)2, TOTAL (pg/mL)"
+1171,"lab_VITAMIN D, 25-OH, D2 (ng/mL)"
+1172,"lab_VITAMIN D, 25-OH, D3 (ng/mL)"
+1173,"lab_VITAMIN D, 25-OH, TOTAL (ng/mL)"
+1174,"lab_VITAMIN D,25-OH,TOTAL,IA (ng/mL)"
+1175,"lab_VITAMIN D2, 1,25 (OH)2 (pg/mL)"
+1176,"lab_VITAMIN D3, 1,25 (OH)2 (pg/mL)"
+1177,lab_VLDL Cholesterol Cal (mg/dL)
+1178,lab_Vitamin B12 (pg/mL)
+1179,"lab_Vitamin D, 25-Hydroxy (ng/mL)"
+1180,"lab_Vitamin D, 25-Hydroxy, Serum (ng/mL)"
+1181,lab_WBC (/HPF)
+1182,lab_WBC (/hpf)
+1183,lab_WBC (x10E3/uL)
+1184,lab_WHITE BLOOD CELL COUNT (Thousand/uL)
+1185,lab_ZINC (mcg/dL)
+1186,lab_aPTT (sec)
+1187,lab_eGFR AFRICAN AMERICAN (mL/min/1.73m2)
+1188,lab_eGFR If Africn Am (mL/min/1.73)
+1189,lab_eGFR If NonAfricn Am (mL/min/1.73)
+1190,lab_eGFR NON-AFR. AMERICAN (mL/min/1.73m2)
+1191,asmt_txt_description
+1192,asmt_txt_tokenized
+1193,asmt_ngrams
+1194,asmt_ngram2
+1195,asmt_txt_tokenized2
+1196,asmt_np_chunks
+1197,CCSR Category
+1198,asmt_description
+1199,ccsr_BLD001
+1200,ccsr_BLD002
+1201,ccsr_BLD003
+1202,ccsr_BLD004
+1203,ccsr_BLD005
+1204,ccsr_BLD006
+1205,ccsr_BLD007
+1206,ccsr_BLD008
+1207,ccsr_BLD010
+1208,ccsr_CIR001
+1209,ccsr_CIR002
+1210,ccsr_CIR003
+1211,ccsr_CIR004
+1212,ccsr_CIR005
+1213,ccsr_CIR006
+1214,ccsr_CIR007
+1215,ccsr_CIR008
+1216,ccsr_CIR009
+1217,ccsr_CIR010
+1218,ccsr_CIR011
+1219,ccsr_CIR012
+1220,ccsr_CIR013
+1221,ccsr_CIR014
+1222,ccsr_CIR015
+1223,ccsr_CIR016
+1224,ccsr_CIR017
+1225,ccsr_CIR019
+1226,ccsr_CIR020
+1227,ccsr_CIR021
+1228,ccsr_CIR022
+1229,ccsr_CIR023
+1230,ccsr_CIR024
+1231,ccsr_CIR025
+1232,ccsr_CIR026
+1233,ccsr_CIR028
+1234,ccsr_CIR029
+1235,ccsr_CIR030
+1236,ccsr_CIR031
+1237,ccsr_CIR032
+1238,ccsr_CIR033
+1239,ccsr_CIR034
+1240,ccsr_CIR035
+1241,ccsr_CIR036
+1242,ccsr_CIR037
+1243,ccsr_CIR038
+1244,ccsr_CIR039
+1245,ccsr_DIG001
+1246,ccsr_DIG002
+1247,ccsr_DIG003
+1248,ccsr_DIG004
+1249,ccsr_DIG005
+1250,ccsr_DIG006
+1251,ccsr_DIG007
+1252,ccsr_DIG008
+1253,ccsr_DIG009
+1254,ccsr_DIG010
+1255,ccsr_DIG011
+1256,ccsr_DIG012
+1257,ccsr_DIG013
+1258,ccsr_DIG014
+1259,ccsr_DIG015
+1260,ccsr_DIG016
+1261,ccsr_DIG017
+1262,ccsr_DIG018
+1263,ccsr_DIG019
+1264,ccsr_DIG020
+1265,ccsr_DIG021
+1266,ccsr_DIG022
+1267,ccsr_DIG023
+1268,ccsr_DIG024
+1269,ccsr_DIG025
+1270,ccsr_EAR001
+1271,ccsr_EAR002
+1272,ccsr_EAR003
+1273,ccsr_EAR004
+1274,ccsr_EAR006
+1275,ccsr_END001
+1276,ccsr_END002
+1277,ccsr_END003
+1278,ccsr_END004
+1279,ccsr_END005
+1280,ccsr_END006
+1281,ccsr_END007
+1282,ccsr_END008
+1283,ccsr_END009
+1284,ccsr_END010
+1285,ccsr_END011
+1286,ccsr_END013
+1287,ccsr_END014
+1288,ccsr_END015
+1289,ccsr_END016
+1290,ccsr_EXT001
+1291,ccsr_EXT003
+1292,ccsr_EXT004
+1293,ccsr_EXT007
+1294,ccsr_EXT009
+1295,ccsr_EXT010
+1296,ccsr_EXT011
+1297,ccsr_EXT012
+1298,ccsr_EXT013
+1299,ccsr_EXT014
+1300,ccsr_EXT015
+1301,ccsr_EXT016
+1302,ccsr_EXT017
+1303,ccsr_EXT018
+1304,ccsr_EXT019
+1305,ccsr_EXT020
+1306,ccsr_EXT021
+1307,ccsr_EXT022
+1308,ccsr_EXT023
+1309,ccsr_EXT025
+1310,ccsr_EXT027
+1311,ccsr_EXT029
+1312,ccsr_EXT030
+1313,ccsr_EYE001
+1314,ccsr_EYE002
+1315,ccsr_EYE003
+1316,ccsr_EYE004
+1317,ccsr_EYE005
+1318,ccsr_EYE006
+1319,ccsr_EYE007
+1320,ccsr_EYE008
+1321,ccsr_EYE009
+1322,ccsr_EYE010
+1323,ccsr_EYE011
+1324,ccsr_EYE012
+1325,ccsr_FAC001
+1326,ccsr_FAC003
+1327,ccsr_FAC004
+1328,ccsr_FAC005
+1329,ccsr_FAC007
+1330,ccsr_FAC008
+1331,ccsr_FAC009
+1332,ccsr_FAC010
+1333,ccsr_FAC012
+1334,ccsr_FAC013
+1335,ccsr_FAC014
+1336,ccsr_FAC016
+1337,ccsr_FAC017
+1338,ccsr_FAC019
+1339,ccsr_FAC020
+1340,ccsr_FAC021
+1341,ccsr_FAC022
+1342,ccsr_FAC023
+1343,ccsr_FAC024
+1344,ccsr_FAC025
+1345,ccsr_GEN001
+1346,ccsr_GEN002
+1347,ccsr_GEN003
+1348,ccsr_GEN004
+1349,ccsr_GEN005
+1350,ccsr_GEN006
+1351,ccsr_GEN007
+1352,ccsr_GEN008
+1353,ccsr_GEN009
+1354,ccsr_GEN010
+1355,ccsr_GEN012
+1356,ccsr_GEN013
+1357,ccsr_GEN014
+1358,ccsr_GEN016
+1359,ccsr_GEN017
+1360,ccsr_GEN018
+1361,ccsr_GEN020
+1362,ccsr_GEN021
+1363,ccsr_GEN022
+1364,ccsr_GEN023
+1365,ccsr_GEN024
+1366,ccsr_GEN025
+1367,ccsr_GEN026
+1368,ccsr_INF001
+1369,ccsr_INF002
+1370,ccsr_INF003
+1371,ccsr_INF004
+1372,ccsr_INF006
+1373,ccsr_INF007
+1374,ccsr_INF008
+1375,ccsr_INF009
+1376,ccsr_INF010
+1377,ccsr_INF011
+1378,ccsr_INJ001
+1379,ccsr_INJ002
+1380,ccsr_INJ003
+1381,ccsr_INJ004
+1382,ccsr_INJ005
+1383,ccsr_INJ006
+1384,ccsr_INJ007
+1385,ccsr_INJ008
+1386,ccsr_INJ009
+1387,ccsr_INJ010
+1388,ccsr_INJ011
+1389,ccsr_INJ012
+1390,ccsr_INJ013
+1391,ccsr_INJ014
+1392,ccsr_INJ017
+1393,ccsr_INJ018
+1394,ccsr_INJ019
+1395,ccsr_INJ020
+1396,ccsr_INJ021
+1397,ccsr_INJ022
+1398,ccsr_INJ023
+1399,ccsr_INJ024
+1400,ccsr_INJ025
+1401,ccsr_INJ026
+1402,ccsr_INJ027
+1403,ccsr_INJ028
+1404,ccsr_INJ030
+1405,ccsr_INJ031
+1406,ccsr_INJ032
+1407,ccsr_INJ033
+1408,ccsr_INJ034
+1409,ccsr_INJ035
+1410,ccsr_INJ036
+1411,ccsr_INJ037
+1412,ccsr_INJ038
+1413,ccsr_INJ039
+1414,ccsr_INJ040
+1415,ccsr_INJ041
+1416,ccsr_INJ042
+1417,ccsr_INJ043
+1418,ccsr_INJ044
+1419,ccsr_INJ045
+1420,ccsr_INJ048
+1421,ccsr_INJ049
+1422,ccsr_INJ050
+1423,ccsr_INJ051
+1424,ccsr_INJ054
+1425,ccsr_INJ056
+1426,ccsr_INJ057
+1427,ccsr_INJ058
+1428,ccsr_INJ061
+1429,ccsr_INJ062
+1430,ccsr_INJ063
+1431,ccsr_INJ064
+1432,ccsr_INJ065
+1433,ccsr_INJ067
+1434,ccsr_INJ068
+1435,ccsr_INJ069
+1436,ccsr_INJ070
+1437,ccsr_INJ071
+1438,ccsr_INJ072
+1439,ccsr_INJ073
+1440,ccsr_INJ074
+1441,ccsr_INJ075
+1442,ccsr_INJ076
+1443,ccsr_MAL001
+1444,ccsr_MAL002
+1445,ccsr_MAL003
+1446,ccsr_MAL004
+1447,ccsr_MAL005
+1448,ccsr_MAL006
+1449,ccsr_MAL008
+1450,ccsr_MAL010
+1451,ccsr_MBD001
+1452,ccsr_MBD002
+1453,ccsr_MBD003
+1454,ccsr_MBD004
+1455,ccsr_MBD005
+1456,ccsr_MBD006
+1457,ccsr_MBD007
+1458,ccsr_MBD008
+1459,ccsr_MBD009
+1460,ccsr_MBD010
+1461,ccsr_MBD011
+1462,ccsr_MBD012
+1463,ccsr_MBD013
+1464,ccsr_MBD014
+1465,ccsr_MBD017
+1466,ccsr_MBD018
+1467,ccsr_MBD019
+1468,ccsr_MBD020
+1469,ccsr_MBD021
+1470,ccsr_MBD024
+1471,ccsr_MBD025
+1472,ccsr_MBD026
+1473,ccsr_MUS001
+1474,ccsr_MUS002
+1475,ccsr_MUS003
+1476,ccsr_MUS004
+1477,ccsr_MUS005
+1478,ccsr_MUS006
+1479,ccsr_MUS007
+1480,ccsr_MUS008
+1481,ccsr_MUS009
+1482,ccsr_MUS010
+1483,ccsr_MUS011
+1484,ccsr_MUS012
+1485,ccsr_MUS013
+1486,ccsr_MUS014
+1487,ccsr_MUS015
+1488,ccsr_MUS016
+1489,ccsr_MUS017
+1490,ccsr_MUS020
+1491,ccsr_MUS021
+1492,ccsr_MUS022
+1493,ccsr_MUS023
+1494,ccsr_MUS024
+1495,ccsr_MUS025
+1496,ccsr_MUS026
+1497,ccsr_MUS027
+1498,ccsr_MUS028
+1499,ccsr_MUS029
+1500,ccsr_MUS030
+1501,ccsr_MUS031
+1502,ccsr_MUS032
+1503,ccsr_MUS033
+1504,ccsr_MUS034
+1505,ccsr_MUS037
+1506,ccsr_MUS038
+1507,ccsr_NEO001
+1508,ccsr_NEO002
+1509,ccsr_NEO004
+1510,ccsr_NEO007
+1511,ccsr_NEO008
+1512,ccsr_NEO010
+1513,ccsr_NEO012
+1514,ccsr_NEO013
+1515,ccsr_NEO015
+1516,ccsr_NEO017
+1517,ccsr_NEO018
+1518,ccsr_NEO019
+1519,ccsr_NEO021
+1520,ccsr_NEO022
+1521,ccsr_NEO023
+1522,ccsr_NEO024
+1523,ccsr_NEO025
+1524,ccsr_NEO026
+1525,ccsr_NEO027
+1526,ccsr_NEO028
+1527,ccsr_NEO029
+1528,ccsr_NEO030
+1529,ccsr_NEO031
+1530,ccsr_NEO033
+1531,ccsr_NEO035
+1532,ccsr_NEO038
+1533,ccsr_NEO039
+1534,ccsr_NEO043
+1535,ccsr_NEO045
+1536,ccsr_NEO048
+1537,ccsr_NEO049
+1538,ccsr_NEO050
+1539,ccsr_NEO051
+1540,ccsr_NEO052
+1541,ccsr_NEO057
+1542,ccsr_NEO058
+1543,ccsr_NEO059
+1544,ccsr_NEO061
+1545,ccsr_NEO064
+1546,ccsr_NEO065
+1547,ccsr_NEO066
+1548,ccsr_NEO068
+1549,ccsr_NEO070
+1550,ccsr_NEO071
+1551,ccsr_NEO072
+1552,ccsr_NEO073
+1553,ccsr_NEO074
+1554,ccsr_NVS002
+1555,ccsr_NVS003
+1556,ccsr_NVS004
+1557,ccsr_NVS005
+1558,ccsr_NVS006
+1559,ccsr_NVS007
+1560,ccsr_NVS008
+1561,ccsr_NVS009
+1562,ccsr_NVS010
+1563,ccsr_NVS011
+1564,ccsr_NVS012
+1565,ccsr_NVS013
+1566,ccsr_NVS014
+1567,ccsr_NVS015
+1568,ccsr_NVS016
+1569,ccsr_NVS017
+1570,ccsr_NVS018
+1571,ccsr_NVS019
+1572,ccsr_NVS020
+1573,ccsr_NVS021
+1574,ccsr_NVS022
+1575,ccsr_PRG028
+1576,ccsr_RSP001
+1577,ccsr_RSP002
+1578,ccsr_RSP003
+1579,ccsr_RSP004
+1580,ccsr_RSP005
+1581,ccsr_RSP006
+1582,ccsr_RSP007
+1583,ccsr_RSP008
+1584,ccsr_RSP009
+1585,ccsr_RSP010
+1586,ccsr_RSP011
+1587,ccsr_RSP012
+1588,ccsr_RSP013
+1589,ccsr_RSP015
+1590,ccsr_RSP016
+1591,ccsr_SKN001
+1592,ccsr_SKN002
+1593,ccsr_SKN003
+1594,ccsr_SKN004
+1595,ccsr_SKN005
+1596,ccsr_SKN006
+1597,ccsr_SKN007
+1598,ccsr_SYM001
+1599,ccsr_SYM002
+1600,ccsr_SYM003
+1601,ccsr_SYM004
+1602,ccsr_SYM005
+1603,ccsr_SYM006
+1604,ccsr_SYM007
+1605,ccsr_SYM008
+1606,ccsr_SYM010
+1607,ccsr_SYM011
+1608,ccsr_SYM012
+1609,ccsr_SYM013
+1610,ccsr_SYM014
+1611,ccsr_SYM015
+1612,ccsr_SYM016
+1613,ccsr_SYM017
+1614,enc_Race_ 
+1615,enc_Race_American Indian or Alaska Native 
+1616,enc_Race_Asian 
+1617,enc_Race_Black or African American 
+1618,enc_Race_Declined To Specify 
+1619,enc_Race_Declined to Specify 
+1620,enc_Race_Native Hawaiian or Other Pacific Islander 
+1621,enc_Race_White 
+1622,enc_Ethnicity_Declined To Specify 
+1623,enc_Ethnicity_Declined to Specify 
+1624,enc_Ethnicity_Hispanic or Latino 
+1625,enc_Ethnicity_Not Hispanic or Latino 
+1626,enc_Ethnicity_Unknown / Not Reported 
+1627,enc_Gender_F 
+1628,enc_Gender_M 
+1629,enc_rfv_cluster_0
+1630,enc_rfv_cluster_1
+1631,enc_rfv_cluster_2
+1632,enc_rfv_cluster_3
+1633,enc_rfv_cluster_4
+1634,enc_rfv_cluster_5
+1635,enc_rfv_cluster_6
+1636,enc_rfv_cluster_7
+1637,enc_rfv_cluster_8
+1638,enc_rfv_cluster_9
+1639,enc_rfv_cluster_10
+1640,enc_rfv_cluster_11
+1641,enc_rfv_cluster_12
+1642,enc_rfv_cluster_13
+1643,enc_rfv_cluster_14
+1644,enc_rfv_cluster_15
+1645,enc_rfv_cluster_16
+1646,enc_rfv_cluster_17
+1647,enc_rfv_cluster_18
+1648,enc_rfv_cluster_19
+1649,enc_rfv_cluster_20
+1650,enc_rfv_cluster_21
+1651,asmt_txt_diagnosis_code_id
+1652,asmt_np_chunk_clusters
+1653,asmt_topic_clusters
+1654,asmt_kmeans_0
+1655,asmt_kmeans_1
+1656,asmt_kmeans_2
+1657,asmt_kmeans_3
+1658,asmt_kmeans_4
+1659,asmt_kmeans_5
+1660,asmt_kmeans_6
+1661,asmt_kmeans_7
+1662,asmt_kmeans_8
+1663,asmt_kmeans_9
+1664,asmt_kmeans_10
+1665,asmt_kmeans_11
+1666,asmt_kmeans_12
+1667,asmt_kmeans_13
+1668,asmt_kmeans_14
+1669,asmt_topic_0
+1670,asmt_topic_1
+1671,asmt_topic_2
+1672,asmt_topic_3
+1673,asmt_topic_4
+1674,asmt_topic_5
+1675,asmt_topic_6
+1676,asmt_topic_7
+1677,asmt_topic_8
+1678,asmt_topic_9
+1679,asmt_topic_10
+1680,asmt_topic_11
+1681,asmt_topic_12
+1682,asmt_topic_13
+1683,asmt_topic_14
+1684,asmt_topic_15
+1685,asmt_topic_16
+1686,asmt_topic_17
+1687,asmt_topic_18
+1688,asmt_topic_19
+1689,asmt_icd9cm_code_id
+1690,asmt_diagnosis_code_id
+1691,asmt_date_onset_sympt
+1692,asmt_date_diagnosed
+1693,asmt_date_resolved
+1694,asmt_status_id
+1695,asmt_dx_priority
+1696,asmt_chronic_ind
+1697,asmt_recorded_elsewhere_ind
+1698,asmt_CCSR Category

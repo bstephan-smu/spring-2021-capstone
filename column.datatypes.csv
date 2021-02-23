@@ -1,0 +1,1700 @@
+,0
+person_id,object
+enc_id,object
+enc_EncounterDate,int64
+enc_AgeAtEnc,int64
+Reason_for_Visit,object
+AD_event,int32
+AD_person,int32
+dem_event,int32
+dem_person,int32
+Cognition,object
+cpt_10060,uint8
+cpt_10061,uint8
+cpt_10080,uint8
+cpt_10120,uint8
+cpt_11000,uint8
+cpt_11055,uint8
+cpt_11056,uint8
+cpt_11100,uint8
+cpt_11101,uint8
+cpt_11102,uint8
+cpt_11104,uint8
+cpt_11200,uint8
+cpt_1125F,uint8
+cpt_1126F,uint8
+cpt_11300,uint8
+cpt_11301,uint8
+cpt_11302,uint8
+cpt_11303,uint8
+cpt_11306,uint8
+cpt_11307,uint8
+cpt_11312,uint8
+cpt_11401,uint8
+cpt_11402,uint8
+cpt_11403,uint8
+cpt_11421,uint8
+cpt_1157F,uint8
+cpt_1159F,uint8
+cpt_11719,uint8
+cpt_11730,uint8
+cpt_11740,uint8
+cpt_11750,uint8
+cpt_11765,uint8
+cpt_12001,uint8
+cpt_12004,uint8
+cpt_12031,uint8
+cpt_12345,uint8
+cpt_15851,uint8
+cpt_17000,uint8
+cpt_17003,uint8
+cpt_17110,uint8
+cpt_17111,uint8
+cpt_2028F,uint8
+cpt_20526,uint8
+cpt_20550,uint8
+cpt_20551,uint8
+cpt_20552,uint8
+cpt_20553,uint8
+cpt_20600,uint8
+cpt_20604,uint8
+cpt_20605,uint8
+cpt_20606,uint8
+cpt_20610,uint8
+cpt_20611,uint8
+cpt_20612,uint8
+cpt_20615,uint8
+cpt_21011,uint8
+cpt_23931,uint8
+cpt_27096,uint8
+cpt_29125,uint8
+cpt_29425,uint8
+cpt_29700,uint8
+cpt_3008F,uint8
+cpt_3044F,uint8
+cpt_3045F,uint8
+cpt_3046F,uint8
+cpt_3074F,uint8
+cpt_3075F,uint8
+cpt_3077F,uint8
+cpt_3078F,uint8
+cpt_3079F,uint8
+cpt_3080F,uint8
+cpt_30901,uint8
+cpt_3120F,uint8
+cpt_46611,uint8
+cpt_51701,uint8
+cpt_58100,uint8
+cpt_62282,uint8
+cpt_62311,uint8
+cpt_64405,uint8
+cpt_65210,uint8
+cpt_65220,uint8
+cpt_69200,uint8
+cpt_69209,uint8
+cpt_69210,uint8
+cpt_76536,uint8
+cpt_76604,uint8
+cpt_76700,uint8
+cpt_76882,uint8
+cpt_76942,uint8
+cpt_77002,uint8
+cpt_80299,uint8
+cpt_81001,uint8
+cpt_81002,uint8
+cpt_81003,uint8
+cpt_82270,uint8
+cpt_82271,uint8
+cpt_82272,uint8
+cpt_82274,uint8
+cpt_82607,uint8
+cpt_82947,uint8
+cpt_82962,uint8
+cpt_83036,uint8
+cpt_83037,uint8
+cpt_83518,uint8
+cpt_83986,uint8
+cpt_85610,uint8
+cpt_86580,uint8
+cpt_87210,uint8
+cpt_87220,uint8
+cpt_87400,uint8
+cpt_87804,uint8
+cpt_87880,uint8
+cpt_88164,uint8
+cpt_90471,uint8
+cpt_90472,uint8
+cpt_90630,uint8
+cpt_90632,uint8
+cpt_90653,uint8
+cpt_90662,uint8
+cpt_90670,uint8
+cpt_90674,uint8
+cpt_90685,uint8
+cpt_90686,uint8
+cpt_90688,uint8
+cpt_90707,uint8
+cpt_90715,uint8
+cpt_90732,uint8
+cpt_90739,uint8
+cpt_90746,uint8
+cpt_90756,uint8
+cpt_90833,uint8
+cpt_92551,uint8
+cpt_92552,uint8
+cpt_92553,uint8
+cpt_93000,uint8
+cpt_93005,uint8
+cpt_93015,uint8
+cpt_93784,uint8
+cpt_93922,uint8
+cpt_93971,uint8
+cpt_94010,uint8
+cpt_94016,uint8
+cpt_94060,uint8
+cpt_94200,uint8
+cpt_94618,uint8
+cpt_94620,uint8
+cpt_94640,uint8
+cpt_94664,uint8
+cpt_94729,uint8
+cpt_96127,uint8
+cpt_96136,uint8
+cpt_96160,uint8
+cpt_96372,uint8
+cpt_97032,uint8
+cpt_97035,uint8
+cpt_97110,uint8
+cpt_97112,uint8
+cpt_97116,uint8
+cpt_97140,uint8
+cpt_97161,uint8
+cpt_97162,uint8
+cpt_97163,uint8
+cpt_97164,uint8
+cpt_97530,uint8
+cpt_97535,uint8
+cpt_97597,uint8
+cpt_97750,uint8
+cpt_98925,uint8
+cpt_98926,uint8
+cpt_98927,uint8
+cpt_98928,uint8
+cpt_98929,uint8
+cpt_99000,uint8
+cpt_99024,uint8
+cpt_99058,uint8
+cpt_99078,uint8
+cpt_99080,uint8
+cpt_99173,uint8
+cpt_99201,uint8
+cpt_99202,uint8
+cpt_99203,uint8
+cpt_99204,uint8
+cpt_99205,uint8
+cpt_99211,uint8
+cpt_99212,uint8
+cpt_99213,uint8
+cpt_99214,uint8
+cpt_99215,uint8
+cpt_99244,uint8
+cpt_99245,uint8
+cpt_99354,uint8
+cpt_99355,uint8
+cpt_99358,uint8
+cpt_99387,uint8
+cpt_99397,uint8
+cpt_99406,uint8
+cpt_99407,uint8
+cpt_99483,uint8
+cpt_99495,uint8
+cpt_99496,uint8
+cpt_99497,uint8
+cpt_99498,uint8
+cpt_A4550,uint8
+cpt_A4557,uint8
+cpt_A6450,uint8
+cpt_A7003,uint8
+cpt_CASEM,uint8
+cpt_CCMRX,uint8
+cpt_CHRON,uint8
+cpt_CURBS,uint8
+cpt_G0008,uint8
+cpt_G0009,uint8
+cpt_G0010,uint8
+cpt_G0101,uint8
+cpt_G0123,uint8
+cpt_G0127,uint8
+cpt_G0268,uint8
+cpt_G0402,uint8
+cpt_G0403,uint8
+cpt_G0404,uint8
+cpt_G0438,uint8
+cpt_G0439,uint8
+cpt_G0442,uint8
+cpt_G0443,uint8
+cpt_G0444,uint8
+cpt_G0447,uint8
+cpt_G0505,uint8
+cpt_G0506,uint8
+cpt_G8978,uint8
+cpt_G8979,uint8
+cpt_G8980,uint8
+cpt_G8981,uint8
+cpt_G8982,uint8
+cpt_G8983,uint8
+cpt_G8984,uint8
+cpt_G8985,uint8
+cpt_J0171,uint8
+cpt_J0561,uint8
+cpt_J0696,uint8
+cpt_J0702,uint8
+cpt_J0715,uint8
+cpt_J0897,uint8
+cpt_J1020,uint8
+cpt_J1030,uint8
+cpt_J1040,uint8
+cpt_J1071,uint8
+cpt_J1094,uint8
+cpt_J1100,uint8
+cpt_J1200,uint8
+cpt_J1885,uint8
+cpt_J1940,uint8
+cpt_J2001,uint8
+cpt_J2405,uint8
+cpt_J2680,uint8
+cpt_J2930,uint8
+cpt_J3301,uint8
+cpt_J3420,uint8
+cpt_J7325,uint8
+cpt_J7613,uint8
+cpt_J7620,uint8
+cpt_L3300,uint8
+cpt_L3908,uint8
+cpt_L4386,uint8
+cpt_NURSH,uint8
+cpt_PHARM,uint8
+cpt_PHRHV,uint8
+cpt_PRISK,uint8
+cpt_PSAFE,uint8
+cpt_PTHER,uint8
+cpt_Q0091,uint8
+cpt_Q2037,uint8
+cpt_Q2038,uint8
+cpt_S0630,uint8
+cpt_WELLE,uint8
+vit_BMI_calc,float64
+vit_bp_diastolic,float64
+vit_bp_systolic,float64
+vit_height_cm,float64
+vit_pulse_rate,float64
+vit_respiration_rate,float64
+vit_temp_deg_F,float64
+vit_weight_lb,float64
+med_acid reducer (ranitidine),float64
+med_acidophilus capsule,float64
+med_acyclovir,float64
+med_advair diskus,float64
+med_advair hfa,float64
+med_advil,float64
+med_allopurinol,float64
+med_alprazolam,float64
+med_amiodarone,float64
+med_amitriptyline,float64
+med_amlodipine,float64
+med_aspir,float64
+med_aspirin,float64
+med_aspirin low dose,float64
+med_atenolol,float64
+med_atorvastatin,float64
+med_azithromycin,float64
+med_benicar hct,float64
+med_betamethasone dipropionate,float64
+med_bystolic,float64
+med_calcium,float64
+med_carvedilol,float64
+med_cephalexin,float64
+med_citalopram,float64
+med_claritin,float64
+med_clindamycin,float64
+med_cloderm,float64
+med_clonazepam,float64
+med_clonidine hcl,float64
+med_clopidogrel,float64
+med_co q,float64
+med_cod liver oil capsule,float64
+med_cozaar,float64
+med_cranberry,float64
+med_detrol la,float64
+med_divalproex,float64
+med_dorzolamide,float64
+med_eliquis,float64
+med_erythromycin,float64
+med_escitalopram,float64
+med_exelon patch,float64
+med_fexofenadine,float64
+med_fish oil,float64
+med_flomax,float64
+med_fluticasone,float64
+med_furosemide,float64
+med_gabapentin,float64
+med_garlic capsule,float64
+med_glipizide,float64
+med_glipizide er,float64
+med_glucoten,float64
+med_hydralazine,float64
+med_hydrochlorothiazide,float64
+med_hydrocodone,float64
+med_hydroxyzine hcl,float64
+med_isosorbide mononitrate er,float64
+med_lancets,float64
+med_lantus,float64
+med_lantus solostar,float64
+med_lasix,float64
+med_levaquin,float64
+med_levemir flextouch,float64
+med_levoxyl,float64
+med_lidoderm,float64
+med_lipitor,float64
+med_lisinopril,float64
+med_loratadine,float64
+med_losartan,float64
+med_magnesium,float64
+med_memantine,float64
+med_methotrexate sodium,float64
+med_metoprolol succinate er,float64
+med_metoprolol tartrate,float64
+med_ms contin,float64
+med_msm,float64
+med_multivitamin tablet,float64
+med_norvasc,float64
+med_omega,float64
+med_omeprazole,float64
+med_onetouch ultra test strips,float64
+med_pantoprazole,float64
+med_pentoxifylline er,float64
+med_permethrin,float64
+med_plavix,float64
+med_potassium chloride er,float64
+med_prednisone,float64
+med_proair hfa,float64
+med_protonix,float64
+med_proventil hfa,float64
+med_qvar,float64
+med_spironolactone,float64
+med_toprol xl,float64
+med_triamcinolone acetonide,float64
+med_trileptal,float64
+med_trulicity,float64
+med_tums,float64
+med_vesicare,float64
+med_vitamin b,float64
+med_vitamin c,float64
+med_vitamin d,float64
+med_voltaren,float64
+med_xalatan,float64
+med_xopenex,float64
+lab_flags_Abnormal 30 Kd (Igg) Band,float64
+lab_flags_Abnormal 41 Kd (Igg) Band,float64
+lab_flags_Abnormal 58 Kd (Igg) Band,float64
+lab_flags_Abnormal 84110700,float64
+lab_flags_Abnormal 84122200,float64
+lab_flags_Abnormal Abnormal Protein Band 1,float64
+lab_flags_Abnormal Acetaminophen,float64
+lab_flags_Abnormal Alcohol Metabolites,float64
+lab_flags_Abnormal Amorphous Sediment,float64
+lab_flags_Abnormal Amphetamines,float64
+lab_flags_Abnormal Ana Pattern,float64
+"lab_flags_Abnormal Ana Screen, Ifa",float64
+lab_flags_Abnormal Ana Titer,float64
+lab_flags_Abnormal Appearance,float64
+lab_flags_Abnormal Bacteria,float64
+lab_flags_Abnormal Benzodiazepines,float64
+lab_flags_Abnormal Bilirubin,float64
+lab_flags_Abnormal Bv Category:,float64
+"lab_flags_Abnormal C. Albicans, Dna",float64
+"lab_flags_Abnormal C. Difficile Toxin B, Ql Real Time Pcr, Isolate",float64
+"lab_flags_Abnormal C. Glabrata, Dna",float64
+lab_flags_Abnormal Calcium Oxalate Crystals,float64
+lab_flags_Abnormal Clostridium Difficile Culture,float64
+lab_flags_Abnormal Clostridium Difficile Cytotoxicity Assay,float64
+lab_flags_Abnormal Cocaine Metabolite,float64
+lab_flags_Abnormal Codeine,float64
+lab_flags_Abnormal Color,float64
+lab_flags_Abnormal Comments/Recommendations,float64
+lab_flags_Abnormal Crystals,float64
+"lab_flags_Abnormal Culture, Aerobic Bacteria",float64
+"lab_flags_Abnormal Culture, Sputum/Lower Respiratory",float64
+"lab_flags_Abnormal Culture, Urine, Routine",float64
+"lab_flags_Abnormal Drug Screen, Comprehensive (Urine)",float64
+lab_flags_Abnormal Epithelial Cells (Non Renal),float64
+lab_flags_Abnormal Ethanol,float64
+lab_flags_Abnormal F010-Ige Sesame Seed,float64
+lab_flags_Abnormal F011-Ige Buckwheat,float64
+lab_flags_Abnormal F013-Ige Peanut,float64
+lab_flags_Abnormal F015-Ige White Bean,float64
+lab_flags_Abnormal F023-Ige Crab,float64
+lab_flags_Abnormal F025-Ige Tomato,float64
+"lab_flags_Abnormal F035-Ige Potato, White",float64
+lab_flags_Abnormal F096-Ige Avocado,float64
+lab_flags_Abnormal F270-Ige Ginger,float64
+lab_flags_Abnormal F299-Ige Sweet Chestnut,float64
+lab_flags_Abnormal Fecal Globin By Immunochemistry,float64
+lab_flags_Abnormal Fta-Abs,float64
+lab_flags_Abnormal General Categorization:,float64
+lab_flags_Abnormal Glucose,float64
+lab_flags_Abnormal Granular Cast,float64
+lab_flags_Abnormal Hcv Rna Naa Qualitative,float64
+"lab_flags_Abnormal Helicobacter Pylori, Urea Breath Test",float64
+"lab_flags_Abnormal Hepatitis A Ab, Total",float64
+"lab_flags_Abnormal Hepatitis A Ab, Total W/Refl Igm",float64
+lab_flags_Abnormal Hepatitis B Core Ab Total,float64
+lab_flags_Abnormal Hepatitis B Surface Antibody Ql,float64
+lab_flags_Abnormal Hepatitis C Antibody,float64
+lab_flags_Abnormal Hyaline Cast,float64
+lab_flags_Abnormal Hydrocodone,float64
+lab_flags_Abnormal Hydromorphone,float64
+lab_flags_Abnormal Interpretation/Result:,float64
+lab_flags_Abnormal Ketones,float64
+lab_flags_Abnormal Ldl Pattern,float64
+lab_flags_Abnormal Leukocyte Esterase,float64
+lab_flags_Abnormal Marijuana,float64
+lab_flags_Abnormal Marijuana Metabolite,float64
+lab_flags_Abnormal Medmatch Benzoylecgonine,float64
+lab_flags_Abnormal Medmatch Etg,float64
+lab_flags_Abnormal Medmatch Ets,float64
+lab_flags_Abnormal Medmatch Hydrocodone,float64
+lab_flags_Abnormal Medmatch Hydromorphone,float64
+lab_flags_Abnormal Medmatch Marijuana Metab,float64
+lab_flags_Abnormal Medmatch Norhydrocodone,float64
+lab_flags_Abnormal Medmatch Oxazepam,float64
+lab_flags_Abnormal Medmatch Temazepam,float64
+lab_flags_Abnormal Methadone,float64
+"lab_flags_Abnormal Microalbumin/Creatinine Ratio, Random Urine",float64
+lab_flags_Abnormal Morphine,float64
+lab_flags_Abnormal Nitrite,float64
+"lab_flags_Abnormal Nitrite, Urine",float64
+lab_flags_Abnormal Occult Blood,float64
+lab_flags_Abnormal Opiates,float64
+"lab_flags_Abnormal Opiates, Ia",float64
+"lab_flags_Abnormal Ova And Parasites, Stool Conc And Perm Smear",float64
+lab_flags_Abnormal Ph,float64
+lab_flags_Abnormal Platelet Estimation,float64
+lab_flags_Abnormal Plts,float64
+lab_flags_Abnormal Propoxyphene,float64
+lab_flags_Abnormal Protein,float64
+lab_flags_Abnormal Rbc,float64
+lab_flags_Abnormal Result 1,float64
+lab_flags_Abnormal Rpr (Dx) W/Refl Titer And Confirmatory Testing,float64
+lab_flags_Abnormal Rpr (Monitor) W/Refl Titer,float64
+lab_flags_Abnormal Serum Results,float64
+lab_flags_Abnormal Specific Gravity,float64
+lab_flags_Abnormal Squamous Epithelial Cells,float64
+"lab_flags_Abnormal Sureswab(R) Trichomonas Vaginalis Rna, Ql, Tma",float64
+lab_flags_Abnormal Triple Phosphate Crystals,float64
+"lab_flags_Abnormal Urine Culture, Routine",float64
+"lab_flags_Abnormal Urine Culture,Comprehensive",float64
+lab_flags_Abnormal Urine Results,float64
+lab_flags_Abnormal Wbc,float64
+lab_flags_Abnormal Wbc Esterase,float64
+lab_flags_Abnormal Yeast,float64
+lab_flags_High % Saturation,float64
+lab_flags_High A/G Ratio,float64
+lab_flags_High Abnormal Protein Band 1,float64
+lab_flags_High Absolute Band Neutrophils,float64
+lab_flags_High Absolute Basophils,float64
+lab_flags_High Absolute Blasts,float64
+lab_flags_High Absolute Eosinophils,float64
+lab_flags_High Absolute Lymphocytes,float64
+lab_flags_High Absolute Metamyelocytes,float64
+lab_flags_High Absolute Monocytes,float64
+lab_flags_High Absolute Myelocytes,float64
+lab_flags_High Absolute Neutrophils,float64
+lab_flags_High Absolute Nucleated Rbc,float64
+lab_flags_High Alb/Creat Ratio,float64
+lab_flags_High Albumin,float64
+"lab_flags_High Albumin, Serum",float64
+"lab_flags_High Albumin/Creatinine Ratio, Random Urine",float64
+lab_flags_High Albumin/Globulin Ratio,float64
+lab_flags_High Aldo/Pra Ratio,float64
+lab_flags_High Alkaline Phosphatase,float64
+"lab_flags_High Alkaline Phosphatase, S",float64
+lab_flags_High Alpha 2 Globulin,float64
+"lab_flags_High Alpha Fetoprotein, Tumor Marker",float64
+lab_flags_High Alphahydroxyalprazolam,float64
+lab_flags_High Alt,float64
+lab_flags_High Alt (Sgpt),float64
+lab_flags_High Ammonia (P),float64
+"lab_flags_High Ammonia, Plasma",float64
+lab_flags_High Amphetamine,float64
+"lab_flags_High Amylase, Serum",float64
+lab_flags_High Ana Titer,float64
+lab_flags_High Anti-Dna (Ds) Ab Qn,float64
+lab_flags_High Antithrombin Iii Activity,float64
+lab_flags_High Aptt,float64
+lab_flags_High Ast,float64
+lab_flags_High Ast (Sgot),float64
+lab_flags_High B Type Natriuretic Peptide (Bnp),float64
+lab_flags_High B-Type Natriuretic Peptide,float64
+lab_flags_High Benzoylecgonine,float64
+lab_flags_High Beta 2 Globulin,float64
+lab_flags_High Beta-Lactoglobulin (F77) Ige,float64
+"lab_flags_High Bilirubin, Direct",float64
+"lab_flags_High Bilirubin, Indirect",float64
+"lab_flags_High Bilirubin, Total",float64
+lab_flags_High Blasts,float64
+lab_flags_High Bun,float64
+lab_flags_High Bun/Creatinine Ratio,float64
+lab_flags_High C-Reactive Protein,float64
+"lab_flags_High C-Reactive Protein, Quant",float64
+lab_flags_High C. Pneumoniae Iga,float64
+lab_flags_High C. Pneumoniae Igg,float64
+"lab_flags_High Calcitriol(1,25 Di-Oh Vit D)",float64
+lab_flags_High Calcium,float64
+"lab_flags_High Calcium, Ionized",float64
+"lab_flags_High Calcium, Ionized, Serum",float64
+"lab_flags_High Calcium, Serum",float64
+lab_flags_High Carbon Dioxide,float64
+"lab_flags_High Carbon Dioxide, Total",float64
+"lab_flags_High Chlamydia Antibodies, Igg",float64
+lab_flags_High Chloride,float64
+"lab_flags_High Chloride, Serum",float64
+lab_flags_High Chol/Hdlc Ratio,float64
+"lab_flags_High Cholesterol, Total",float64
+lab_flags_High Codeine,float64
+"lab_flags_High Complement, Total (Ch50)",float64
+lab_flags_High Cow'S Milk (F2) Ige,float64
+lab_flags_High Crab (F23) Ige,float64
+"lab_flags_High Creatine Kinase, Total",float64
+lab_flags_High Creatinine,float64
+"lab_flags_High Creatinine, 24 Hour Urine",float64
+"lab_flags_High Creatinine, Random Urine",float64
+"lab_flags_High Creatinine, Serum",float64
+lab_flags_High Cyclic Citrullinated Peptide (Ccp) Ab (Igg),float64
+"lab_flags_High D-Dimer, Quantitative",float64
+lab_flags_High Desmethyltramadol,float64
+lab_flags_High Digoxin,float64
+lab_flags_High Direct Ldl,float64
+lab_flags_High Dna (Ds) Antibody,float64
+lab_flags_High Drvvt Screen,float64
+lab_flags_High Ebv Nuclear Ag (Ebna) Ab (Igg),float64
+lab_flags_High Ebv Viral Capsid Ag (Vca) Ab (Igg),float64
+lab_flags_High Egg White (F1) Ige,float64
+lab_flags_High Elm (T8) Ige,float64
+lab_flags_High Eos (Absolute),float64
+lab_flags_High Ethyl Glucuronide (Etg),float64
+lab_flags_High Ethyl Sulfate (Ets),float64
+lab_flags_High Fasting Specimen,float64
+lab_flags_High Ferritin,float64
+"lab_flags_High Ferritin, Serum",float64
+lab_flags_High Free T4 Index (T7),float64
+lab_flags_High Free Testosterone,float64
+lab_flags_High Gamma Globulin,float64
+lab_flags_High Gastric Parietal Cell Ab,float64
+lab_flags_High Ggt,float64
+lab_flags_High Globulin,float64
+lab_flags_High Glucose,float64
+"lab_flags_High Glucose, Serum",float64
+lab_flags_High Hcv Ab,float64
+"lab_flags_High Hcv Rna, Quantitative Real Time Pcr",float64
+lab_flags_High Hematocrit,float64
+lab_flags_High Hemoglobin,float64
+lab_flags_High Hemoglobin A1C,float64
+lab_flags_High Hep C Virus Ab,float64
+lab_flags_High Hepatitis B Virus Dna,float64
+lab_flags_High Homocysteine,float64
+lab_flags_High Hs Crp,float64
+lab_flags_High Hydrocodone,float64
+lab_flags_High Hydromorphone,float64
+lab_flags_High Immunoglobulin A,float64
+lab_flags_High Immunoglobulin E,float64
+lab_flags_High Immunoglobulin G,float64
+lab_flags_High Inr,float64
+lab_flags_High Intestinal Isoenzymes,float64
+lab_flags_High Iron,float64
+lab_flags_High Iron Binding Capacity,float64
+"lab_flags_High Iron, Total",float64
+lab_flags_High Kappa,float64
+"lab_flags_High Kappa Light Chain, Free, Serum",float64
+lab_flags_High Lambda,float64
+"lab_flags_High Lambda Light Chain, Free, Serum",float64
+lab_flags_High Ldl Cholesterol Calc,float64
+lab_flags_High Ldl-Cholesterol,float64
+lab_flags_High Ldl/Hdl Ratio,float64
+lab_flags_High Levetiracetam,float64
+lab_flags_High Lipase,float64
+"lab_flags_High Lipase, Serum",float64
+lab_flags_High Lipoprotein (A),float64
+lab_flags_High Lithium,float64
+"lab_flags_High Lymphocytes, %",float64
+lab_flags_High Lymphs (Absolute),float64
+lab_flags_High Magnesium,float64
+"lab_flags_High Magnesium, Serum",float64
+lab_flags_High Marijuana Metabolite,float64
+lab_flags_High Mch,float64
+lab_flags_High Mchc,float64
+lab_flags_High Mcv,float64
+lab_flags_High Metamyelocytes,float64
+lab_flags_High Methamphetamine,float64
+lab_flags_High Microalb/Creat Ratio,float64
+"lab_flags_High Microalbumin, Urine",float64
+"lab_flags_High Microalbumin/Creatinine Ratio, Random Urine",float64
+lab_flags_High Monocytes(Absolute),float64
+lab_flags_High Morphine,float64
+lab_flags_High Mpv,float64
+lab_flags_High Myelocytes,float64
+lab_flags_High Neutrophils (Absolute),float64
+lab_flags_High Non Hdl Cholesterol,float64
+lab_flags_High Norhydrocodone,float64
+lab_flags_High Nrbc,float64
+lab_flags_High Nucleated Rbc,float64
+lab_flags_High Oak (T7) Ige,float64
+lab_flags_High Ovalbumin (F232) Ige,float64
+lab_flags_High Oxazepam,float64
+"lab_flags_High Parathyroid Hormone, Intact",float64
+"lab_flags_High Partial Thromboplastin Time, Activated",float64
+lab_flags_High Ph,float64
+lab_flags_High Phenytoin,float64
+lab_flags_High Phosphate (As Phosphorus),float64
+"lab_flags_High Phosphorus, Serum",float64
+lab_flags_High Platelet Count,float64
+lab_flags_High Platelets,float64
+lab_flags_High Potassium,float64
+"lab_flags_High Potassium, Serum",float64
+lab_flags_High Prealbumin,float64
+lab_flags_High Prolactin,float64
+"lab_flags_High Prostate Specific Ag, Serum",float64
+"lab_flags_High Protein C, Activity",float64
+"lab_flags_High Protein S, Activity",float64
+"lab_flags_High Protein, Total",float64
+"lab_flags_High Protein, Total, 24 Hr Ur",float64
+"lab_flags_High Protein, Total, Random Ur",float64
+"lab_flags_High Protein,Total,Urine",float64
+lab_flags_High Protein/Creat Ratio,float64
+lab_flags_High Protein/Creatinine Ratio,float64
+lab_flags_High Prothrombin Time,float64
+"lab_flags_High Psa, Total",float64
+lab_flags_High Pt,float64
+"lab_flags_High Pth, Intact",float64
+lab_flags_High Ptt-La Screen,float64
+lab_flags_High Rbc,float64
+lab_flags_High Rdw,float64
+lab_flags_High Red Blood Cell Count,float64
+"lab_flags_High Reticulocyte, Absolute",float64
+lab_flags_High Rheumatoid Factor,float64
+lab_flags_High Rough Marsh Elder (W16) Ige,float64
+lab_flags_High Rpr Titer,float64
+lab_flags_High Rye (F5) Ige,float64
+lab_flags_High Sed Rate By Modified Westergren,float64
+lab_flags_High Sedimentation Rate-Westergren,float64
+lab_flags_High Sex Hormone Binding Globulin,float64
+lab_flags_High Shrimp (F24) Ige,float64
+lab_flags_High Signal To Cut-Off,float64
+lab_flags_High Sodium,float64
+"lab_flags_High Sodium, Serum",float64
+lab_flags_High Specific Gravity,float64
+"lab_flags_High T3 Reverse, Lc/Ms/Ms",float64
+lab_flags_High T3 Uptake,float64
+"lab_flags_High T4 (Thyroxine), Total",float64
+"lab_flags_High T4, Free",float64
+"lab_flags_High T4,Free(Direct)",float64
+lab_flags_High Temazepam,float64
+"lab_flags_High Testosterone, Free",float64
+"lab_flags_High Testosterone, Total, Lc/Ms/Ms",float64
+lab_flags_High Thyroglobulin Antibodies,float64
+lab_flags_High Thyroid Peroxidase Antibodies,float64
+lab_flags_High Total Nucleated Cell Ct,float64
+lab_flags_High Tramadol,float64
+lab_flags_High Transferrin,float64
+lab_flags_High Triglycerides,float64
+"lab_flags_High Triiodothyronine, Free, Serum",float64
+lab_flags_High Tsh,float64
+lab_flags_High Tsh W/Reflex To Ft4,float64
+lab_flags_High Uibc,float64
+lab_flags_High Urea Nitrogen (Bun),float64
+lab_flags_High Uric Acid,float64
+"lab_flags_High Vitamin B1 (Thiamine), Blood, Lc/Ms/Ms",float64
+"lab_flags_High Vitamin B1 (Thiamine), Lc/Ms/Ms",float64
+lab_flags_High Vitamin B12,float64
+"lab_flags_High Vitamin B2 (Riboflavin), Plasma",float64
+"lab_flags_High Vitamin D, 1,25 (Oh)2, Total",float64
+"lab_flags_High Vitamin D, 25-Oh, Total",float64
+"lab_flags_High Vitamin D,25-Oh,Total,Ia",float64
+lab_flags_High Vldl Cholesterol Cal,float64
+lab_flags_High Wbc,float64
+lab_flags_High White Blood Cell Count,float64
+lab_flags_Low % Saturation,float64
+"lab_flags_Low 25-Hydroxy, Vitamin D",float64
+lab_flags_Low A/G Ratio,float64
+lab_flags_Low Absolute Eosinophils,float64
+lab_flags_Low Absolute Lymphocytes,float64
+lab_flags_Low Absolute Monocytes,float64
+lab_flags_Low Absolute Neutrophils,float64
+lab_flags_Low Albumin,float64
+"lab_flags_Low Albumin, Serum",float64
+lab_flags_Low Albumin/Globulin Ratio,float64
+lab_flags_Low Alkaline Phosphatase,float64
+"lab_flags_Low Alkaline Phosphatase, S",float64
+lab_flags_Low Alt,float64
+lab_flags_Low Amylase,float64
+lab_flags_Low Apolipoprotein B,float64
+lab_flags_Low Ast,float64
+"lab_flags_Low Bilirubin, Indirect",float64
+lab_flags_Low Bone Isoenzymes,float64
+lab_flags_Low Bun,float64
+lab_flags_Low Bun/Creatinine Ratio,float64
+lab_flags_Low Calcium,float64
+"lab_flags_Low Calcium, Ionized",float64
+"lab_flags_Low Calcium, Serum",float64
+lab_flags_Low Carbon Dioxide,float64
+"lab_flags_Low Carbon Dioxide, Total",float64
+lab_flags_Low Chloride,float64
+"lab_flags_Low Chloride, Serum",float64
+"lab_flags_Low Cholesterol, Total",float64
+"lab_flags_Low Creatine Kinase, Total",float64
+lab_flags_Low Creatinine,float64
+"lab_flags_Low Creatinine, Random Urine",float64
+"lab_flags_Low Creatinine, Serum",float64
+lab_flags_Low Digoxin,float64
+"lab_flags_Low Digoxin, Serum",float64
+lab_flags_Low Egfr African American,float64
+lab_flags_Low Egfr If Africn Am,float64
+lab_flags_Low Egfr If Nonafricn Am,float64
+lab_flags_Low Egfr Non-Afr. American,float64
+lab_flags_Low Ferritin,float64
+"lab_flags_Low Folate, Serum",float64
+lab_flags_Low Free T4 Index (T7),float64
+lab_flags_Low Free Testosterone,float64
+lab_flags_Low Free Testosterone(Direct),float64
+lab_flags_Low Free Thyroxine Index,float64
+lab_flags_Low Globulin,float64
+lab_flags_Low Glucose,float64
+"lab_flags_Low Glucose, Serum",float64
+lab_flags_Low Hdl Cholesterol,float64
+lab_flags_Low Hematocrit,float64
+lab_flags_Low Hemoglobin,float64
+lab_flags_Low Hemoglobin A1C,float64
+lab_flags_Low Hemoglobin A2 (Quant),float64
+"lab_flags_Low Hepatitis B Surface Ab Immunity, Qn",float64
+lab_flags_Low Immunoglobulin M,float64
+lab_flags_Low Iron Bind.Cap.(Tibc),float64
+lab_flags_Low Iron Binding Capacity,float64
+lab_flags_Low Iron Saturation,float64
+"lab_flags_Low Iron, Total",float64
+lab_flags_Low Ld,float64
+lab_flags_Low Ldl Particle Number,float64
+lab_flags_Low Ldl Peak Size,float64
+lab_flags_Low Levetiracetam,float64
+lab_flags_Low Lipase,float64
+lab_flags_Low Lymphs (Absolute),float64
+lab_flags_Low Magnesium,float64
+lab_flags_Low Mch,float64
+lab_flags_Low Mchc,float64
+lab_flags_Low Mcv,float64
+lab_flags_Low Monocytes(Absolute),float64
+lab_flags_Low Mpv,float64
+lab_flags_Low Neutrophils (Absolute),float64
+lab_flags_Low Osmolality (Serum),float64
+lab_flags_Low Ph,float64
+lab_flags_Low Phenytoin,float64
+"lab_flags_Low Phenytoin, Serum",float64
+"lab_flags_Low Plasma Renin Activity, Lc/Ms/Ms",float64
+lab_flags_Low Platelet Count,float64
+lab_flags_Low Platelets,float64
+lab_flags_Low Potassium,float64
+"lab_flags_Low Potassium, Serum",float64
+lab_flags_Low Prealbumin,float64
+lab_flags_Low Prolactin,float64
+"lab_flags_Low Protein, Total",float64
+"lab_flags_Low Protein, Total, Random Ur",float64
+"lab_flags_Low Protein, Total, Serum",float64
+"lab_flags_Low Psa, % Free",float64
+lab_flags_Low Pth-Rp,float64
+lab_flags_Low Rbc,float64
+lab_flags_Low Rdw,float64
+lab_flags_Low Red Blood Cell Count,float64
+"lab_flags_Low Reticulocyte, Absolute",float64
+lab_flags_Low Sodium,float64
+"lab_flags_Low Sodium, Random Urine",float64
+"lab_flags_Low Sodium, Serum",float64
+lab_flags_Low T3 Uptake,float64
+"lab_flags_Low T3, Free",float64
+"lab_flags_Low T3, Total",float64
+"lab_flags_Low T4 (Thyroxine), Total",float64
+"lab_flags_Low T4, Free",float64
+"lab_flags_Low Testosterone, Free",float64
+"lab_flags_Low Testosterone, Serum",float64
+"lab_flags_Low Testosterone, Total, Lc/Ms",float64
+"lab_flags_Low Testosterone, Total, Lc/Ms/Ms",float64
+"lab_flags_Low Testosterone, Total, Males (Adult), Ia",float64
+"lab_flags_Low Testosterone, Total, Ms",float64
+"lab_flags_Low Theophylline, Serum",float64
+lab_flags_Low Transferrin,float64
+lab_flags_Low Tsh,float64
+lab_flags_Low Tsh W/Reflex To Ft4,float64
+lab_flags_Low Urea Nitrogen (Bun),float64
+lab_flags_Low Uric Acid,float64
+lab_flags_Low Valproic Acid,float64
+"lab_flags_Low Vitamin B1 (Thiamine), Serum/Plasma, Lc/Ms/Ms",float64
+lab_flags_Low Vitamin B12,float64
+"lab_flags_Low Vitamin B2 (Riboflavin), Plasma",float64
+"lab_flags_Low Vitamin C, Lc/Ms/Ms",float64
+"lab_flags_Low Vitamin D, 1,25 (Oh)2, Total",float64
+"lab_flags_Low Vitamin D, 25-Hydroxy",float64
+"lab_flags_Low Vitamin D, 25-Oh, Total",float64
+"lab_flags_Low Vitamin D,25-Oh,Total,Ia",float64
+lab_flags_Low Wbc,float64
+lab_flags_Low White Blood Cell Count,float64
+lab_flags_Low Zinc,float64
+"lab_flags_Very High Ammonia, Plasma",float64
+lab_flags_Very High Wbc,float64
+lab_flags_Very Low Hemoglobin,float64
+lab_flags_Very Low Iron Saturation,float64
+lab_flags_Very Low Platelets,float64
+lab_flags_Very Low Rbc,float64
+lab_% Free PSA (%),float64
+lab_% SATURATION (% (calc)),float64
+"lab_25-Hydroxy, Vitamin D (ng/mL)",float64
+"lab_25-Hydroxy, Vitamin D-2 (ng/mL)",float64
+"lab_25-Hydroxy, Vitamin D-3 (ng/mL)",float64
+lab_ABNORMAL PROTEIN BAND 1 (g/dL),float64
+lab_ABSOLUTE BAND NEUTROPHILS (cells/uL),float64
+lab_ABSOLUTE BASOPHILS (cells/uL),float64
+lab_ABSOLUTE BLASTS (cells/uL),float64
+lab_ABSOLUTE EOSINOPHILS (cells/uL),float64
+lab_ABSOLUTE LYMPHOCYTES (cells/uL),float64
+lab_ABSOLUTE METAMYELOCYTES (cells/uL),float64
+lab_ABSOLUTE MONOCYTES (cells/uL),float64
+lab_ABSOLUTE MYELOCYTES (cells/uL),float64
+lab_ABSOLUTE NEUTROPHILS (cells/uL),float64
+lab_ALBUMIN (g/dL),float64
+"lab_ALBUMIN, URINE (mg/dL)",float64
+"lab_ALBUMIN/CREATININE RATIO, RANDOM URINE (mcg/mg creat)",float64
+lab_ALBUMIN/GLOBULIN RATIO ((calc)),float64
+lab_ALKALINE PHOSPHATASE (U/L),float64
+lab_ALPHA 2 GLOBULIN (g/dL),float64
+"lab_ALPHA FETOPROTEIN, TUMOR MARKER (ng/mL)",float64
+lab_ALT (SGPT) (IU/L),float64
+lab_ALT (U/L),float64
+lab_AMMONIA (P) (umol/L),float64
+lab_AMYLASE (U/L),float64
+lab_ANA TITER (titer),float64
+lab_APOLIPOPROTEIN B (mg/dL),float64
+lab_AST (SGOT) (IU/L),float64
+lab_AST (U/L),float64
+lab_ATOPOBIUM VAGINAE (Log (cells/mL)),float64
+lab_Alb/Creat Ratio (mg/g creat),float64
+lab_Albumin (g/dL),float64
+"lab_Albumin, Serum (g/dL)",float64
+"lab_Albumin, Urine (ug/mL)",float64
+lab_Alcohol Metabolites (ng/mL),float64
+lab_Alkaline Phosphatase (IU/L),float64
+"lab_Alkaline Phosphatase, S (IU/L)",float64
+lab_Alphahydroxyalprazolam (ng/mL),float64
+"lab_Ammonia, Plasma (ug/dL)",float64
+lab_Amphetamines (ng/mL),float64
+"lab_Amylase, Serum (U/L)",float64
+lab_B TYPE NATRIURETIC PEPTIDE (BNP) (pg/mL),float64
+lab_B-Type Natriuretic Peptide (pg/mL),float64
+lab_BAND NEUTROPHILS (%),float64
+lab_BASOPHILS (%),float64
+lab_BETA 1 GLOBULIN (g/dL),float64
+lab_BETA 2 GLOBULIN (g/dL),float64
+"lab_BILIRUBIN, DIRECT (mg/dL)",float64
+"lab_BILIRUBIN, INDIRECT (mg/dL (calc))",float64
+"lab_BILIRUBIN, TOTAL (mg/dL)",float64
+lab_BLASTS (%),float64
+lab_BUN (mg/dL),float64
+lab_BUN/CREATININE RATIO ((calc)),float64
+lab_Baso (Absolute) (x10E3/uL),float64
+lab_Basos (%),float64
+lab_Benzodiazepines (ng/mL),float64
+lab_Benzoylecgonine (ng/mL),float64
+"lab_Bilirubin, Total (mg/dL)",float64
+lab_C-REACTIVE PROTEIN (mg/L),float64
+lab_C-REACTIVE PROTEIN (mg/dL),float64
+"lab_C-Reactive Protein, Quant (mg/L)",float64
+lab_C. PNEUMONIAE IGA (titer),float64
+lab_CA 125 (U/mL),float64
+lab_CALCIUM (mg/dL),float64
+"lab_CALCIUM, IONIZED (mg/dL)",float64
+"lab_CARBAMAZEPINE, TOTAL (mg/L)",float64
+lab_CARBON DIOXIDE (mmol/L),float64
+lab_CEA (ng/mL),float64
+lab_CHLORIDE (mmol/L),float64
+lab_CHOL/HDLC RATIO ((calc)),float64
+lab_CHOL/HDLC RATIO (calc),float64
+"lab_CHOLESTEROL, TOTAL (mg/dL)",float64
+lab_CK-MM (% of total),float64
+lab_COMPLEMENT COMPONENT C3C (mg/dL),float64
+lab_COMPLEMENT COMPONENT C4C (mg/dL),float64
+lab_COW'S MILK (F2) IGE (kU/L),float64
+"lab_CREATINE KINASE, TOTAL (U/L)",float64
+lab_CREATININE (mg/dL),float64
+"lab_CREATININE, 24 HOUR URINE (g/24 h)",float64
+"lab_CREATININE, RANDOM URINE (mg/dL)",float64
+lab_CYCLIC CITRULLINATED PEPTIDE (CCP) AB (IGG) (UNITS),float64
+"lab_Calcitriol(1,25 di-OH Vit D) (pg/mL)",float64
+lab_Calcium (mg/dL),float64
+"lab_Calcium, Ionized, Serum (mg/dL)",float64
+"lab_Calcium, Serum (mg/dL)",float64
+"lab_Carbon Dioxide, Total (mmol/L)",float64
+lab_Chloride (mmol/L),float64
+"lab_Chloride, Serum (mmol/L)",float64
+"lab_Cholesterol, Total (mg/dL)",float64
+lab_Cocaine Metabolite (ng/mL),float64
+lab_Codeine (ng/mL),float64
+lab_Creatinine (mg/dL),float64
+"lab_Creatinine, Serum (mg/dL)",float64
+"lab_Creatinine, Urine (mg/dL)",float64
+"lab_D-DIMER, QUANTITATIVE (mcg/mL FEU)",float64
+lab_DIGOXIN (mcg/L),float64
+lab_DIRECT LDL (mg/dL),float64
+lab_DNA (DS) ANTIBODY (IU/mL),float64
+lab_DRVVT SCREEN (seconds),float64
+lab_Desmethyltramadol (ng/mL),float64
+"lab_Digoxin, Serum (ng/mL)",float64
+lab_EBV NUCLEAR AG (EBNA) AB (IGG) (U/mL),float64
+lab_EBV VIRAL CAPSID AG (VCA) AB (IGG) (U/mL),float64
+lab_EGG WHITE (F1) IGE (kU/L),float64
+lab_ELM (T8) IGE (kU/L),float64
+lab_EOSINOPHILS (%),float64
+lab_ERYTHROPOIETIN (mIU/mL),float64
+lab_ESTRADIOL (pg/mL),float64
+lab_Eos (%),float64
+lab_Eos (Absolute) (x10E3/uL),float64
+lab_Epithelial Cells (non renal) (/hpf),float64
+lab_Estim. Avg Glu (eAG) (mg/dL),float64
+lab_Ethyl Glucuronide (ETG) (ng/mL),float64
+lab_Ethyl Sulfate (ETS) (ng/mL),float64
+lab_FERRITIN (ng/mL),float64
+"lab_FOLATE, RBC (ng/mL RBC)",float64
+"lab_FOLATE, SERUM (ng/mL)",float64
+lab_FREE TESTOSTERONE (pg/mL),float64
+"lab_Ferritin, Serum (ng/mL)",float64
+"lab_Folate (Folic Acid), Serum (ng/mL)",float64
+lab_Free Testosterone(Direct) (pg/mL),float64
+lab_GAMMA GLOBULIN (g/dL),float64
+lab_GARDNERELLA VAGINALIS (Log (cells/mL)),float64
+lab_GASTRIC PARIETAL CELL AB (U),float64
+lab_GGT (U/L),float64
+lab_GLOBULIN (g/dL (calc)),float64
+lab_GLUCOSE (mg/dL),float64
+"lab_Globulin, Total (g/dL)",float64
+lab_Glucose (mg/dL),float64
+"lab_Glucose, Serum (mg/dL)",float64
+"lab_HCV RNA, QUANTITATIVE REAL TIME PCR (IU/mL)",float64
+"lab_HCV RNA, QUANTITATIVE REAL TIME PCR (Log IU/mL)",float64
+"lab_HCV RNA, QUANTITATIVE REAL TIME PCR (LogIU/mL)",float64
+lab_HDL CHOLESTEROL (mg/dL),float64
+lab_HDL Cholesterol (mg/dL),float64
+lab_HDL LARGE (nmol/L),float64
+lab_HEMATOCRIT (%),float64
+lab_HEMOGLOBIN (g/dL),float64
+lab_HEMOGLOBIN A (%),float64
+lab_HEMOGLOBIN A1c (% of total Hgb),float64
+lab_HEMOGLOBIN A2 (QUANT) (%),float64
+"lab_HEPATITIS B SURFACE AB IMMUNITY, QN (mIU/mL)",float64
+lab_HEPATITIS B VIRUS DNA (IU/mL),float64
+lab_HOMOCYSTEINE (umol/L),float64
+lab_HS CRP (mg/L),float64
+lab_HYALINE CAST (/LPF),float64
+lab_HYDROCODONE (ng/mL),float64
+lab_Hematocrit (%),float64
+lab_Hemoglobin (g/dL),float64
+lab_Hemoglobin A1c (% of total Hgb),float64
+lab_Hemoglobin A1c (%),float64
+lab_Hep C Virus Ab (s/co ratio),float64
+lab_Hydrocodone (ng/mL),float64
+lab_Hydromorphone (ng/mL),float64
+lab_IMMUNOGLOBULIN A (mg/dL),float64
+lab_IMMUNOGLOBULIN G (mg/dL),float64
+lab_IMMUNOGLOBULIN M (mg/dL),float64
+lab_INSULIN (uIU/mL),float64
+lab_IRON BINDING CAPACITY (mcg/dL (calc)),float64
+lab_IRON BINDING CAPACITY (mcg/dL),float64
+"lab_IRON, TOTAL (mcg/dL)",float64
+lab_Immature Grans (Abs) (x10E3/uL),float64
+lab_Immature Granulocytes (%),float64
+lab_Iron (ug/dL),float64
+lab_Iron Bind.Cap.(TIBC) (ug/dL),float64
+lab_Iron Saturation (%),float64
+"lab_Iron, Serum (ug/dL)",float64
+"lab_KAPPA LIGHT CHAIN, FREE, SERUM (mg/L)",float64
+lab_LACTOBACILLUS SPECIES (Log (cells/mL)),float64
+lab_LAMOTRIGINE (mcg/mL),float64
+lab_LD (U/L),float64
+lab_LDL Cholesterol Calc (mg/dL),float64
+lab_LDL MEDIUM (nmol/L),float64
+lab_LDL PARTICLE NUMBER (nmol/L),float64
+lab_LDL PEAK SIZE (Angstrom),float64
+lab_LDL SMALL (nmol/L),float64
+lab_LDL-CHOLESTEROL (mg/dL (calc)),float64
+lab_LDL-CHOLESTEROL (mg/dL),float64
+lab_LDL/HDL RATIO ((calc)),float64
+lab_LDL/HDL Ratio (ratio units),float64
+lab_LDL/HDL Ratio (ratio),float64
+lab_LEVETIRACETAM (mcg/mL),float64
+lab_LIPASE (U/L),float64
+lab_LIPOPROTEIN (a) (nmol/L),float64
+lab_LITHIUM (mmol/L),float64
+lab_LYMPHOCYTES (%),float64
+"lab_Lipase, Serum (U/L)",float64
+lab_Lymphs (%),float64
+lab_Lymphs (Absolute) (x10E3/uL),float64
+lab_MAGNESIUM (mg/dL),float64
+lab_MCH (pg),float64
+lab_MCHC (g/dL),float64
+lab_MCV (fL),float64
+lab_MEAN PLASMA GLUCOSE (mg/dL (calc)),float64
+lab_METAMYELOCYTES (%),float64
+lab_METHYLMALONIC ACID (nmol/L),float64
+lab_MICROALBUMIN (mg/dL),float64
+"lab_MICROALBUMIN/CREATININE RATIO, RANDOM URINE (mcg/mg creat)",float64
+"lab_MONOCYTE/MACROPHAGE, % (%)",float64
+lab_MONOCYTES (%),float64
+lab_MPV (fL),float64
+lab_MYELOCYTES (%),float64
+"lab_Magnesium, Serum (mg/dL)",float64
+lab_Marijuana Metabolite (ng/mL),float64
+lab_Microalb/Creat Ratio (mg/g creat),float64
+"lab_Microalbumin, Urine (ug/mL)",float64
+lab_Monocytes (%),float64
+lab_Monocytes(Absolute) (x10E3/uL),float64
+lab_Morphine (ng/mL),float64
+lab_NEUTROPHILS (%),float64
+"lab_NEUTROPHILS, % (%)",float64
+lab_NON HDL CHOLESTEROL (mg/dL (calc)),float64
+lab_Neutrophils (%),float64
+lab_Neutrophils (Absolute) (x10E3/uL),float64
+lab_Norhydrocodone (ng/mL),float64
+lab_OAK (T7) IGE (kU/L),float64
+lab_OSMOLALITY (U) (mOsm/kg),float64
+lab_Opiates (ng/mL),float64
+lab_Oxazepam (ng/mL),float64
+"lab_PARATHYROID HORMONE, INTACT (pg/mL)",float64
+"lab_PARTIAL THROMBOPLASTIN TIME, ACTIVATED (sec)",float64
+lab_PHENYTOIN (mg/L),float64
+lab_PHOSPHATE (AS PHOSPHORUS) (mg/dL),float64
+lab_PLATELET COUNT (Thousand/uL),float64
+lab_POTASSIUM (mmol/L),float64
+lab_PREALBUMIN (mg/dL),float64
+lab_PROLACTIN (ng/mL),float64
+"lab_PROTEIN C, ACTIVITY (% normal)",float64
+"lab_PROTEIN S ANTIGEN, FREE (% normal)",float64
+"lab_PROTEIN S, ACTIVITY (% normal)",float64
+"lab_PROTEIN, TOTAL (g/dL)",float64
+"lab_PROTEIN, TOTAL, 24 HR UR (mg/24 h)",float64
+"lab_PROTEIN, TOTAL, RANDOM UR (mg/dL)",float64
+lab_PROTEIN/CREATININE RATIO (mg/g creat),float64
+"lab_PSA, % FREE (% (calc))",float64
+"lab_PSA, FREE (ng/mL)",float64
+"lab_PSA, Free (ng/mL)",float64
+"lab_PSA, TOTAL (ng/mL)",float64
+lab_PT (sec),float64
+"lab_PTH, Intact (pg/mL)",float64
+lab_PTH-RP (pg/mL),float64
+"lab_Phenytoin, Serum (ug/mL)",float64
+"lab_Phosphorus, Serum (mg/dL)",float64
+lab_Platelets (x10E3/uL),float64
+lab_Potassium (mmol/L),float64
+"lab_Potassium, Serum (mmol/L)",float64
+lab_Prealbumin (mg/dL),float64
+"lab_Prostate Specific Ag, Serum (ng/mL)",float64
+"lab_Protein, Total (g/dL)",float64
+"lab_Protein, Total, Serum (g/dL)",float64
+"lab_Protein,Total,Urine (mg/dL)",float64
+lab_Protein/Creat Ratio (mg/g creat),float64
+lab_Prothrombin Time (sec),float64
+lab_RBC (/HPF),float64
+lab_RBC (/hpf),float64
+lab_RBC (x10E6/uL),float64
+lab_RDW (%),float64
+lab_RED BLOOD CELL COUNT (Million/uL),float64
+"lab_RETICULOCYTE COUNT, AUTOMATED (%)",float64
+"lab_RETICULOCYTE, ABSOLUTE (cells/uL)",float64
+lab_RHEUMATOID FACTOR (IU/mL),float64
+lab_Reticulocyte Count (%),float64
+lab_SED RATE BY MODIFIED WESTERGREN (mm/h),float64
+lab_SEX HORMONE BINDING GLOBULIN (nmol/L),float64
+lab_SODIUM (mmol/L),float64
+"lab_SODIUM, RANDOM URINE (mmol/L)",float64
+lab_SODIUM/CREAT RATIO (mmol/g creat),float64
+lab_SQUAMOUS EPITHELIAL CELLS (/HPF),float64
+lab_SYSTOLIC BLOOD PRESSURE (mmHg),float64
+lab_Sedimentation Rate-Westergren (mm/hr),float64
+lab_Sodium (mmol/L),float64
+"lab_Sodium, Serum (mmol/L)",float64
+"lab_T3 REVERSE, LC/MS/MS (ng/dL)",float64
+lab_T3 UPTAKE (%),float64
+lab_T3 Uptake (%),float64
+"lab_T3, FREE (pg/mL)",float64
+"lab_T3, TOTAL (ng/dL)",float64
+"lab_T4 (THYROXINE), TOTAL (mcg/dL)",float64
+"lab_T4, FREE (ng/dL)",float64
+"lab_T4, TOTAL (THYROXINE) (mcg/dL)",float64
+"lab_T4,Free (Direct) (ng/dL)",float64
+"lab_T4,Free(Direct) (ng/dL)",float64
+"lab_TESTOSTERONE, FREE (pg/mL)",float64
+"lab_TESTOSTERONE, TOTAL, LC/MS/MS (ng/dL)",float64
+"lab_TESTOSTERONE, TOTAL, MALES (ADULT), IA (ng/dL)",float64
+"lab_TESTOSTERONE, TOTAL, MS (ng/dL)",float64
+lab_THYROGLOBULIN ANTIBODIES (IU/mL),float64
+lab_THYROID PEROXIDASE ANTIBODIES (IU/mL),float64
+"lab_TISSUE TRANSGLUTAMINASE AB, IGA (U/mL)",float64
+lab_TOTAL NUCLEATED CELL CT (cells/uL),float64
+lab_TRANSFERRIN (mg/dL),float64
+lab_TRIGLYCERIDES (mg/dL),float64
+lab_TROPONIN I (ng/mL),float64
+lab_TSH (REFL) (mIU/L),float64
+lab_TSH (mIU/L),float64
+lab_TSH (uIU/mL),float64
+lab_TSH W/REFLEX TO FT4 (mIU/L),float64
+lab_Temazepam (ng/mL),float64
+"lab_Testosterone, Serum (ng/dL)",float64
+lab_Thyroxine (T4) (ug/dL),float64
+lab_Transferrin (mg/dL),float64
+lab_Triglycerides (mg/dL),float64
+lab_Triiodothyronine (T3) (ng/dL),float64
+"lab_Triiodothyronine, Free, Serum (pg/mL)",float64
+lab_UIBC (ug/dL),float64
+lab_UREA NITROGEN (BUN) (mg/dL),float64
+lab_URIC ACID (mg/dL),float64
+lab_Uric Acid (mg/dL),float64
+"lab_Urobilinogen,Semi-Qn (mg/dL)",float64
+lab_VALPROIC ACID (mg/L),float64
+"lab_VITAMIN B1 (THIAMINE), BLOOD, LC/MS/MS (nmol/L)",float64
+"lab_VITAMIN B1 (THIAMINE), LC/MS/MS (nmol/L)",float64
+"lab_VITAMIN B1 (THIAMINE), SERUM/PLASMA, LC/MS/MS (nmol/L)",float64
+lab_VITAMIN B12 (pg/mL),float64
+"lab_VITAMIN B2 (RIBOFLAVIN), PLASMA (nmol/L)",float64
+"lab_VITAMIN B6, PLASMA (ng/mL)",float64
+"lab_VITAMIN D, 1,25 (OH)2, TOTAL (pg/mL)",float64
+"lab_VITAMIN D, 25-OH, D2 (ng/mL)",float64
+"lab_VITAMIN D, 25-OH, D3 (ng/mL)",float64
+"lab_VITAMIN D, 25-OH, TOTAL (ng/mL)",float64
+"lab_VITAMIN D,25-OH,TOTAL,IA (ng/mL)",float64
+"lab_VITAMIN D2, 1,25 (OH)2 (pg/mL)",float64
+"lab_VITAMIN D3, 1,25 (OH)2 (pg/mL)",float64
+lab_VLDL Cholesterol Cal (mg/dL),float64
+lab_Vitamin B12 (pg/mL),float64
+"lab_Vitamin D, 25-Hydroxy (ng/mL)",float64
+"lab_Vitamin D, 25-Hydroxy, Serum (ng/mL)",float64
+lab_WBC (/HPF),float64
+lab_WBC (/hpf),float64
+lab_WBC (x10E3/uL),float64
+lab_WHITE BLOOD CELL COUNT (Thousand/uL),float64
+lab_ZINC (mcg/dL),float64
+lab_aPTT (sec),float64
+lab_eGFR AFRICAN AMERICAN (mL/min/1.73m2),float64
+lab_eGFR If Africn Am (mL/min/1.73),float64
+lab_eGFR If NonAfricn Am (mL/min/1.73),float64
+lab_eGFR NON-AFR. AMERICAN (mL/min/1.73m2),float64
+asmt_txt_description,object
+asmt_txt_tokenized,object
+asmt_ngrams,object
+asmt_ngram2,object
+asmt_txt_tokenized2,object
+asmt_np_chunks,object
+CCSR Category,object
+asmt_description,object
+ccsr_BLD001,float64
+ccsr_BLD002,float64
+ccsr_BLD003,float64
+ccsr_BLD004,float64
+ccsr_BLD005,float64
+ccsr_BLD006,float64
+ccsr_BLD007,float64
+ccsr_BLD008,float64
+ccsr_BLD010,float64
+ccsr_CIR001,float64
+ccsr_CIR002,float64
+ccsr_CIR003,float64
+ccsr_CIR004,float64
+ccsr_CIR005,float64
+ccsr_CIR006,float64
+ccsr_CIR007,float64
+ccsr_CIR008,float64
+ccsr_CIR009,float64
+ccsr_CIR010,float64
+ccsr_CIR011,float64
+ccsr_CIR012,float64
+ccsr_CIR013,float64
+ccsr_CIR014,float64
+ccsr_CIR015,float64
+ccsr_CIR016,float64
+ccsr_CIR017,float64
+ccsr_CIR019,float64
+ccsr_CIR020,float64
+ccsr_CIR021,float64
+ccsr_CIR022,float64
+ccsr_CIR023,float64
+ccsr_CIR024,float64
+ccsr_CIR025,float64
+ccsr_CIR026,float64
+ccsr_CIR028,float64
+ccsr_CIR029,float64
+ccsr_CIR030,float64
+ccsr_CIR031,float64
+ccsr_CIR032,float64
+ccsr_CIR033,float64
+ccsr_CIR034,float64
+ccsr_CIR035,float64
+ccsr_CIR036,float64
+ccsr_CIR037,float64
+ccsr_CIR038,float64
+ccsr_CIR039,float64
+ccsr_DIG001,float64
+ccsr_DIG002,float64
+ccsr_DIG003,float64
+ccsr_DIG004,float64
+ccsr_DIG005,float64
+ccsr_DIG006,float64
+ccsr_DIG007,float64
+ccsr_DIG008,float64
+ccsr_DIG009,float64
+ccsr_DIG010,float64
+ccsr_DIG011,float64
+ccsr_DIG012,float64
+ccsr_DIG013,float64
+ccsr_DIG014,float64
+ccsr_DIG015,float64
+ccsr_DIG016,float64
+ccsr_DIG017,float64
+ccsr_DIG018,float64
+ccsr_DIG019,float64
+ccsr_DIG020,float64
+ccsr_DIG021,float64
+ccsr_DIG022,float64
+ccsr_DIG023,float64
+ccsr_DIG024,float64
+ccsr_DIG025,float64
+ccsr_EAR001,float64
+ccsr_EAR002,float64
+ccsr_EAR003,float64
+ccsr_EAR004,float64
+ccsr_EAR006,float64
+ccsr_END001,float64
+ccsr_END002,float64
+ccsr_END003,float64
+ccsr_END004,float64
+ccsr_END005,float64
+ccsr_END006,float64
+ccsr_END007,float64
+ccsr_END008,float64
+ccsr_END009,float64
+ccsr_END010,float64
+ccsr_END011,float64
+ccsr_END013,float64
+ccsr_END014,float64
+ccsr_END015,float64
+ccsr_END016,float64
+ccsr_EXT001,float64
+ccsr_EXT003,float64
+ccsr_EXT004,float64
+ccsr_EXT007,float64
+ccsr_EXT009,float64
+ccsr_EXT010,float64
+ccsr_EXT011,float64
+ccsr_EXT012,float64
+ccsr_EXT013,float64
+ccsr_EXT014,float64
+ccsr_EXT015,float64
+ccsr_EXT016,float64
+ccsr_EXT017,float64
+ccsr_EXT018,float64
+ccsr_EXT019,float64
+ccsr_EXT020,float64
+ccsr_EXT021,float64
+ccsr_EXT022,float64
+ccsr_EXT023,float64
+ccsr_EXT025,float64
+ccsr_EXT027,float64
+ccsr_EXT029,float64
+ccsr_EXT030,float64
+ccsr_EYE001,float64
+ccsr_EYE002,float64
+ccsr_EYE003,float64
+ccsr_EYE004,float64
+ccsr_EYE005,float64
+ccsr_EYE006,float64
+ccsr_EYE007,float64
+ccsr_EYE008,float64
+ccsr_EYE009,float64
+ccsr_EYE010,float64
+ccsr_EYE011,float64
+ccsr_EYE012,float64
+ccsr_FAC001,float64
+ccsr_FAC003,float64
+ccsr_FAC004,float64
+ccsr_FAC005,float64
+ccsr_FAC007,float64
+ccsr_FAC008,float64
+ccsr_FAC009,float64
+ccsr_FAC010,float64
+ccsr_FAC012,float64
+ccsr_FAC013,float64
+ccsr_FAC014,float64
+ccsr_FAC016,float64
+ccsr_FAC017,float64
+ccsr_FAC019,float64
+ccsr_FAC020,float64
+ccsr_FAC021,float64
+ccsr_FAC022,float64
+ccsr_FAC023,float64
+ccsr_FAC024,float64
+ccsr_FAC025,float64
+ccsr_GEN001,float64
+ccsr_GEN002,float64
+ccsr_GEN003,float64
+ccsr_GEN004,float64
+ccsr_GEN005,float64
+ccsr_GEN006,float64
+ccsr_GEN007,float64
+ccsr_GEN008,float64
+ccsr_GEN009,float64
+ccsr_GEN010,float64
+ccsr_GEN012,float64
+ccsr_GEN013,float64
+ccsr_GEN014,float64
+ccsr_GEN016,float64
+ccsr_GEN017,float64
+ccsr_GEN018,float64
+ccsr_GEN020,float64
+ccsr_GEN021,float64
+ccsr_GEN022,float64
+ccsr_GEN023,float64
+ccsr_GEN024,float64
+ccsr_GEN025,float64
+ccsr_GEN026,float64
+ccsr_INF001,float64
+ccsr_INF002,float64
+ccsr_INF003,float64
+ccsr_INF004,float64
+ccsr_INF006,float64
+ccsr_INF007,float64
+ccsr_INF008,float64
+ccsr_INF009,float64
+ccsr_INF010,float64
+ccsr_INF011,float64
+ccsr_INJ001,float64
+ccsr_INJ002,float64
+ccsr_INJ003,float64
+ccsr_INJ004,float64
+ccsr_INJ005,float64
+ccsr_INJ006,float64
+ccsr_INJ007,float64
+ccsr_INJ008,float64
+ccsr_INJ009,float64
+ccsr_INJ010,float64
+ccsr_INJ011,float64
+ccsr_INJ012,float64
+ccsr_INJ013,float64
+ccsr_INJ014,float64
+ccsr_INJ017,float64
+ccsr_INJ018,float64
+ccsr_INJ019,float64
+ccsr_INJ020,float64
+ccsr_INJ021,float64
+ccsr_INJ022,float64
+ccsr_INJ023,float64
+ccsr_INJ024,float64
+ccsr_INJ025,float64
+ccsr_INJ026,float64
+ccsr_INJ027,float64
+ccsr_INJ028,float64
+ccsr_INJ030,float64
+ccsr_INJ031,float64
+ccsr_INJ032,float64
+ccsr_INJ033,float64
+ccsr_INJ034,float64
+ccsr_INJ035,float64
+ccsr_INJ036,float64
+ccsr_INJ037,float64
+ccsr_INJ038,float64
+ccsr_INJ039,float64
+ccsr_INJ040,float64
+ccsr_INJ041,float64
+ccsr_INJ042,float64
+ccsr_INJ043,float64
+ccsr_INJ044,float64
+ccsr_INJ045,float64
+ccsr_INJ048,float64
+ccsr_INJ049,float64
+ccsr_INJ050,float64
+ccsr_INJ051,float64
+ccsr_INJ054,float64
+ccsr_INJ056,float64
+ccsr_INJ057,float64
+ccsr_INJ058,float64
+ccsr_INJ061,float64
+ccsr_INJ062,float64
+ccsr_INJ063,float64
+ccsr_INJ064,float64
+ccsr_INJ065,float64
+ccsr_INJ067,float64
+ccsr_INJ068,float64
+ccsr_INJ069,float64
+ccsr_INJ070,float64
+ccsr_INJ071,float64
+ccsr_INJ072,float64
+ccsr_INJ073,float64
+ccsr_INJ074,float64
+ccsr_INJ075,float64
+ccsr_INJ076,float64
+ccsr_MAL001,float64
+ccsr_MAL002,float64
+ccsr_MAL003,float64
+ccsr_MAL004,float64
+ccsr_MAL005,float64
+ccsr_MAL006,float64
+ccsr_MAL008,float64
+ccsr_MAL010,float64
+ccsr_MBD001,float64
+ccsr_MBD002,float64
+ccsr_MBD003,float64
+ccsr_MBD004,float64
+ccsr_MBD005,float64
+ccsr_MBD006,float64
+ccsr_MBD007,float64
+ccsr_MBD008,float64
+ccsr_MBD009,float64
+ccsr_MBD010,float64
+ccsr_MBD011,float64
+ccsr_MBD012,float64
+ccsr_MBD013,float64
+ccsr_MBD014,float64
+ccsr_MBD017,float64
+ccsr_MBD018,float64
+ccsr_MBD019,float64
+ccsr_MBD020,float64
+ccsr_MBD021,float64
+ccsr_MBD024,float64
+ccsr_MBD025,float64
+ccsr_MBD026,float64
+ccsr_MUS001,float64
+ccsr_MUS002,float64
+ccsr_MUS003,float64
+ccsr_MUS004,float64
+ccsr_MUS005,float64
+ccsr_MUS006,float64
+ccsr_MUS007,float64
+ccsr_MUS008,float64
+ccsr_MUS009,float64
+ccsr_MUS010,float64
+ccsr_MUS011,float64
+ccsr_MUS012,float64
+ccsr_MUS013,float64
+ccsr_MUS014,float64
+ccsr_MUS015,float64
+ccsr_MUS016,float64
+ccsr_MUS017,float64
+ccsr_MUS020,float64
+ccsr_MUS021,float64
+ccsr_MUS022,float64
+ccsr_MUS023,float64
+ccsr_MUS024,float64
+ccsr_MUS025,float64
+ccsr_MUS026,float64
+ccsr_MUS027,float64
+ccsr_MUS028,float64
+ccsr_MUS029,float64
+ccsr_MUS030,float64
+ccsr_MUS031,float64
+ccsr_MUS032,float64
+ccsr_MUS033,float64
+ccsr_MUS034,float64
+ccsr_MUS037,float64
+ccsr_MUS038,float64
+ccsr_NEO001,float64
+ccsr_NEO002,float64
+ccsr_NEO004,float64
+ccsr_NEO007,float64
+ccsr_NEO008,float64
+ccsr_NEO010,float64
+ccsr_NEO012,float64
+ccsr_NEO013,float64
+ccsr_NEO015,float64
+ccsr_NEO017,float64
+ccsr_NEO018,float64
+ccsr_NEO019,float64
+ccsr_NEO021,float64
+ccsr_NEO022,float64
+ccsr_NEO023,float64
+ccsr_NEO024,float64
+ccsr_NEO025,float64
+ccsr_NEO026,float64
+ccsr_NEO027,float64
+ccsr_NEO028,float64
+ccsr_NEO029,float64
+ccsr_NEO030,float64
+ccsr_NEO031,float64
+ccsr_NEO033,float64
+ccsr_NEO035,float64
+ccsr_NEO038,float64
+ccsr_NEO039,float64
+ccsr_NEO043,float64
+ccsr_NEO045,float64
+ccsr_NEO048,float64
+ccsr_NEO049,float64
+ccsr_NEO050,float64
+ccsr_NEO051,float64
+ccsr_NEO052,float64
+ccsr_NEO057,float64
+ccsr_NEO058,float64
+ccsr_NEO059,float64
+ccsr_NEO061,float64
+ccsr_NEO064,float64
+ccsr_NEO065,float64
+ccsr_NEO066,float64
+ccsr_NEO068,float64
+ccsr_NEO070,float64
+ccsr_NEO071,float64
+ccsr_NEO072,float64
+ccsr_NEO073,float64
+ccsr_NEO074,float64
+ccsr_NVS002,float64
+ccsr_NVS003,float64
+ccsr_NVS004,float64
+ccsr_NVS005,float64
+ccsr_NVS006,float64
+ccsr_NVS007,float64
+ccsr_NVS008,float64
+ccsr_NVS009,float64
+ccsr_NVS010,float64
+ccsr_NVS011,float64
+ccsr_NVS012,float64
+ccsr_NVS013,float64
+ccsr_NVS014,float64
+ccsr_NVS015,float64
+ccsr_NVS016,float64
+ccsr_NVS017,float64
+ccsr_NVS018,float64
+ccsr_NVS019,float64
+ccsr_NVS020,float64
+ccsr_NVS021,float64
+ccsr_NVS022,float64
+ccsr_PRG028,float64
+ccsr_RSP001,float64
+ccsr_RSP002,float64
+ccsr_RSP003,float64
+ccsr_RSP004,float64
+ccsr_RSP005,float64
+ccsr_RSP006,float64
+ccsr_RSP007,float64
+ccsr_RSP008,float64
+ccsr_RSP009,float64
+ccsr_RSP010,float64
+ccsr_RSP011,float64
+ccsr_RSP012,float64
+ccsr_RSP013,float64
+ccsr_RSP015,float64
+ccsr_RSP016,float64
+ccsr_SKN001,float64
+ccsr_SKN002,float64
+ccsr_SKN003,float64
+ccsr_SKN004,float64
+ccsr_SKN005,float64
+ccsr_SKN006,float64
+ccsr_SKN007,float64
+ccsr_SYM001,float64
+ccsr_SYM002,float64
+ccsr_SYM003,float64
+ccsr_SYM004,float64
+ccsr_SYM005,float64
+ccsr_SYM006,float64
+ccsr_SYM007,float64
+ccsr_SYM008,float64
+ccsr_SYM010,float64
+ccsr_SYM011,float64
+ccsr_SYM012,float64
+ccsr_SYM013,float64
+ccsr_SYM014,float64
+ccsr_SYM015,float64
+ccsr_SYM016,float64
+ccsr_SYM017,float64
+enc_Race_ ,uint8
+enc_Race_American Indian or Alaska Native ,uint8
+enc_Race_Asian ,uint8
+enc_Race_Black or African American ,uint8
+enc_Race_Declined To Specify ,uint8
+enc_Race_Declined to Specify ,uint8
+enc_Race_Native Hawaiian or Other Pacific Islander ,uint8
+enc_Race_White ,uint8
+enc_Ethnicity_Declined To Specify ,uint8
+enc_Ethnicity_Declined to Specify ,uint8
+enc_Ethnicity_Hispanic or Latino ,uint8
+enc_Ethnicity_Not Hispanic or Latino ,uint8
+enc_Ethnicity_Unknown / Not Reported ,uint8
+enc_Gender_F ,uint8
+enc_Gender_M ,uint8
+enc_rfv_cluster_0,uint8
+enc_rfv_cluster_1,uint8
+enc_rfv_cluster_2,uint8
+enc_rfv_cluster_3,uint8
+enc_rfv_cluster_4,uint8
+enc_rfv_cluster_5,uint8
+enc_rfv_cluster_6,uint8
+enc_rfv_cluster_7,uint8
+enc_rfv_cluster_8,uint8
+enc_rfv_cluster_9,uint8
+enc_rfv_cluster_10,uint8
+enc_rfv_cluster_11,uint8
+enc_rfv_cluster_12,uint8
+enc_rfv_cluster_13,uint8
+enc_rfv_cluster_14,uint8
+enc_rfv_cluster_15,uint8
+enc_rfv_cluster_16,uint8
+enc_rfv_cluster_17,uint8
+enc_rfv_cluster_18,uint8
+enc_rfv_cluster_19,uint8
+enc_rfv_cluster_20,uint8
+enc_rfv_cluster_21,uint8
+asmt_txt_diagnosis_code_id,object
+asmt_np_chunk_clusters,float64
+asmt_topic_clusters,float64
+asmt_kmeans_0,float64
+asmt_kmeans_1,float64
+asmt_kmeans_2,float64
+asmt_kmeans_3,float64
+asmt_kmeans_4,float64
+asmt_kmeans_5,float64
+asmt_kmeans_6,float64
+asmt_kmeans_7,float64
+asmt_kmeans_8,float64
+asmt_kmeans_9,float64
+asmt_kmeans_10,float64
+asmt_kmeans_11,float64
+asmt_kmeans_12,float64
+asmt_kmeans_13,float64
+asmt_kmeans_14,float64
+asmt_topic_0,float64
+asmt_topic_1,float64
+asmt_topic_2,float64
+asmt_topic_3,float64
+asmt_topic_4,float64
+asmt_topic_5,float64
+asmt_topic_6,float64
+asmt_topic_7,float64
+asmt_topic_8,float64
+asmt_topic_9,float64
+asmt_topic_10,float64
+asmt_topic_11,float64
+asmt_topic_12,float64
+asmt_topic_13,float64
+asmt_topic_14,float64
+asmt_topic_15,float64
+asmt_topic_16,float64
+asmt_topic_17,float64
+asmt_topic_18,float64
+asmt_topic_19,float64
+asmt_icd9cm_code_id,object
+asmt_diagnosis_code_id,object
+asmt_date_onset_sympt,object
+asmt_date_diagnosed,object
+asmt_date_resolved,object
+asmt_status_id,object
+asmt_dx_priority,object
+asmt_chronic_ind,object
+asmt_recorded_elsewhere_ind,object
+asmt_CCSR Category,object
