@@ -108,9 +108,9 @@ class DataLoader:
         dem_encounters = self.diagnosis[self.diagnosis.description.isin(dementia_output)].enc_id.unique()
 
         # Set response
-        self.encounters['AD_event'] = self.encounters.enc_id.isin(AD_encounters).astype(int)
+        self.encounters['AD_encounter'] = self.encounters.enc_id.isin(AD_encounters).astype(int)
         self.encounters['AD_person'] = self.encounters.person_id.isin(AD_people).astype(int)
-        self.encounters['dem_event'] = self.encounters.enc_id.isin(dem_encounters).astype(int)
+        self.encounters['dem_encounter'] = self.encounters.enc_id.isin(dem_encounters).astype(int)
         self.encounters['dem_person'] = self.encounters.person_id.isin(dem_people).astype(int)
         self.encounters['Cognition'] = np.select(
             [self.encounters.AD_person == 1, self.encounters.dem_person == 1],

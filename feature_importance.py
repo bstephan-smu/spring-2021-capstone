@@ -6,11 +6,11 @@ capData = DataLoader().load()
 
 # %%
 
-def get_data(self, data_cols='all', target_col='AD_event', alt_data=None):
+def get_data(self, data_cols='all', target_col='AD_encounter', alt_data=None):
     """
     \ndata_cols: pass the table prefix to return only a table from main options: 
     \n{'cpt_','lab_','vit_','medid_','asmt_icd', 'enc_'}
-    \ntarget_col: pass AD_event or dem_event for target
+    \ntarget_col: pass AD_encounter or dem_encounter for target
     \nalt_data: pass in a list of columns to run grid on
     \ne.g. X, y = get_data(capData, data_cols='vit_')
     """
@@ -27,9 +27,9 @@ def get_data(self, data_cols='all', target_col='AD_event', alt_data=None):
         'enc_id',
         'person_id',
         'AD_person',
-        'AD_event',
+        'AD_encounter',
         'dem_person',
-        'dem_event',
+        'dem_encounter',
         'ccsr_NVS011'
         ]
     
