@@ -536,3 +536,90 @@ df[df['medid']=='825']
 # %%
 df
 # %%
+import transform
+# %%
+import load_data
+# %%
+# %%
+from load_data import DataLoader
+capData = DataLoader().load()
+
+# %%
+from transform import Clean
+clean = Clean(capData.encounters)
+clean.race_ethnicity()
+# %%
+# %%Read in diagnosis table
+
+import pandas as pd
+diagnoses = pd.read_csv(capData.data_path + '6_patient_diagnoses.csv')
+ccsr = pd.read_csv(capData.data_path + 'ccsr_mapping.csv')
+diagnoses['diagnosis_code_stripped'] = diagnoses['diagnosis_code_id'].str.replace(".", "")
+diagnoses = diagnoses.merge(ccsr, left_on='diagnosis_code_stripped', right_on='ICD-10-CM Code', how='left')
+
+diagnosis_icd9 = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['icd9cm_code_id'].apply(list))
+diagnosis_dc = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['diagnosis_code_id'].apply(list))
+diagnosis_desc = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['description'].apply(list))
+diagnosis_datesymp = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['date_onset_sympt'].apply(list))
+diagnosis_datediag = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['date_diagnosed'].apply(list))
+diagnosis_dateresl = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['date_resolved'].apply(list))
+diagnosis_statusid = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['status_id'].apply(list))
+diagnosis_dx = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['dx_priority'].apply(list))
+diagnosis_chronic = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['chronic_ind'].apply(list))
+diagnosis_rcdelswhr = pd.DataFrame(
+    diagnoses.groupby(['person_id', 'enc_id'])['recorded_elsewhere_ind'].apply(list))
+
+diagnosis_ccsr_category = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['CCSR Category Description'].apply(list))
+# Merge series data from text and codeID columns into one df for assessment
+diagnoses2 = diagnosis_icd9 \
+    .merge(diagnosis_dc, how='left', on=['person_id', 'enc_id']) \
+    .merge(diagnosis_desc, how='left', on=['person_id', 'enc_id']) \
+    .merge(diagnosis_datesymp, how='left', on=['person_id', 'enc_id']) \
+    .merge(diagnosis_datediag, how='left', on=['person_id', 'enc_id']) \
+    .merge(diagnosis_dateresl, how='left', on=['person_id', 'enc_id']) \
+    .merge(diagnosis_statusid, how='left', on=['person_id', 'enc_id']) \
+    .merge(diagnosis_dx, how='left', on=['person_id', 'enc_id']) \
+    .merge(diagnosis_chronic, how='left', on=['person_id', 'enc_id']) \
+    .merge(diagnosis_rcdelswhr, how='left', on=['person_id', 'enc_id']) \
+    .merge(diagnosis_ccsr_category, how='left', on=['person_id', 'enc_id'])
+
+diagnoses2 = pd.DataFrame(diagnoses2)
+diagnoses2.reset_index(inplace=True)
+
+# %%
+diagnoses2['CCSR Category Description'].nunique
+# %%
+capData.main
+# %%
+df = diagnoses2[['enc_id', 'CCSR Category Description']]
+
+def stripNA(lst_col):
+    for item in lst_col:
+        if type(item) != str:
+            lst_col.remove(item)
+    return lst_col
+df['CCSR Category Description'].apply(stripNA)
+
+def one_hot(df, col_name, prefix=''):
+
+    mlb = MultiLabelBinarizer()
+    df = df.join(pd.DataFrame(mlb.fit_transform(df[col_name]), columns=prefix + mlb.classes_))
+    df = df.drop(columns=[col_name])
+    return df
+    
+from sklearn.preprocessing import MultiLabelBinarizer
+
+df = one_hot(df, 'CCSR Category Description', prefix='ccsr_')
+dropcols = [x for x in capData.main if x.startswith('ccsr')]
+capData.main.drop(columns=dropcols, inplace=True)
+capData.main.merge(df, how='left', on='enc_id')
+# %%
+
+
+from load_data import DataLoader
+tmp = DataLoader().load()
+# %%
+tmp.main[tmp.main['ccsr_INF003']]
+# %%
+[x for x in df if df[x] > 0]
+# %%
