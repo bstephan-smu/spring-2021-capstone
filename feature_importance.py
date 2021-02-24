@@ -181,6 +181,7 @@ from gridsearch import GridSearch
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
+from xgboost import XGBClassifier
 import warnings
 from scipy.sparse.csc import csc_matrix
 from sklearn.linear_model import SGDClassifier
@@ -199,7 +200,8 @@ data = get_data(capData, data_cols='xxx', target_col='dem_person', alt_data=list
 # Choose classifiers to run
 classifiers = {
     #'Random_Forest': RandomForestClassifier,
-    'Logistic_Regression': LogisticRegression
+    'Logistic_Regression': LogisticRegression,
+    'XGBoost': XGBClassifier
     #'SVM': LinearSVC,
     #'GBoost': GradientBoostingClassifier,
     #'AdaBoost': AdaBoostClassifier,
@@ -265,24 +267,24 @@ param_grid = {
          },
 
     'GBoost' : {
-        # 'ccp_alpha': 0.0,
+        'ccp_alpha': [0.01],
         # 'criterion': 'friedman_mse',
         # 'init': None,
-         'learning_rate': [0.1, .01, .05],
+        # 'learning_rate': [0.1, .01, .05],
         # 'loss': 'deviance',
-         'max_depth': [3, 5, 7],
+         'max_depth': [20],
         # 'max_features': None,
         # 'max_leaf_nodes': None,
         # 'min_impurity_decrease': 0.0,
         # 'min_impurity_split': None,
-         'min_samples_leaf': [1,10,300],
-         'min_samples_split': [3,30,100],
+        # 'min_samples_leaf': [1,10,300],
+        # 'min_samples_split': [3,30,100],
         # 'min_weight_fraction_leaf': 0.0,
-         'n_estimators': [1000, 5000],
+         'n_estimators': [1000],
         # 'n_iter_no_change': None,
         # 'presort': 'deprecated',
         # 'random_state': None,
-        # 'subsample': 1.0,
+         'subsample': [.6],
          'tol': [0.0001, .001, .01],
         # 'validation_fraction': 0.1,
         # 'verbose': 0,
@@ -326,6 +328,37 @@ param_grid = {
         'binarize':[.1,1],
         'fit_prior':[True,False],
         # 'class_prior':
+    },
+
+    'XGBoost' : {
+     'objective': ['binary:logistic'],
+    # 'use_label_encoder': True,
+    # 'base_score': None,
+     'booster': ['gbtree'],
+     'colsample_bylevel': [1],
+    # 'colsample_bynode': None,
+     'colsample_bytree': [.8],
+     'gamma': [0],
+    # 'gpu_id': None,
+    # 'importance_type': 'gain',
+    # 'interaction_constraints': None,
+    # 'learning_rate': None,
+     'max_delta_step': [0],
+     'max_depth': [20],
+     'min_child_weight': [15],
+    # 'missing': nan,
+    # 'monotone_constraints': None,
+    # 'n_estimators': 100,
+    # 'n_jobs': None,
+    # 'num_parallel_tree': None,
+    # 'random_state': None,
+     'reg_alpha': [.01],
+     'reg_lambda': [.01],
+    # 'scale_pos_weight': None,
+     'subsample': [.6],
+     'tree_method': ['hist']
+    # 'validate_parameters': None,
+    # 'verbosity': None
     }
 }
 
