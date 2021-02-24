@@ -96,7 +96,78 @@ class DataLoader:
         dementia_output = [desc for desc in dementia_output if desc not in self.exclude_dementia_lookup]
         self.dementia_icd_codes = self.diagnosis[
             self.diagnosis.description.isin(dementia_output)].icd9cm_code_id.unique()
-
+  
+    # function to rename and clean up the race and ethnicity by combining these two
+    # into a single race_ethnicity column and then rename the different levels to 
+    # common name reducing the number of levels
+    def clean_race_ethnicity(self):
+        self.encounters['r&e'] = self.encounters['Race'] + self.encounters['Ethnicity']
+        self.encounters['race_ethincity']=self.encountersc['r&e'].replace([
+            #concatinated column values 
+            'White Hispanic or Latino ',
+            'White Declined To Specify ', 
+            'White Not Hispanic or Latino ',
+            'Black or African American Not Hispanic or Latino ',
+            'Declined To Specify Not Hispanic or Latino ',
+            'White Unknown / Not Reported ',
+            'Declined to Specify Not Hispanic or Latino ',
+            'Asian Declined To Specify ',
+            'Declined to Specify Declined To Specify ',
+            'Black or African American Declined To Specify ',
+            'American Indian or Alaska Native Not Hispanic or Latino ',
+            'Asian Not Hispanic or Latino ',
+            'White Declined to Specify ', 
+            'Native Hawaiian or Other Pacific Islander Not Hispanic or Latino ',
+            'Declined To Specify Declined To Specify ',
+            'Black or African American Unknown / Not Reported ',
+            'Black or African American Hispanic or Latino ',
+            'Declined To Specify Hispanic or Latino ',
+            'Declined to Specify Unknown / Not Reported ',
+            'Black or African American Declined to Specify ',
+            'Declined to Specify Hispanic or Latino ',
+            'Declined To Specify Declined to Specify ',
+            'American Indian or Alaska Native Declined To Specify ',
+            'Declined To Specify Unknown / Not Reported ',
+            'Asian Unknown / Not Reported ',
+            'American Indian or Alaska Native Hispanic or Latino ',
+            'Asian Hispanic or Latino ',
+            ' Declined To Specify '
+            ],
+            #these are the renames for each of the concatinated columns above
+            ['White, Hispanic or Latino',				
+            'White, Not Hispanic or Latino',				
+            'White, Not Hispanic or Latino',				
+            'Black or African American',				
+            'Declined To Specify',				
+            'White Not Hispanic or Latino',				
+            'Declined To Specify',				
+            'Asian',			
+            'Declined To Specify',				
+            'Black or African American',				
+            'American Indian or Alaska Native',				
+            'Asian',				
+            'White, Not Hispanic or Latino',				
+            'Native Hawaiian or Other Pacific Islander',				
+            'Declined To Specify',				
+            'Black or African American',				
+            'Black or African American, Hispanic or Latino',				
+            'Hispanic or Latino',				
+            'Declined To Specify',				
+            'Black or African American',				
+            'Hispanic or Latino',				
+            'Declined To Specify',				
+            'American Indian or Alaska Native',				
+            'Declined To Specify',				
+            'Asian',			
+            'American Indian or Alaska Native, Hispanic or Latino',				
+            'Asian, Hispanic or Latino',				
+            'Declined To Specify'				
+            ]) 
+        #drop the extra and old columns. 
+        self.encounters.drop(['r&e', 'Race', 'Ethnicity'], axis=1)
+    
+    
+    
         # TODO add self.AD_icd_codes
 
         # Collect response
@@ -456,6 +527,10 @@ class DataLoader:
                     'place_of_service']
 
         self.main.drop(columns=dropcols, inplace=True)
+        
+        # drop the row that have NA's from ANY of the following columns 'Race', 'Gender', 'AgeAtEnc'
+        # Its important to have age race and gender for each entry        
+        self.main.dropna(subset=['Race', 'Gender', 'AgeAtEnc'])
 
         # Apply enc_ label to encounter columns
         self.main.rename(columns={
