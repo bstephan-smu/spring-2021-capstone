@@ -10,14 +10,68 @@ pd.set_option('display.max_columns', None)
 df = capData.main.copy()
 
 # %% check column headers
-capData.assessments.head()
+cluster_9_eda = df[df['asmt_kmeans_9'] == 1]
+cluster_9_eda = cluster_9_eda[['asmt_ngram2','asmt_np_chunks']]
 
+#%%
+import wordcloud
+import matplotlib.pyplot as plt
+text3 = ' '.join(cluster_9_eda['asmt_np_chunks'])
+wordcloud3 = wordcloud.WordCloud().generate(text3)
+wordcloud3
+# Generate plot
+plt.figure(figsize=(20,10))
+plt.imshow(wordcloud3)
+plt.axis("off")
+plt.show()
+
+#%%
+
+pd.set_option('display.max_rows', 500)
+word_counts = pd.Series(' '.join(cluster_9_eda.asmt_np_chunks).split()).value_counts()
+word_counts = word_counts.reset_index()
+word_counts.columns = ['np_chunk','count']
+word_counts = pd.DataFrame(word_counts)
+word_counts.head(500)
+
+
+# %% generate word cloud from trigrams
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt 
+
+#convert word_count df to dictionary for ease of use in wordcloud()
+word_counts_dict = dict(zip(word_counts['np_chunk'].tolist(),word_counts['count'].tolist()))
+
+#make the wordcloud
+cloud = WordCloud(width = 1600, height = 800,max_font_size=100,max_words = 500, background_color = 'white', colormap ="viridis_r").generate_from_frequencies(word_counts_dict)
+plt.figure(figsize=(20,10))
+plt.imshow(cloud)
+plt.axis('off')
+#plt.show()
+plt.savefig('cluster9.png')
+
+# %% check column headers
+capData.encounters.head()
+
+
+#%%
+
+columns = pd.DataFrame(df.columns)
+columns.to_csv("df_columns.csv")
 
 # %% see data types
 
 pd.set_option('display.max_rows', None)
-df.dtypes
+data_types = pd.DataFrame(df.dtypes)
+data_types.to_csv("column.datatypes.csv")
 
+#%%
+import pandas as pd 
+import missingno as msno 
+  
+# Loading the dataset 
+# Visualize missing values as a matrix 
+msno.matrix(df) 
 
 #%%isolate one-hot-encoded features
 
@@ -115,6 +169,7 @@ top_corr = get_feature_correlation(corr,50000,remove_duplicates=True, remove_sel
 top_corr
 
 
+
 # %% Identify
 
 high_corr_features = set(list(top_corr['Feature 2']))
@@ -155,3 +210,11 @@ print("F1_Score: ", f1_score())
 print("Recall: ", recall_score())
 print("Precision: ", precision_score())
 print("ROC_AUC: ", roc_auc_score())
+
+
+#%%
+import pandas as pd
+
+model_results = pd.read_pickle(r'E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/model_results/20210211/20210211results.pickle')
+
+# %%
