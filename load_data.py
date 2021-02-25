@@ -365,6 +365,10 @@ class DataLoader:
         assessment2['txt_description'] = assessment2['txt_description'].str.replace('[^\w\s]', '')
         assessment2['txt_description'] = assessment2['txt_description'].str.lower()
 
+        #remove words that are directly correlated to positive AD or Dementia
+        ad_pos = 'alzheimers disease|dementia|late onset alzheimers|alzh|lewy|frontotemporal|hydrocephalus|huntington|wernicke|creutzfeldt|vascular dementia|Huntingtons disease|Mixed dementia|Parkisons disease'
+        assessment2['txt_description'] = assessment2['txt_description'].str.replace(ad_pos,'')
+
         # tokenize
         assessment2['txt_tokenized'] = assessment2.apply(
             lambda row: nltk.word_tokenize(row['txt_description']), axis=1)
