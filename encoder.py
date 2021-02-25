@@ -7,6 +7,7 @@ from sklearn.cluster import KMeans
 import nlp_utils
 import numpy as np
 import re
+import pickle
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation as LDA
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -142,13 +143,6 @@ class Encoder(DataLoader):
         self.main = self.main.merge(vitals_copy, on='enc_id')
 
 
-    def get_assessments(self):
-        assess_copy = self.assessments.copy()
-        assess_copy.drop(columns=['txt_diagnosis_code_id'], inplace=True)
-        assess_copy = self.rename_cols(assess_copy, prefix='asmt_')
-        self.main = self.main.merge(assess_copy, on=['person_id', 'enc_id'], how='left')
-
-
     def get_response_cols(self, return_val='description'):
         dementia_string = '|'.join(self.dementia_lookup)
         diag = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
@@ -191,53 +185,65 @@ class Encoder(DataLoader):
         self.main = self.main.merge(diag, on=['person_id', 'enc_id'], how='left')
 
 
+    def build_assessment_clusters(self):
+        try:
+            with open(self.data_path + 'bin/assessment_with_clusters.pickle', 'rb') as picklefile:
+                self.assessments = pickle.load(picklefile)
+
+        except FileNotFoundError:
+            # DBSCAN Clusterin for trigrams and noun phrase chunks
+            tfidf = TfidfVectorizer()
+            assessment2 = self.assessments.copy()
+            # tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
+            tfidf_data_np = tfidf.fit_transform(assessment2['np_chunks'])
+
+            print("Starting NP Chunk Kmeans model fit on np chunks...")
+            cluster_model = KMeans(n_jobs=-1, n_clusters=15)
+            np_db_model = cluster_model.fit(tfidf_data_np)
+            print("NP Chunk Kmeans model fit on np chunks COMPLETE...")
+
+            # KMeans cluster counts and labeling
+            assessment2['np_chunk_clusters'] = np_db_model.labels_
+
+            # print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
+            print("ngram DBSCAN Model Cluster Count:", assessment2['np_chunk_clusters'].nunique())
+
+            # %% LDA clustering
+            count_vectorizer = CountVectorizer()
+            count_data = count_vectorizer.fit_transform(assessment2['ngram2'].values.astype('U'))
+            lda = LDA(n_components=20, learning_method='online')
+            lda.fit(count_data)
+
+            # LDA Cluster labeling
+            topic_values = lda.transform(count_data)
+            assessment2['topic_clusters'] = topic_values.argmax(axis=1)
+
+            # %% FINAL ASSESSMENTS TABLE
+            # assessment2.drop(['np_chunk_clusters','topic_clusters','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks'],axis=1, inplace=True)
+
+            kmeans_cluster = pd.get_dummies(assessment2.np_chunk_clusters, prefix='kmeans')
+            topic_cluster = pd.get_dummies(assessment2.topic_clusters, prefix='topic')
+
+            # use pd.concat to join the new columns with your original dataframe
+            assessment2 = pd.concat([assessment2, kmeans_cluster], axis=1)
+            assessment2 = pd.concat([assessment2, topic_cluster], axis=1)
+            self.assessments = assessment2
+            with open(self.data_path + 'bin/assessment_with_clusters.pickle', 'wb') as picklefile:
+                pickle.dump(self.assessments, picklefile)
+
+
     def get_assessment_clusters(self):
-        # DBSCAN Clusterin for trigrams and noun phrase chunks
-        tfidf = TfidfVectorizer()
-        assessment2 = self.assessments.copy()
-        # tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
-        tfidf_data_np = tfidf.fit_transform(assessment2['np_chunks'])
-
-        print("Starting NP Chunk Kmeans model fit on np chunks...")
-        cluster_model = KMeans(n_jobs=-1, n_clusters=15)
-        np_db_model = cluster_model.fit(tfidf_data_np)
-        print("NP Chunk Kmeans model fit on np chunks COMPLETE...")
-
-        # KMeans cluster counts and labeling
-        assessment2['np_chunk_clusters'] = np_db_model.labels_
-
-        # print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
-        print("ngram DBSCAN Model Cluster Count:", assessment2['np_chunk_clusters'].nunique())
-
-        # %% LDA clustering
-        count_vectorizer = CountVectorizer()
-        count_data = count_vectorizer.fit_transform(assessment2['ngram2'].values.astype('U'))
-        lda = LDA(n_components=20, learning_method='online')
-        lda.fit(count_data)
-
-        # LDA Cluster labeling
-        topic_values = lda.transform(count_data)
-        assessment2['topic_clusters'] = topic_values.argmax(axis=1)
-
-        # %% FINAL ASSESSMENTS TABLE
-        # assessment2.drop(['np_chunk_clusters','topic_clusters','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks'],axis=1, inplace=True)
-
-        kmeans_cluster = pd.get_dummies(assessment2.np_chunk_clusters, prefix='kmeans')
-        topic_cluster = pd.get_dummies(assessment2.topic_clusters, prefix='topic')
-
-        # use pd.concat to join the new columns with your original dataframe
-        assessment2 = pd.concat([assessment2, kmeans_cluster], axis=1)
-        assessment2 = pd.concat([assessment2, topic_cluster], axis=1)
-        self.assessments = assessment2
-
+        self.build_assessment_clusters()
         # Add in clusters:
-        assess_cluster_cols = [col for col in self.assessments if col.startswith('topic') or col.startswith('kmeans')]
-        assess_cluster_cols += ['person_id','enc_id','np_chunk_clusters']
+        assess_cluster_cols = [col for col in self.assessments if col.startswith('asmt_topic') or col.startswith('asmt_kmeans')]
+        assess_cluster_cols += ['person_id','enc_id']
+        assess_cluster_cols.remove('asmt_topic_clusters')
         clusters = self.assessments[assess_cluster_cols]
-        clusters = self.rename_cols(self.assessments, prefix='asmt_')
         self.main = self.main.merge(clusters, on=['person_id', 'enc_id'], how='left')
-        # function to classify as True/False Alzheimers Disease in the encounter dataset
-        # will also encode a separate dementia encoding.
+
+        # Fix float cols
+        cols = [col for col in self.main if col.startswith('asmt_')]
+        self.main[cols] = self.main[cols].fillna(value=0).astype(int)
 
 
     def clean(self):
@@ -261,8 +267,7 @@ class Encoder(DataLoader):
         self.get_cpt()
         self.get_vitals()
         self.get_reason_for_visit()
-        self.get_assessments()
-
+        self.get_assessment_clusters()
 
 def main():
     from encoder import Encoder
