@@ -6,15 +6,8 @@ import os
 import pickle
 import nltk
 import nlp_utils
-
 from nltk.corpus import stopwords
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import KMeans
-from sklearn.decomposition import LatentDirichletAllocation as LDA
-from sklearn.feature_extraction.text import CountVectorizer
 
-# os.environ["MODIN_ENGINE"] = "dask"  # Modin will use Dask
-# import modin.pandas as pd
 
 class DataLoader:
     def __init__(self, data_path='E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/',
@@ -63,9 +56,10 @@ class DataLoader:
         self.labs = None
         self.diagnosis = None
         self.assessments = None
+        self.main = None
 
 
-    # reading in raw data from all datasets
+    # read in raw data from all datasets
     def generate_csv_attributes(self):
         self.encounters = pd.read_csv(self.data_path + '1_BaseEncounters_Dempgraphics_Payers.csv')
         self.format_encounters()  # align encounters table columns...make sure columns are aligned as planned
@@ -166,31 +160,38 @@ class DataLoader:
                 'Declined To Specify'				
                 ]) 
             #drop the extra and old columns. 
-            self.encounters.drop(['r&e', 'Race', 'Ethnicity'], axis=1)
+            self.encounters.drop(columns=['r&e', 'Race', 'Ethnicity'], axis=1, inplace=True)
         clean_race_ethnicity()
 
 
     # function to find which meds were currently being taken during the encounter period
     def format_meds(self):
-        self.meds['start_date'] = pd.to_datetime(self.meds['start_date'], format='%Y%m%d')
-        self.meds['date_stopped'] = pd.to_datetime(self.meds['date_stopped'], format='%Y%m%d')
+        try:
+            with open(self.data_path + 'bin\meds.pickle', 'rb') as picklefile:
+                self.meds = pickle.load(picklefile)
 
-        self.meds['is_currently_taking'] = False
+        except FileNotFoundError:
+            self.meds['start_date'] = pd.to_datetime(self.meds['start_date'], format='%Y%m%d')
+            self.meds['date_stopped'] = pd.to_datetime(self.meds['date_stopped'], format='%Y%m%d')
 
-        def check_meds(row):
-            patient_medical_history = self.meds[(self.meds['person_id'] == row['person_id'])
-                                                & (self.meds['enc_id'] == row['enc_id'])
-                                                & (self.meds['start_date'] < row[
-                'EncounterDate'])
-                                                & (self.meds['date_stopped'] > row[
-                'EncounterDate'])].index
-            if len(patient_medical_history) > 0:
-                self.meds.iloc[patient_medical_history, -1] = True
+            self.meds['is_currently_taking'] = False
 
-        # apply function as a reverse lookup..
-        # first check each appt date, then see which meds patient was taking on that appt
-        # store output as boolean for that medication
-        self.encounters.apply(check_meds, axis=1)
+            def check_meds(row):
+                patient_medical_history = self.meds[(self.meds['person_id'] == row['person_id'])
+                                                    & (self.meds['enc_id'] == row['enc_id'])
+                                                    & (self.meds['start_date'] < row[
+                    'EncounterDate'])
+                                                    & (self.meds['date_stopped'] > row[
+                    'EncounterDate'])].index
+                if len(patient_medical_history) > 0:
+                    self.meds.iloc[patient_medical_history, -1] = True
+
+            # apply function as a reverse lookup..
+            # first check each appt date, then see which meds patient was taking on that appt
+            # store output as boolean for that medication
+            self.encounters.apply(check_meds, axis=1)
+            with open(self.data_path + 'bin\meds.pickle', 'wb') as picklefile:
+                pickle.dump(self.meds, picklefile)
 
         def get_med_name(med):
             med = re.search('(\\D+)(.*)', med, flags=re.IGNORECASE).group(1).strip().lower()
@@ -254,142 +255,6 @@ class DataLoader:
         abnormal_labs.columns = ['person_id', 'enc_id', 'lab_results']
 
         self.labs = abnormal_labs
-
-
-    # function to transform assessments table to merge with encounters
-    def format_assessments(self):
-        assessment = self.assessments
-        # Filter for relevant enc_ids
-        assessment = assessment[assessment['enc_id'].isin(
-            set(assessment['enc_id']).intersection(
-                set(self.encounters.enc_id)))]
-
-        # Collapse data down by enc_id for assessment
-
-        assessment_text = assessment.groupby(['person_id', 'enc_id'])['txt_description'].apply(list)
-        assessment_codeID = assessment.groupby(['person_id', 'enc_id'])['txt_diagnosis_code_id'].apply(list)
-
-        assessment_text = pd.DataFrame(assessment_text)
-        assessment_codeID = pd.DataFrame(assessment_codeID)
-
-        # Merge series data from text and codeID columns into one df for assessment
-        assessment2 = assessment_text.merge(assessment_codeID, how='left', on=['person_id', 'enc_id'])
-        assessment2 = pd.DataFrame(assessment2)
-        assessment2.reset_index(inplace=True)
-
-        # Remove punctuation, convert all to lowercase, remove stopwords, tokenize, create bigrams
-
-        # Remove Punctuation and convert to lower
-        assessment2['txt_description'] = assessment2.txt_description.apply(
-            lambda x: ', '.join([str(i) for i in x]))
-        assessment2['txt_description'] = assessment2['txt_description'].str.replace('[^\w\s]', '')
-        assessment2['txt_description'] = assessment2['txt_description'].str.lower()
-
-        # tokenize
-        assessment2['txt_tokenized'] = assessment2.apply(
-            lambda row: nltk.word_tokenize(row['txt_description']), axis=1)
-
-        # Remove Stopwords
-        stop = stopwords.words('english')
-        assessment2['txt_tokenized'] = assessment2['txt_tokenized'].apply(
-            lambda x: [item for item in x if item not in stop])
-
-        # Create ngrams
-        assessment2['ngrams'] = assessment2.apply(
-            lambda row: list(nltk.trigrams(row['txt_tokenized'])), axis=1)
-
-        # Convert trigram lists to words joined by underscores
-        assessment2['ngram2'] = assessment2.ngrams.apply(lambda row: ['_'.join(i) for i in row])
-
-        # Convert trigram and token lists to strings
-        assessment2['txt_tokenized2'] = assessment2['txt_tokenized'].apply(' '.join)
-        assessment2['ngram2'] = assessment2.ngram2.apply(lambda x: ' '.join([str(i) for i in x]))
-
-        assessment2['np_chunks'] = assessment2['txt_tokenized2'].apply(nlp_utils.getNounChunks)
-
-         # DBSCAN Clusterin for trigrams and noun phrase chunks
-        tfidf = TfidfVectorizer()
-
-        # tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
-        tfidf_data_np = tfidf.fit_transform(assessment2['np_chunks'])
-
-        cluster_model = KMeans(n_jobs=-1, n_clusters=15)
-
-        print("Starting NP Chunk Kmeans model fit on np chunks...")
-        np_db_model = cluster_model.fit(tfidf_data_np)
-        print("NP Chunk Kmeans model fit on np chunks COMPLETE...")
-
-        # KMeans cluster counts and labeling
-        # assessment2['ngram_clusters'] = ngram_db_model.labels_
-        assessment2['np_chunk_clusters'] = np_db_model.labels_
-
-        # print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
-        print("ngram DBSCAN Model Cluster Count:", assessment2['np_chunk_clusters'].nunique())
-
-        # %% LDA clustering
-        count_vectorizer = CountVectorizer()
-        count_data = count_vectorizer.fit_transform(assessment2['ngram2'].values.astype('U'))
-        lda = LDA(n_components=20, learning_method='online')
-        lda.fit(count_data)
-
-        # LDA Cluster labeling
-        topic_values = lda.transform(count_data)
-        assessment2['topic_clusters'] = topic_values.argmax(axis=1)
-
-        # %% FINAL ASSESSMENTS TABLE
-        # assessment2.drop(['np_chunk_clusters','topic_clusters','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks'],axis=1, inplace=True)
-
-        kmeans_cluster = pd.get_dummies(assessment2.np_chunk_clusters, prefix='kmeans')
-        topic_cluster = pd.get_dummies(assessment2.topic_clusters, prefix='topic')
-
-        # use pd.concat to join the new columns with your original dataframe
-        assessment2 = pd.concat([assessment2, kmeans_cluster], axis=1)
-        assessment2 = pd.concat([assessment2, topic_cluster], axis=1)
-
-        # Read in diagnosis table
-        diagnoses = pd.read_csv(self.data_path + '6_patient_diagnoses.csv')
-        ccsr = pd.read_csv(self.data_path + 'ccsr_mapping.csv')
-        diagnoses['diagnosis_code_stripped'] = diagnoses['diagnosis_code_id'].str.replace(".", "")
-        diagnoses = diagnoses.merge(ccsr, left_on='diagnosis_code_stripped', right_on='ICD-10-CM Code', how='left')
-
-        diagnosis_icd9 = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['icd9cm_code_id'].apply(list))
-        diagnosis_dc = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['diagnosis_code_id'].apply(list))
-        diagnosis_desc = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['description'].apply(list))
-        diagnosis_datesymp = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['date_onset_sympt'].apply(list))
-        diagnosis_datediag = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['date_diagnosed'].apply(list))
-        diagnosis_dateresl = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['date_resolved'].apply(list))
-        diagnosis_statusid = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['status_id'].apply(list))
-        diagnosis_dx = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['dx_priority'].apply(list))
-        diagnosis_chronic = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['chronic_ind'].apply(list))
-        diagnosis_rcdelswhr = pd.DataFrame(
-            diagnoses.groupby(['person_id', 'enc_id'])['recorded_elsewhere_ind'].apply(list))
-
-        diagnosis_ccsr_category = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['CCSR Category Description'].apply(list))
-        # Merge series data from text and codeID columns into one df for assessment
-        diagnoses2 = diagnosis_icd9 \
-            .merge(diagnosis_dc, how='left', on=['person_id', 'enc_id']) \
-            .merge(diagnosis_desc, how='left', on=['person_id', 'enc_id']) \
-            .merge(diagnosis_datesymp, how='left', on=['person_id', 'enc_id']) \
-            .merge(diagnosis_datediag, how='left', on=['person_id', 'enc_id']) \
-            .merge(diagnosis_dateresl, how='left', on=['person_id', 'enc_id']) \
-            .merge(diagnosis_statusid, how='left', on=['person_id', 'enc_id']) \
-            .merge(diagnosis_dx, how='left', on=['person_id', 'enc_id']) \
-            .merge(diagnosis_chronic, how='left', on=['person_id', 'enc_id']) \
-            .merge(diagnosis_rcdelswhr, how='left', on=['person_id', 'enc_id']) \
-            .merge(diagnosis_ccsr_category, how='left', on=['person_id', 'enc_id'])
-
-        diagnoses2 = pd.DataFrame(diagnoses2)
-        diagnoses2.reset_index(inplace=True)
-
-        # Merge assements[txt_description] to ngd df
-        # Diagnosis occur after assessments, diagnosis table is smaller than assessments table
-        assessments_diagnoses = assessment2.merge(diagnoses2, how='left', on=['person_id', 'enc_id'])
-
-        self.asmt_diag = assessments_diagnoses
-
-        # drop 5 rows with missing diag data
-        # TODO: fix this statement
-        self.asmt_diag = self.asmt_diag[~self.asmt_diag['diagnosis_code_id'].isnull()]
 
 
     def format_labs_continuous(self):
@@ -461,29 +326,147 @@ class DataLoader:
         self.labs_cont = labs2
 
 
+    # function to transform assessments table to merge with encounters
+    def format_assessments(self):
+        try:
+            with open(self.data_path + 'bin/assessments.pickle', 'rb') as picklefile:
+                self.assessments = pickle.load(picklefile)
+
+        except FileNotFoundError:
+            assessment = self.assessments
+            # Filter for relevant enc_ids
+            assessment = assessment[assessment['enc_id'].isin(
+                set(assessment['enc_id']).intersection(
+                    set(self.encounters.enc_id)))]
+
+            # Collapse data down by enc_id for assessment
+            assessment_text = assessment.groupby(['person_id', 'enc_id'])['txt_description'].apply(list)
+            assessment_codeID = assessment.groupby(['person_id', 'enc_id'])['txt_diagnosis_code_id'].apply(list)
+            assessment_text = pd.DataFrame(assessment_text)
+            assessment_codeID = pd.DataFrame(assessment_codeID)
+
+            # Merge series data from text and codeID columns into one df for assessment
+            assessment2 = assessment_text.merge(assessment_codeID, how='left', on=['person_id', 'enc_id'])
+            assessment2 = pd.DataFrame(assessment2)
+            assessment2.reset_index(inplace=True)
+
+            # Remove punctuation, convert all to lowercase, remove stopwords, tokenize, create bigrams
+
+            # Remove Punctuation and convert to lower
+            assessment2['txt_description'] = assessment2.txt_description.apply(
+                lambda x: ', '.join([str(i) for i in x]))
+            assessment2['txt_description'] = assessment2['txt_description'].str.replace('[^\w\s]', '')
+            assessment2['txt_description'] = assessment2['txt_description'].str.lower()
+
+            #remove words that are directly correlated to positive AD or Dementia
+            ad_pos = 'alzheimers disease|dementia|late onset alzheimers|alzh|lewy|frontotemporal|hydrocephalus|huntington|wernicke|creutzfeldt|vascular dementia|Huntingtons disease|Mixed dementia|Parkisons disease'
+            assessment2['txt_description'] = assessment2['txt_description'].str.replace(ad_pos,'')
+
+            # tokenize
+            assessment2['txt_tokenized'] = assessment2.apply(
+                lambda row: nltk.word_tokenize(row['txt_description']), axis=1)
+
+            # Remove Stopwords
+            stop = stopwords.words('english')
+            assessment2['txt_tokenized'] = assessment2['txt_tokenized'].apply(
+                lambda x: [item for item in x if item not in stop])
+
+            # Create ngrams
+            assessment2['ngrams'] = assessment2.apply(
+                lambda row: list(nltk.trigrams(row['txt_tokenized'])), axis=1)
+
+            # Convert trigram lists to words joined by underscores
+            assessment2['ngram2'] = assessment2.ngrams.apply(lambda row: ['_'.join(i) for i in row])
+
+            # Convert trigram and token lists to strings
+            assessment2['txt_tokenized2'] = assessment2['txt_tokenized'].apply(' '.join)
+            assessment2['ngram2'] = assessment2.ngram2.apply(lambda x: ' '.join([str(i) for i in x]))
+            assessment2['np_chunks'] = assessment2['txt_tokenized2'].apply(nlp_utils.getNounChunks)
+
+            self.assessments = assessment2
+            with open(self.data_path + 'bin/assessments.pickle', 'wb') as picklefile:
+                pickle.dump(self.assessments, picklefile)
+
+
+    def format_diagnosis(self):
+        try:
+            with open(self.data_path + 'bin/diagnosis.pickle', 'rb') as picklefile:
+                self.diagnosis = pickle.load(picklefile)
+
+        except FileNotFoundError:
+            # Read in diagnosis table
+            diagnosis = self.diagnosis
+            ccsr = pd.read_csv(self.data_path + 'ccsr_mapping.csv')
+            diagnosis['diagnosis_code_stripped'] = diagnosis['diagnosis_code_id'].str.replace(".", "")
+            diagnosis = diagnosis.merge(ccsr, left_on='diagnosis_code_stripped', right_on='ICD-10-CM Code', how='left')
+
+            diagnosis_icd9 = pd.DataFrame(diagnosis.groupby(['person_id', 'enc_id'])['icd9cm_code_id'].apply(list))
+            diagnosis_dc = pd.DataFrame(diagnosis.groupby(['person_id', 'enc_id'])['diagnosis_code_id'].apply(list))
+            diagnosis_desc = pd.DataFrame(diagnosis.groupby(['person_id', 'enc_id'])['description'].apply(list))
+            diagnosis_datesymp = pd.DataFrame(diagnosis.groupby(['person_id', 'enc_id'])['date_onset_sympt'].apply(list))
+            diagnosis_datediag = pd.DataFrame(diagnosis.groupby(['person_id', 'enc_id'])['date_diagnosed'].apply(list))
+            diagnosis_dateresl = pd.DataFrame(diagnosis.groupby(['person_id', 'enc_id'])['date_resolved'].apply(list))
+            diagnosis_statusid = pd.DataFrame(diagnosis.groupby(['person_id', 'enc_id'])['status_id'].apply(list))
+            diagnosis_dx = pd.DataFrame(diagnosis.groupby(['person_id', 'enc_id'])['dx_priority'].apply(list))
+            diagnosis_chronic = pd.DataFrame(diagnosis.groupby(['person_id', 'enc_id'])['chronic_ind'].apply(list))
+            diagnosis_rcdelswhr = pd.DataFrame(
+                diagnosis.groupby(['person_id', 'enc_id'])['recorded_elsewhere_ind'].apply(list))
+
+            diagnosis_ccsr_category = pd.DataFrame(diagnosis.groupby(['person_id', 'enc_id'])['CCSR Category Description'].apply(list))
+            # Merge series data from text and codeID columns into one df for assessment
+            diagnosis2 = diagnosis_icd9 \
+                .merge(diagnosis_dc, how='left', on=['person_id', 'enc_id']) \
+                .merge(diagnosis_desc, how='left', on=['person_id', 'enc_id']) \
+                .merge(diagnosis_datesymp, how='left', on=['person_id', 'enc_id']) \
+                .merge(diagnosis_datediag, how='left', on=['person_id', 'enc_id']) \
+                .merge(diagnosis_dateresl, how='left', on=['person_id', 'enc_id']) \
+                .merge(diagnosis_statusid, how='left', on=['person_id', 'enc_id']) \
+                .merge(diagnosis_dx, how='left', on=['person_id', 'enc_id']) \
+                .merge(diagnosis_chronic, how='left', on=['person_id', 'enc_id']) \
+                .merge(diagnosis_rcdelswhr, how='left', on=['person_id', 'enc_id']) \
+                .merge(diagnosis_ccsr_category, how='left', on=['person_id', 'enc_id'])
+
+            diagnosis2 = pd.DataFrame(diagnosis2)
+            diagnosis2.reset_index(inplace=True)
+
+            self.diagnosis = diagnosis2
+
+            # drop 5 rows with missing diag data
+            self.diagnosis = self.diagnosis[~self.diagnosis['diagnosis_code_id'].isnull()]
+
+            with open(self.data_path + 'bin/diagnosis.pickle', 'wb') as picklefile:
+                pickle.dump(self.diagnosis, picklefile)
+
     # return the main data output
     def create(self, name='main'):
+        print('Initializing DataLoader\n..loading CSVs')
         self.generate_csv_attributes()
-        self.format_encounters()
+        print('..loading meds')
         self.format_meds()
+        print('..loading lab flags')
         self.format_labs()
+        print('..loading continuous labs')
         self.format_labs_continuous()
+        print('..loading diagnosis')
+        self.format_diagnosis()
+        print('..loading assessments')
         self.format_assessments()
+        self.main = self.encounters.copy()
 
         # write to pickle file
         self.write(filename=name)
-        print('data load complete')
+        print('Data load complete!\n')
 
 
     # helper function write entire class object
     def write(self, filename='main'):
-        with open(self.data_path + filename + '.pickle', 'wb') as picklefile:
+        with open(self.data_path + 'bin/' + filename + '.pickle', 'wb') as picklefile:
             pickle.dump(self, picklefile)
 
 
     # helper function to return entire class object
     def load(self, filename='main'):
-        with open(self.data_path + filename + '.pickle', 'rb') as picklefile:
+        with open(self.data_path + 'bin/' + filename + '.pickle', 'rb') as picklefile:
             return pickle.load(picklefile)
 
 

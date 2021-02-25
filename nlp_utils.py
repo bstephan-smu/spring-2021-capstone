@@ -75,7 +75,7 @@ def custom_lexicon(self, word_list):
     # make sure to split lexicon definition by space and strip any non alpha numeric characters
 
 
-def strip_non_alpha(word_list):
+def strip_non_alpha(self, word_list):
     output = []
     for row in word_list:
         row_list = []
@@ -90,7 +90,7 @@ def strip_non_alpha(word_list):
     return output
 
 
-def porter_stemmer(word_list):
+def porter_stemmer(self, word_list):
     ps = nltk.PorterStemmer()
     output = []
     for row in word_list:
@@ -104,7 +104,7 @@ def porter_stemmer(word_list):
 # Get noun phrases
 nlp = en_core_web_sm.load()
 
-def getNounChunks(text_data):
+def getNounChunks(self, text_data):
     doc = nlp(text_data)
     noun_chunks = list(doc.noun_chunks)
     noun_chunks_strlist = [chunk.text for chunk in noun_chunks]
