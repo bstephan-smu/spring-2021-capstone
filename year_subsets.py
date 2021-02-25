@@ -32,7 +32,7 @@ drop_col = ['enc_EncounterDate','Reason_for_Visit','asmt_txt_description','asmt_
             'asmt_ngram2','asmt_txt_tokenized2','asmt_np_chunks','asmt_description','CCSR Category','asmt_txt_diagnosis_code_id',
             'asmt_np_chunk_clusters','asmt_topic_clusters','asmt_icd9cm_code_id','asmt_diagnosis_code_id','asmt_date_onset_sympt',
             'asmt_date_diagnosed','asmt_date_resolved','asmt_status_id','asmt_dx_priority','asmt_chronic_ind',
-            'asmt_recorded_elsewhere_ind','asmt_CCSR Category']
+            'asmt_recorded_elsewhere_ind','asmt_CCSR Category','ccsr_NVS011','asmt_kmeans_9']
 
 #Drop unneeded columns
 df2 = df_jeff.drop(drop_col, axis=1)
@@ -218,6 +218,31 @@ X1_sm, y1_sm = sm.fit_resample(X1, y1)# correct X and y for response and feature
 #lab_flags_High Protein,Total,Urine
 #med_memantine
 
+#%% Make a scoreer
+from sklearn import metrics as mt
+def npv_score(ytest, yhat):
+    confusion = mt.confusion_matrix(yhat, ytest)
+
+    TN = confusion[0, 0]
+    FN = confusion[1, 0]
+
+    # convert to float and Calculate score 
+    npv = (TN.astype(float)/(FN.astype(float)+TN.astype(float)))
+    #    (True Negative/(Predicted Negative + True Negative))
+    
+    return npv
+
+def ppv_score(ytest, yhat):
+
+    confusion = mt.confusion_matrix(yhat, ytest)
+    FP = confusion[0, 1]
+    TP = confusion[1, 1]
+
+    # convert to float and Calculate score 
+    ppv = (TP.astype(float)/(FP.astype(float)+TP.astype(float)))
+    #    (True Negative/(Predicted Negative + True Positive))
+    
+    return ppv
 
 #%% Helper function
 from sklearn.linear_model import LogisticRegression
@@ -227,33 +252,40 @@ import matplotlib.pyplot as plt
 import time
 
 # Set test/train split to 80/20
-cv = ShuffleSplit(n_splits = 10, train_size  = 0.8, random_state=42)
+cv = ShuffleSplit(n_splits = 3, train_size  = 0.8, random_state=42)
 
 #helper function preforms cross validation and generates model preformance metrics
 def cross_validate(model,feature_names, X, y, scale = False, classifier = 0, cv=cv):
-    auc,acc, pre, f1, recall, weights = ([] for i in range(6))
+    auc,acc, ppv, npv, f1, recall, weights = ([] for i in range(7))
         
     start = time.time()
     for iter_num, (train_indices, test_indices) in enumerate(cv.split(X,y)):
         
         model.fit(X[train_indices],y[train_indices])  # train object
-        y_hat = model.predict(X[test_indices]) # get test set precitions
+        y_hat= model.predict_proba(X[test_indices]) # get test set precitions
         
+        prob = 0.40
+        y_hat[y_hat >= prob] = 1
+        y_hat[y_hat < prob] = 0
+        y_hat =  y_hat[:, 1]
+        print(y_hat)
         #present iteration model metrics
         print("====Iteration",iter_num + 1," ====")
         print("roc_auc", mt.roc_auc_score(y[test_indices],y_hat))
+        print("Positive Predictive Value", ppv_score(y[test_indices],y_hat))
+        print("Negative Predictive Value", npv_score(y[test_indices],y_hat))
         print("f1-score", mt.f1_score(y[test_indices],y_hat))
         print("Accuracy", mt.accuracy_score(y[test_indices],y_hat))
-        print("Precision", mt.precision_score(y[test_indices],y_hat))
         print("Recall", mt.recall_score(y[test_indices],y_hat))
         print("\nconfusion matrix\n",mt.confusion_matrix(y[test_indices],y_hat))
         
         #append iteration model metrics for later averaging
         auc.append(mt.roc_auc_score(y[test_indices],y_hat))
         f1.append(mt.f1_score(y[test_indices],y_hat))
-        acc.append(mt.f1_score(y[test_indices],y_hat))
-        pre.append(mt.f1_score(y[test_indices],y_hat))
-        recall.append(mt.f1_score(y[test_indices],y_hat))
+        acc.append(mt.accuracy_score(y[test_indices],y_hat))
+        ppv.append(ppv_score(y[test_indices],y_hat))
+        npv.append(npv_score(y[test_indices],y_hat))
+        recall.append(mt.recall_score(y[test_indices],y_hat))
         elapsed_time = (time.time() - start)
         
         if scale == True:
@@ -264,9 +296,10 @@ def cross_validate(model,feature_names, X, y, scale = False, classifier = 0, cv=
     #Take average of CV metrics
     print('--------------------------------')
     print('Mean AUC score:', np.array(auc).mean())
+    print('Mean Positive Predictive Value:', np.array(ppv).mean())
+    print('Mean Negative Predictive Value:', np.array(npv).mean())
     print('Mean f1-score:', np.array(f1).mean())
     print('Mean Accuracy:', np.array(acc).mean())
-    print('Mean Precision:', np.array(pre).mean())
     print('Mean Recall:', np.array(recall).mean())
     print('CV Time: ', elapsed_time)
         
@@ -286,8 +319,12 @@ def cross_validate(model,feature_names, X, y, scale = False, classifier = 0, cv=
 #%% Inital Modeling
 
 clf = LogisticRegression(penalty = 'l1',n_jobs = -1, solver = 'liblinear')
-cross_validate(clf,feature_space.columns, X, y,scale =False)
-
-# %%
+#cross_validate(clf,feature_space.columns, X, y,scale =False)
 cross_validate(clf,feature_space.columns, X1_sm.values, y1_sm.values,scale =False)
-# %%
+
+
+# %% Random Forest
+
+from sklearn.ensemble import RandomForestClassifier
+rfc = RandomForestClassifier(max_depth=50, n_estimators=150, n_jobs=-1, oob_score=True)
+cross_validate(rfc,feature_space.columns, X1_sm.values, y1_sm.values,scale =False)
