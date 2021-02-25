@@ -121,7 +121,7 @@ tfidf = TfidfVectorizer()
 #tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
 tfidf_data_np = tfidf.fit_transform(assessment2['np_chunks'])
 
-cluster_model = KMeans(n_jobs=-1,n_clusters=50)
+cluster_model = KMeans(n_jobs=-1,n_clusters=15)
 #print("Starting ngram Kmeans model fit...")
 #ngram_db_model = cluster_model.fit(tfidf_data_ngram)
 #print("ngram DBSCAN model fit COMPLETE...")
@@ -133,7 +133,7 @@ print("NP Chunk Kmeans model fit on np chunks COMPLETE...")
 
 #%% KMeans cluster counts and labeling
 #print("ngram Model Cluster Count:",assessment2['ngram_clusters'].nunique())
-#print("ngram DBSCAN Model Cluster Count:",assessment2['np_chunk_clusters'].nunique())
+print("ngram DBSCAN Model Cluster Count:",assessment2['np_chunk_clusters'].nunique())
 
 
 
