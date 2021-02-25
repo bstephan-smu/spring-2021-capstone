@@ -5,6 +5,8 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 import nlp_utils
+import numpy as np
+import re
 
 class Encoder(DataLoader):
     def __init__(self, filename='main'):
@@ -152,7 +154,7 @@ class Encoder(DataLoader):
         assess_copy['CCSR Category2'] = assess_copy['CCSR Category'].apply(stripNA)
         assess_copy.drop(columns=['CCSR Category'], inplace = True)
 
-        assess_copy = one_hot(assess_copy, 'CCSR Category2', prefix='ccsr_')
+        assess_copy = self.one_hot(assess_copy, 'CCSR Category2', prefix='ccsr_')
 
         if rename:
             assess_copy = self.rename_cols(assess_copy, prefix='asmt_')
@@ -167,8 +169,54 @@ class Encoder(DataLoader):
         clusters = assess_copy[assess_cluster_cols]
         clusters = self.rename_cols(assess_copy, prefix='asmt_')
         self.main = self.main.merge(clusters, on=['person_id', 'enc_id'], how='left')
+        # function to classify as True/False Alzheimers Disease in the encounter dataset
+        # will also encode a separate dementia encoding.
 
 
+    def get_response_cols(self, return_val='description'):
+        dementia_string = '|'.join(self.dementia_lookup)
+        dementia_output = list(
+            self.diagnosis[self.diagnosis.description.str.contains(dementia_string, regex=True, flags=re.IGNORECASE)]
+            [return_val].unique()
+        )
+        dementia_output = [desc for desc in dementia_output if desc not in self.exclude_dementia_lookup]
+        self.dementia_icd_codes = self.diagnosis[
+            self.diagnosis.description.isin(dementia_output)].icd9cm_code_id.unique()
+
+        # TODO add self.AD_icd_codes
+
+        # Collect response
+        AD_people = self.diagnosis[
+            self.diagnosis.description.str.contains(self.alz_regex, regex=True, flags=re.IGNORECASE)].person_id.unique()
+        AD_encounters = self.diagnosis[
+            self.diagnosis.description.str.contains(self.alz_regex, regex=True, flags=re.IGNORECASE)].enc_id.unique()
+        dem_people = self.diagnosis[self.diagnosis.description.isin(dementia_output)].person_id.unique()
+        dem_encounters = self.diagnosis[self.diagnosis.description.isin(dementia_output)].enc_id.unique()
+
+        # Set response
+        self.main['AD_encounter'] = self.main.enc_id.isin(AD_encounters).astype(int)
+        self.main['AD_person'] = self.main.person_id.isin(AD_people).astype(int)
+        self.main['dem_encounter'] = self.main.enc_id.isin(dem_encounters).astype(int)
+        self.main['dem_person'] = self.main.person_id.isin(dem_people).astype(int)
+        self.main['Cognition'] = np.select(
+            [self.main.AD_person == 1, self.main.dem_person == 1],
+            ['AD', 'Dementia'],
+            default='Normal'
+        )
+
+
+    def clean(self):
+        # Drop single value columns
+        single_val_columns = []
+        for col in self.main:
+            try:
+                if self.main[col].nunique() == 1:
+                    single_val_columns.append(col)
+            except TypeError:
+                pass  # skip list cols
+        self.main.drop(columns=single_val_columns, inplace=True)
+
+        
 def main():
     pass
 

@@ -1,3 +1,7 @@
+import en_core_web_sm
+import re
+import nltk
+
 # split number word combinations
 def split_numbers(self, word_list):
     output = []
@@ -96,3 +100,13 @@ def porter_stemmer(word_list):
             row_list.append(word_)
         output.append(' '.join(row_list))
     return output
+
+# Get noun phrases
+nlp = en_core_web_sm.load()
+
+def getNounChunks(text_data):
+    doc = nlp(text_data)
+    noun_chunks = list(doc.noun_chunks)
+    noun_chunks_strlist = [chunk.text for chunk in noun_chunks]
+    noun_chunks_str = '_'.join(noun_chunks_strlist)
+    return noun_chunks_str

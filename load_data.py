@@ -5,13 +5,13 @@ import re
 import os
 import pickle
 import nltk
-import spacy
-import en_core_web_sm
+import nlp_utils
 
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
-
+from sklearn.decomposition import LatentDirichletAllocation as LDA
+from sklearn.feature_extraction.text import CountVectorizer
 
 # os.environ["MODIN_ENGINE"] = "dask"  # Modin will use Dask
 # import modin.pandas as pd
@@ -104,7 +104,7 @@ class DataLoader:
             common name reducing the number of levels
             """
             self.encounters['r&e'] = self.encounters['Race'] + self.encounters['Ethnicity']
-            self.encounters['race_ethincity']=self.encountersc['r&e'].replace([
+            self.encounters['race_ethincity']=self.encounters['r&e'].replace([
                 #concatinated column values 
                 'White Hispanic or Latino ',
                 'White Declined To Specify ', 
@@ -168,41 +168,6 @@ class DataLoader:
             #drop the extra and old columns. 
             self.encounters.drop(['r&e', 'Race', 'Ethnicity'], axis=1)
         clean_race_ethnicity()
-
-
-        # function to classify as True/False Alzheimers Disease in the encounter dataset
-        # will also encode a separate dementia encoding.
-        def encode_alzheimers(return_val='description'):
-            dementia_string = '|'.join(self.dementia_lookup)
-            dementia_output = list(
-                self.diagnosis[self.diagnosis.description.str.contains(dementia_string, regex=True, flags=re.IGNORECASE)]
-                [return_val].unique()
-            )
-            dementia_output = [desc for desc in dementia_output if desc not in self.exclude_dementia_lookup]
-            self.dementia_icd_codes = self.diagnosis[
-                self.diagnosis.description.isin(dementia_output)].icd9cm_code_id.unique()
-    
-            # TODO add self.AD_icd_codes
-
-            # Collect response
-            AD_people = self.diagnosis[
-                self.diagnosis.description.str.contains(self.alz_regex, regex=True, flags=re.IGNORECASE)].person_id.unique()
-            AD_encounters = self.diagnosis[
-                self.diagnosis.description.str.contains(self.alz_regex, regex=True, flags=re.IGNORECASE)].enc_id.unique()
-            dem_people = self.diagnosis[self.diagnosis.description.isin(dementia_output)].person_id.unique()
-            dem_encounters = self.diagnosis[self.diagnosis.description.isin(dementia_output)].enc_id.unique()
-
-            # Set response
-            self.encounters['AD_encounter'] = self.encounters.enc_id.isin(AD_encounters).astype(int)
-            self.encounters['AD_person'] = self.encounters.person_id.isin(AD_people).astype(int)
-            self.encounters['dem_encounter'] = self.encounters.enc_id.isin(dem_encounters).astype(int)
-            self.encounters['dem_person'] = self.encounters.person_id.isin(dem_people).astype(int)
-            self.encounters['Cognition'] = np.select(
-                [self.encounters.AD_person == 1, self.encounters.dem_person == 1],
-                ['AD', 'Dementia'],
-                default='Normal'
-            )
-        encode_alzheimers()
 
 
     # function to find which meds were currently being taken during the encounter period
@@ -340,32 +305,15 @@ class DataLoader:
         assessment2['txt_tokenized2'] = assessment2['txt_tokenized'].apply(' '.join)
         assessment2['ngram2'] = assessment2.ngram2.apply(lambda x: ' '.join([str(i) for i in x]))
 
-        # Get noun phrases
-        nlp = en_core_web_sm.load()
+        assessment2['np_chunks'] = assessment2['txt_tokenized2'].apply(nlp_utils.getNounChunks)
 
-        def getNounChunks(text_data):
-            doc = nlp(text_data)
-            noun_chunks = list(doc.noun_chunks)
-            noun_chunks_strlist = [chunk.text for chunk in noun_chunks]
-            noun_chunks_str = '_'.join(noun_chunks_strlist)
-            return noun_chunks_str
-
-        assessment2['np_chunks'] = assessment2['txt_tokenized2'].apply(getNounChunks)
-
-        # Pair down assessments table to columns of interest
-        # assessment2 = assessment2[['person_id','enc_id','txt_description','txt_tokenized','ngrams','ngram2','txt_tokenized2','np_chunks']]
-
-        # DBSCAN Clusterin for trigrams and noun phrase chunks
+         # DBSCAN Clusterin for trigrams and noun phrase chunks
         tfidf = TfidfVectorizer()
 
         # tfidf_data_ngram = tfidf.fit_transform(assessment2['ngram2'])
         tfidf_data_np = tfidf.fit_transform(assessment2['np_chunks'])
 
         cluster_model = KMeans(n_jobs=-1, n_clusters=15)
-
-        # print("Starting ngram KMeans model fit...")
-        # ngram_db_model = cluster_model.fit(tfidf_data_ngram)
-        # print("ngram KMeans model fit COMPLETE...")
 
         print("Starting NP Chunk Kmeans model fit on np chunks...")
         np_db_model = cluster_model.fit(tfidf_data_np)
@@ -379,9 +327,6 @@ class DataLoader:
         print("ngram DBSCAN Model Cluster Count:", assessment2['np_chunk_clusters'].nunique())
 
         # %% LDA clustering
-        from sklearn.decomposition import LatentDirichletAllocation as LDA
-        from sklearn.feature_extraction.text import CountVectorizer
-
         count_vectorizer = CountVectorizer()
         count_data = count_vectorizer.fit_transform(assessment2['ngram2'].values.astype('U'))
         lda = LDA(n_components=20, learning_method='online')
@@ -419,7 +364,7 @@ class DataLoader:
         diagnosis_rcdelswhr = pd.DataFrame(
             diagnoses.groupby(['person_id', 'enc_id'])['recorded_elsewhere_ind'].apply(list))
 
-        diagnosis_ccsr_category = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['CCSR Category'].apply(list))
+        diagnosis_ccsr_category = pd.DataFrame(diagnoses.groupby(['person_id', 'enc_id'])['CCSR Category Description'].apply(list))
         # Merge series data from text and codeID columns into one df for assessment
         diagnoses2 = diagnosis_icd9 \
             .merge(diagnosis_dc, how='left', on=['person_id', 'enc_id']) \
@@ -516,40 +461,25 @@ class DataLoader:
         self.labs_cont = labs2
 
 
-    def clean(self):
-        # Drop single value columns
-        single_val_columns = []
-        for col in self.main:
-            try:
-                if self.main[col].nunique() == 1:
-                    single_val_columns.append(col)
-            except TypeError:
-                pass  # skip list cols
-        self.main.drop(columns=single_val_columns, inplace=True)
-
-
-
     # return the main data output
     def create(self, name='main'):
         self.generate_csv_attributes()
+        self.format_encounters()
         self.format_meds()
         self.format_labs()
         self.format_labs_continuous()
         self.format_assessments()
 
-        # Start patch here: everything up to this point was good
-        self.merge_assessments()
-        self.merge_clusters()
-        self.clean()
-
         # write to pickle file
         self.write(filename=name)
         print('data load complete')
+
 
     # helper function write entire class object
     def write(self, filename='main'):
         with open(self.data_path + filename + '.pickle', 'wb') as picklefile:
             pickle.dump(self, picklefile)
+
 
     # helper function to return entire class object
     def load(self, filename='main'):
@@ -559,7 +489,4 @@ class DataLoader:
 
 if __name__ == "__main__":
     data = DataLoader(subset=1000)
-    data.generate_csv_attributes()
-    data.format_assessments()
-    #data.create()
-    print(data.load())
+    data.create('subset')
