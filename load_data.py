@@ -438,7 +438,7 @@ class DataLoader:
                 pickle.dump(self.diagnosis, picklefile)
 
     # return the main data output
-    def create(self, name='main'):
+    def create(self, name='dataloader'):
         print('Initializing DataLoader\n..loading CSVs')
         self.generate_csv_attributes()
         print('..loading meds')
@@ -458,17 +458,20 @@ class DataLoader:
         print('Data load complete!\n')
 
 
-    # helper function write entire class object
-    def write(self, filename='main'):
-        with open(self.data_path + 'bin/' + filename + '.pickle', 'wb') as picklefile:
+    # helper function write entire class object to your project directory
+    def write(self, filename='dataloader'):
+        with open('bin/' + filename + '.pickle', 'wb') as picklefile:
             pickle.dump(self, picklefile)
 
 
-    # helper function to return entire class object
-    def load(self, filename='main'):
-        with open(self.data_path + 'bin/' + filename + '.pickle', 'rb') as picklefile:
-            return pickle.load(picklefile)
-
+    # helper function to return entire class object to your project directory
+    def load(self, filename='dataloader'):
+        try:
+            with open('bin/' + filename + '.pickle', 'rb') as picklefile:
+                return pickle.load(picklefile)
+        except FileNotFoundError:
+            print('DataLoader not found. Running create() to rebuild..')
+            self.create()
 
 if __name__ == "__main__":
     data = DataLoader(subset=1000)

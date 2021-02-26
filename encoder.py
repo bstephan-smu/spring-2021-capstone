@@ -13,9 +13,8 @@ from sklearn.decomposition import LatentDirichletAllocation as LDA
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 class Encoder(DataLoader):
-    def __init__(self, filename='main'):
+    def __init__(self):
         super().__init__() 
-        self.create(filename)
 
 
     def one_hot(self, df:pd.DataFrame, col_name:str, prefix:str=''):
@@ -38,7 +37,8 @@ class Encoder(DataLoader):
         return df
 
 
-    def stripNA(self, lst_col):
+    #TODO: Need to modify this to account for when all items are removed from the list and it returns an empty list
+    def stripNA(self, lst_col):  
         for item in lst_col:
             if type(item) != str:
                 lst_col.remove(item)
@@ -62,7 +62,7 @@ class Encoder(DataLoader):
             'EncounterDate': 'enc_EncounterDate',
             'Gender': 'enc_Gender',
             'AgeAtEnc': 'enc_AgeAtEnc',
-            'race_ethincity': 'enc_RaceEthincity'
+            'race_ethincity': 'enc_RaceEth'
         }, inplace=True)
 
         # Update EncounterDate to be an ordinal date (see: pandas.Timestamp.toordinal)
@@ -70,24 +70,29 @@ class Encoder(DataLoader):
 
         # Onehot encode 
         self.main = pd.get_dummies(self.main, columns=['enc_Gender'], drop_first=True)
+        self.main = pd.get_dummies(self.main, columns=['enc_RaceEth'], drop_first=False)
 
 
     def get_labs(self):
-        self.labs = self.one_hot(self.labs, 'lab_results', 'lab_')
+        self.labs = self.one_hot(self.labs, 'lab_results', '')
         labs_copy = self.labs.copy()
         labs_copy.drop(columns=['person_id'], inplace=True)
-        labs_copy = self.rename_cols(labs_copy, prefix='lab_flag_')
+        labs_copy = self.rename_cols(labs_copy, prefix='lab_')
         self.main = self.main.merge(labs_copy, on='enc_id', how='left')
 
         # TODO: address null values col
         self.main[[col for col in labs_copy.columns if col != 'enc_id']].fillna(0, inplace=True)
-
+        # Fix float cols
+        cols = [col for col in self.main if col.startswith('lab_')]
+        self.main[cols] = self.main[cols].fillna(value=0).astype(int)
 
     def get_labs_continuous(self):
         labs2_encoded = self.labs_cont.groupby(['enc_id', 'lab_test'])['lab_test_results'].aggregate(
             'mean').unstack().reset_index()
         self.main = self.main.merge(labs2_encoded, how='left', on='enc_id')
-
+        # Fix float cols
+        cols = [col for col in self.main if col.startswith('asmt_')]
+        self.main[cols] = self.main[cols].fillna(value=0).astype(int)
 
     def get_meds(self):
         # note that the meds table may or may not have columns depending on sample
@@ -98,8 +103,9 @@ class Encoder(DataLoader):
         self.main = self.main.merge(meds_wide, on='enc_id', how='left')
 
         # not all patients have active meds...take care to fill those nulls
-        medcols = [col for col in capData.main if col.startswith('med_')]
-        self.main = self.main[medcols].fillna(value=0).astype(int)
+        medcols = [col for col in self.main if col.startswith('med_')]
+        self.main[medcols] = self.main[medcols].fillna(value=0).astype(int)
+
 
     def get_cpt(self):
         cpt_desc = pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/cpt_updated_full.csv')
@@ -108,7 +114,7 @@ class Encoder(DataLoader):
         df_cpt_codes_encoded = pd.concat(
             [
                 self.cpt[['enc_id']],
-                pd.get_dummies(self.cpt['cpt_desc'], drop_first=True, prefix='cpt')
+                pd.get_dummies(self.cpt['cpt_desc'], prefix='cpt')
             ], axis=1) \
             .groupby('enc_id', as_index=False).max()
 
@@ -174,16 +180,17 @@ class Encoder(DataLoader):
             default='Normal'
         )
 
-    def get_diagnoses(self):
+    def get_diagnoses(self):  # TODO: This is a hack, need to modify the stripNA function
+        self.diagnosis['CCSR Category Description'].apply(self.stripNA).apply(self.stripNA).apply(self.stripNA)
+
         diag = self.diagnosis.copy()
-        diag['CCSR Category'] = diag['CCSR Category Description'].apply(self.stripNA)
-        diag.drop(columns=['CCSR Category Description'], inplace = True)
-
-        diag = self.one_hot(diag, 'CCSR Category', prefix='ccsr_')
-
         diag = self.rename_cols(diag, prefix='asmt_')
-        self.main = self.main.merge(diag, on=['person_id', 'enc_id'], how='left')
+        diag = self.one_hot(diag, 'asmt_CCSR Category Description', prefix='ccsr_')
 
+        self.main = self.main.merge(diag, on=['person_id', 'enc_id'], how='left')
+        # Fix float cols
+        cols = [col for col in self.main if col.startswith('ccsr_')]
+        self.main[cols] = self.main[cols].fillna(value=0).astype(int)
 
     def build_assessment_clusters(self):
         try:
@@ -240,7 +247,6 @@ class Encoder(DataLoader):
         assess_cluster_cols.remove('asmt_topic_clusters')
         clusters = self.assessments[assess_cluster_cols]
         self.main = self.main.merge(clusters, on=['person_id', 'enc_id'], how='left')
-
         # Fix float cols
         cols = [col for col in self.main if col.startswith('asmt_')]
         self.main[cols] = self.main[cols].fillna(value=0).astype(int)
@@ -257,22 +263,53 @@ class Encoder(DataLoader):
                 pass  # skip list cols
         self.main.drop(columns=single_val_columns, inplace=True)
 
+        # Fix float column
+        #self.main['is_currently_taking'] = self.main['is_currently_taking'].astype(int)
 
-    def encode_all(self):
+        # Handle NAs in:
+        #TODO vitals
+
+
+    def build(self):
+        self.create()
+        print('Encoding Main DataFrame\n..encoding response')
         self.get_response_cols()
+        print('..encoding encounters')
         self.get_encounters()
-        self.get_labs()
-    #    capData.get_labs_continuous()
-        self.get_meds()
-        self.get_cpt()
-        self.get_vitals()
+        print('..encoding reasons for visit')
         self.get_reason_for_visit()
+        print('..encoding labs')
+        self.get_labs()
+    #    self.get_labs_continuous()
+        print('..encoding meds')
+        self.get_meds()
+        print('..encoding cpt')
+        self.get_cpt()
+        print('..encoding vitals')
+        self.get_vitals()
+        print('..encoding clusters')
         self.get_assessment_clusters()
+        print('..encoding diagnoses')
+        self.get_diagnoses()
+        self.clean()
+        self.write('encoder')
+        print('Encoding Complete!')
+        return self
+
+
+    def load(self, filename='encoder'):
+        try:
+            with open('bin/' + filename + '.pickle', 'rb') as picklefile:
+                return pickle.load(picklefile)
+        except FileNotFoundError:
+            print('Pickle not found. Rebuilding.')
+            self.build()
+        
 
 def main():
     from encoder import Encoder
     capData = Encoder()
-    capData.encode_all()
+    capData.build()
 
 
 
