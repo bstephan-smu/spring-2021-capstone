@@ -130,3 +130,9 @@ dmypy.json
 
 # ignore local data files
 demo_files
+
+# ignore vscode files
+.vscode/
+
+# pickled binarys:
+*.pickle
