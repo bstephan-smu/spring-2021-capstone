@@ -1,0 +1,174 @@
+,0
+0,visit_number
+1,enc_AgeAtEnc
+2,ccsr_CIR007
+3,ccsr_END005
+4,ccsr_END010
+5,ccsr_FAC025
+6,ccsr_SYM010
+7,ccsr_END002
+8,ccsr_MUS010
+9,ccsr_SYM016
+10,ccsr_MBD002
+11,ccsr_END003
+12,ccsr_END001
+13,ccsr_GEN003
+14,ccsr_MUS006
+15,ccsr_FAC014
+16,ccsr_MBD005
+17,ccsr_END009
+18,ccsr_NVS016
+19,ccsr_FAC021
+20,ccsr_DIG004
+21,ccsr_MUS038
+22,ccsr_FAC012
+23,ccsr_RSP008
+24,ccsr_INJ031
+25,ccsr_RSP007
+26,ccsr_FAC016
+27,ccsr_SYM013
+28,ccsr_CIR017
+29,ccsr_NVS019
+30,ccsr_SYM017
+31,ccsr_SYM006
+32,ccsr_END007
+33,ccsr_CIR011
+34,ccsr_SKN007
+35,ccsr_DIG025
+36,ccsr_MUS011
+37,ccsr_GEN008
+38,ccsr_CIR019
+39,ccsr_MUS013
+40,ccsr_SYM011
+41,ccsr_EAR006
+42,ccsr_SYM007
+43,ccsr_SYM012
+44,ccsr_NVS006
+45,ccsr_NVS015
+46,ccsr_GEN012
+47,ccsr_EAR004
+48,ccsr_GEN004
+49,ccsr_FAC010
+50,ccsr_BLD003
+51,ccsr_INF004
+52,cpt_99214
+53,cpt_99213
+54,cpt_G0444
+55,cpt_99215
+56,cpt_G0008
+57,cpt_1126F
+58,cpt_3078F
+59,cpt_3074F
+60,cpt_99203
+61,cpt_90662
+62,cpt_1125F
+63,cpt_G0009
+64,cpt_3077F
+65,cpt_90653
+66,cpt_3079F
+67,cpt_3075F
+68,cpt_90670
+69,cpt_99204
+70,cpt_G0439
+71,cpt_93000
+72,cpt_3044F
+73,cpt_1159F
+74,cpt_97110
+75,cpt_83036
+76,cpt_96372
+77,med_aspirin
+78,med_aspirin low dose
+79,med_carvedilol
+80,med_lisinopril
+81,med_vesicare
+82,med_multivitamin tablet
+83,med_norvasc
+84,med_divalproex
+85,med_isosorbide mononitrate er
+86,med_bystolic
+87,med_omega
+88,med_fluticasone
+89,med_plavix
+90,med_metoprolol tartrate
+91,med_memantine
+92,med_clindamycin
+93,med_loratadine
+94,med_lipitor
+95,med_clopidogrel
+96,med_dorzolamide
+97,med_potassium chloride er
+98,med_amiodarone
+99,med_fexofenadine
+100,med_glipizide
+101,med_glipizide er
+102,enc_Race_American Indian or Alaska Native 
+103,enc_Race_Asian 
+104,enc_Race_Black or African American 
+105,enc_Race_Declined To Specify 
+106,enc_Race_Declined to Specify 
+107,enc_Race_Native Hawaiian or Other Pacific Islander 
+108,enc_Race_White 
+109,enc_Ethnicity_Declined To Specify 
+110,enc_Ethnicity_Declined to Specify 
+111,enc_Ethnicity_Hispanic or Latino 
+112,enc_Ethnicity_Not Hispanic or Latino 
+113,enc_Ethnicity_Unknown / Not Reported 
+114,enc_Gender_F 
+115,enc_Gender_M 
+116,enc_rfv_cluster_0
+117,enc_rfv_cluster_1
+118,enc_rfv_cluster_2
+119,enc_rfv_cluster_3
+120,enc_rfv_cluster_4
+121,enc_rfv_cluster_5
+122,enc_rfv_cluster_6
+123,enc_rfv_cluster_7
+124,enc_rfv_cluster_8
+125,enc_rfv_cluster_9
+126,enc_rfv_cluster_10
+127,enc_rfv_cluster_11
+128,enc_rfv_cluster_12
+129,enc_rfv_cluster_13
+130,enc_rfv_cluster_14
+131,enc_rfv_cluster_15
+132,enc_rfv_cluster_16
+133,enc_rfv_cluster_17
+134,enc_rfv_cluster_18
+135,enc_rfv_cluster_19
+136,enc_rfv_cluster_20
+137,enc_rfv_cluster_21
+138,asmt_kmeans_0
+139,asmt_kmeans_1
+140,asmt_kmeans_2
+141,asmt_kmeans_3
+142,asmt_kmeans_4
+143,asmt_kmeans_5
+144,asmt_kmeans_6
+145,asmt_kmeans_7
+146,asmt_kmeans_8
+147,asmt_kmeans_10
+148,asmt_kmeans_11
+149,asmt_kmeans_12
+150,asmt_kmeans_13
+151,asmt_kmeans_14
+152,asmt_topic_0
+153,asmt_topic_1
+154,asmt_topic_2
+155,asmt_topic_3
+156,asmt_topic_4
+157,asmt_topic_5
+158,asmt_topic_6
+159,asmt_topic_7
+160,asmt_topic_8
+161,asmt_topic_9
+162,asmt_topic_10
+163,asmt_topic_11
+164,asmt_topic_12
+165,asmt_topic_13
+166,asmt_topic_14
+167,asmt_topic_15
+168,asmt_topic_16
+169,asmt_topic_17
+170,asmt_topic_18
+171,asmt_topic_19
+172,visit_year

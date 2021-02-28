@@ -6,11 +6,11 @@ capData = DataLoader().load()
 
 # %%
 
-def get_data(self, data_cols='all', target_col='AD_event', alt_data=None):
+def get_data(self, data_cols='all', target_col='AD_encounter', alt_data=None):
     """
     \ndata_cols: pass the table prefix to return only a table from main options: 
     \n{'cpt_','lab_','vit_','medid_','asmt_icd', 'enc_'}
-    \ntarget_col: pass AD_event or dem_event for target
+    \ntarget_col: pass AD_encounter or dem_encounter for target
     \nalt_data: pass in a list of columns to run grid on
     \ne.g. X, y = get_data(capData, data_cols='vit_')
     """
@@ -27,9 +27,9 @@ def get_data(self, data_cols='all', target_col='AD_event', alt_data=None):
         'enc_id',
         'person_id',
         'AD_person',
-        'AD_event',
+        'AD_encounter',
         'dem_person',
-        'dem_event',
+        'dem_encounter',
         'ccsr_NVS011'
         ]
     
@@ -77,8 +77,8 @@ def get_feature_importance(dataloader=capData, table='all', target='dem_person',
     M = csc_matrix(X)
     L = y
     for split_id, (train_index, test_index) in enumerate(skf.split(X, y)):
-        #clf = LogisticRegression()
-        clf = RandomForestClassifier()
+        clf = LogisticRegression()
+        #clf = RandomForestClassifier()
         #from sklearn.ensemble import ExtraTreesClassifier
         #clf = ExtraTreesClassifier()
         try:  # always set random and all processors, w/o confounding param_grid
@@ -181,6 +181,7 @@ from gridsearch import GridSearch
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
+from xgboost import XGBClassifier
 import warnings
 from scipy.sparse.csc import csc_matrix
 from sklearn.linear_model import SGDClassifier
@@ -188,21 +189,24 @@ from sklearn.naive_bayes import BernoulliNB
 warnings.simplefilter(action="default")
 
 import pandas as pd
-#LR_coefs = pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/model_results/20210210/LR_Coefs.csv')
+LR_coefs = pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/model_results/20210210/LR_Coefs.csv')
 LR_coefs = LR_coefs[abs(LR_coefs.Coefficient) >  2]
+LR_coefs = LR_coefs[LR_coefs['Feature'] != 'enc_Race_Native Hawaiian or Other Pacific Islander']
+LR_coefs = LR_coefs[LR_coefs['Feature'] != 'enc_Race_ ']
 
 # Get Data:
 data = get_data(capData, data_cols='xxx', target_col='dem_person', alt_data=list(LR_coefs['Feature']))
 
 # Choose classifiers to run
 classifiers = {
-    'Random_Forest': RandomForestClassifier,
+    #'Random_Forest': RandomForestClassifier,
     'Logistic_Regression': LogisticRegression,
-    'SVM': LinearSVC,
+    'XGBoost': XGBClassifier
+    #'SVM': LinearSVC,
     #'GBoost': GradientBoostingClassifier,
     #'AdaBoost': AdaBoostClassifier,
-    'Naive_Bayes': BernoulliNB,
-    'SGD': SGDClassifier
+    #'Naive_Bayes': BernoulliNB,
+    #'SGD': SGDClassifier
 }
 
 # Edit grid params.
@@ -241,14 +245,14 @@ param_grid = {
     #     # 'n_jobs': None,
          'penalty': ['l2'], # sag requires L2 solver
     #     # 'random_state': None,
-         'solver': ['sag'] # sag needs scaled data, but runs well on large datasets
-    #     # 'tol': 0.0001,
+         'solver': ['sag'], # sag needs scaled data, but runs well on large datasets
+         'tol': [0.0001,.001,.01],
     #     # 'verbose': 0,
     #     # 'warm_start': False
          },
 
     'SVM' :{
-        'C': [1, 10, 50],
+        'C': [.001, .01, .1, 1, 10],
         'class_weight': [{1:6},{1:11}], # 1/6 = dem_person, 1/11 = AD_person
         'dual': [False],
         # 'fit_intercept': True,
@@ -263,25 +267,25 @@ param_grid = {
          },
 
     'GBoost' : {
-        # 'ccp_alpha': 0.0,
+        'ccp_alpha': [0.01],
         # 'criterion': 'friedman_mse',
         # 'init': None,
-        # 'learning_rate': 0.1,
+        # 'learning_rate': [0.1, .01, .05],
         # 'loss': 'deviance',
-        # 'max_depth': 3,
+         'max_depth': [20],
         # 'max_features': None,
         # 'max_leaf_nodes': None,
         # 'min_impurity_decrease': 0.0,
         # 'min_impurity_split': None,
-         'min_samples_leaf': [1,10,300],
-         'min_samples_split': [3,30,100]
+        # 'min_samples_leaf': [1,10,300],
+        # 'min_samples_split': [3,30,100],
         # 'min_weight_fraction_leaf': 0.0,
-        # 'n_estimators': 100,
+         'n_estimators': [1000],
         # 'n_iter_no_change': None,
         # 'presort': 'deprecated',
         # 'random_state': None,
-        # 'subsample': 1.0,
-        # 'tol': 0.0001,
+         'subsample': [.6],
+         'tol': [0.0001, .001, .01],
         # 'validation_fraction': 0.1,
         # 'verbose': 0,
         # 'warm_start': False
@@ -305,7 +309,7 @@ param_grid = {
         # 'fit_intercept': True,
         # 'l1_ratio': 0.15,
         # 'learning_rate': 'optimal',
-          'loss': ['perceptron'],
+          'loss': ['perceptron', 'squared_hinge'],
           'max_iter': [5000], # Less than 1k will not resolve
         # 'n_iter_no_change': 5,
         # 'n_jobs': None,
@@ -324,6 +328,37 @@ param_grid = {
         'binarize':[.1,1],
         'fit_prior':[True,False],
         # 'class_prior':
+    },
+
+    'XGBoost' : {
+     'objective': ['binary:logistic'],
+    # 'use_label_encoder': True,
+    # 'base_score': None,
+     'booster': ['gbtree'],
+     'colsample_bylevel': [1],
+    # 'colsample_bynode': None,
+     'colsample_bytree': [.8],
+     'gamma': [0],
+    # 'gpu_id': None,
+    # 'importance_type': 'gain',
+    # 'interaction_constraints': None,
+    # 'learning_rate': None,
+     'max_delta_step': [0],
+     'max_depth': [20],
+     'min_child_weight': [15],
+    # 'missing': nan,
+    # 'monotone_constraints': None,
+    # 'n_estimators': 100,
+    # 'n_jobs': None,
+    # 'num_parallel_tree': None,
+    # 'random_state': None,
+     'reg_alpha': [.01],
+     'reg_lambda': [.01],
+    # 'scale_pos_weight': None,
+     'subsample': [.6],
+     'tree_method': ['hist']
+    # 'validate_parameters': None,
+    # 'verbosity': None
     }
 }
 
@@ -346,8 +381,8 @@ coefs = list(results.get('Logistic_Regression')['best_Logistic_Regression']['clf
 labels = list(data[0])
 LR_coefs = pd.DataFrame(zip(labels,coefs), columns = ['Feature', 'Coefficient']).sort_values(by='Coefficient', ascending=False)
 
-LR_coefs[abs(LR_coefs.Coefficient) >  2]
-
+#LR_coefs = LR_coefs[abs(LR_coefs.Coefficient) >  2]
+LR_coefs[abs(LR_coefs.Coefficient) >  3]
 
 
 
@@ -374,4 +409,9 @@ with open('20210211results.pickle', 'wb') as picklefile:
 #     print(clf)
 #     for x in results[clf]['iteration']:
 #         print(x['set_params'], '\nAUC: ', x['auc'],'\n F1: ', x['f1_score'],'\nPrecision: ',x['precision'],'\nRecall: ',x['recall'],'\nAcc: ',x['accuracy'])
+# %%
+import pickle
+with open('E:\\20201208_Dementia_AD_Research_David_Julovich\QueryResult\model_results\\20210211\\20210211results.pickle', 'rb') as picklefile:
+    results = pickle.load(picklefile)
+
 # %%
