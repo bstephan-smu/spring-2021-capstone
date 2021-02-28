@@ -370,8 +370,8 @@ def gridsearch(model, grid, rf, scoring, x_test, y_test, X_train, y_train,modelT
     print("==== Confusion Matrix ====")
     print("\nconfusion matrix\n",mt.confusion_matrix(y_test,y_hat))
     print()
- 
-    return [cv_results.best_estimator_,cv_results.best_score_, cv_results.best_params_, cv_results.cv_results_] #return grid search results
+    result_list =  [cv_results.best_estimator_,cv_results.best_score_, cv_results.best_params_, cv_results.cv_results_]
+    return result_list #return grid search results
 
 #%% Random Forest Gridsearch 
 ################################################################################################################################
@@ -390,15 +390,16 @@ scoring = {'recall':make_scorer(mt.recall_score),
             'ppv':make_scorer(ppv_score)
             }
 
-#execute grid search using RF on 1st years
-gridsearch(rfc,grid, rf, scoring, X1_test, y1_test, X1_sm, y1_sm, cv=cv)
-#%% RF GS on 2nd years
-gridsearch(rfc,grid, rf, scoring, X2_test, y2_test, X2_sm, y2_sm, cv=cv)
-#%% RF GS on 3rd years
-gridsearch(rfc,grid, rf, scoring, X3_test, y3_test, X3_sm, y3_sm, cv=cv)
-#%% RF GS on 4th years
-gridsearch(rfc,grid, rf, scoring, X4_test, y4_test, X4_sm, y4_sm, cv=cv)
-
+print("RF_results Year 1")
+rf_results1 = gridsearch(rfc,grid, rf, scoring, X1_test, y1_test, X1_sm, y1_sm, cv=cv)
+print("RF_results Year 2")
+rf_results2 = gridsearch(rfc,grid, rf, scoring, X2_test, y2_test, X2_sm, y2_sm, cv=cv)
+print("RF_results Year 3")
+rf_results3 = gridsearch(rfc,grid, rf, scoring, X3_test, y3_test, X3_sm, y3_sm, cv=cv)
+print("RF_results Year 4")
+rf_results4 = gridsearch(rfc,grid, rf, scoring, X4_test, y4_test, X4_sm, y4_sm, cv=cv)
+print("RF_results All Data")
+rf_all_data_results = gridsearch(rfc,grid, rf, scoring, X_test, y_test, X_sm, y_sm, cv=cv)
 
 # %% Logistic Grid Search 
 ################################################################################################################################
@@ -415,14 +416,16 @@ scoring = {'npv': make_scorer(npv_score),
             'ppv':make_scorer(ppv_score)}
 
 #execute grid search on first years1
-gridsearch(clf,grid, rf, scoring, X1_test, y1_test, X1_sm, y1_sm, cv=cv)
+print("LR_results Year 1")
+lr_results1 = gridsearch(clf,grid, rf, scoring, X1_test, y1_test, X1_sm, y1_sm, cv=cv)
+print("LR_results Year 2")
+lr_results2 = gridsearch(clf,grid, rf, scoring, X2_test, y2_test, X2_sm, y2_sm, cv=cv)
+print("LR_results Year 3")
+lr_results3 = gridsearch(clf,grid, rf, scoring, X3_test, y3_test, X3_sm, y3_sm, cv=cv)
+print("LR_results Year 4")
+lr_results4 = gridsearch(clf,grid, rf, scoring, X4_test, y4_test, X4_sm, y4_sm, cv=cv)
+print("LR_results all data")
+lr_results_all = gridsearch(clf,grid, rf, scoring, X4_test, y4_test, X4_sm, y4_sm, cv=cv)
 
-#%% execute grid search on second years
-gridsearch(clf,grid, rf, scoring, X2_test, y2_test, X2_sm, y2_sm, cv=cv)
 
-#%% execute grid search on second years
-gridsearch(clf,grid, rf, scoring, X3_test, y3_test, X3_sm, y3_sm, cv=cv)
-
-#%% execute grid search on second years
-gridsearch(clf,grid, rf, scoring, X4_test, y4_test, X4_sm, y4_sm, cv=cv)
-
+# %%
