@@ -5,10 +5,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from load_data import DataLoader
 # %%
-capData = DataLoader().load()
+
+from encoder import Encoder
+
+# %%
+capData = Encoder().build() # Run to rebuild the pickle after making changes to load_data.py or encoder.py
+#capData = Encoder().load()
 # %%
 df=pd.DataFrame(capData.main.copy())
 
+# %%
+#df.head()
+#df.shape
+for col in df.columns: 
+    print(col)
 # %%
 
 
@@ -18,27 +28,27 @@ import datetime as dt
 df['enc_EncounterDate']= df['enc_EncounterDate'].astype(int).map(dt.datetime.fromordinal)
 # %%
 # %%
-g_df= df.groupby('person_id').apply(lambda x: x.sort_values('enc_EncounterDate')).reset_index(drop=True)
-
-g_df.head()
+#g_df= df.groupby('person_id').apply(lambda x: x.sort_values('enc_EncounterDate')).reset_index(drop=True)
+# %%
+df.head()
 # %%
 for col in df.columns: 
     print(col)
 # %%
-# drop nan for gender and sex 
+#create a subset for wellness exam only
 
-df.dropna(subset=['enc_Gender_F', 'enc_Gender_M', 'enc_AgeAtEnc'], how='all')
+
+
 # %% 
+
 pd.set_option('display.max_rows', None)
 df.isnull().sum().sort_values(ascending = False)
 
 # %% 
 
-df.head()
+
 # %%
-visit_set= df.groupby('person_id').apply(lambda x: x.sort_values('enc_EncounterDate'))
-# %%
-visit_set
+
     
 #%%
 frequency = df['person_id'].value_counts()
@@ -57,18 +67,186 @@ for col in df.columns:
     print(col)
 
 # %%
+# add visit # startying at 1 to the entire df
+df = df.sort_values(['person_id', 'enc_EncounterDate'], ascending=[True, True])
+df['visit'] = df.groupby(['person_id'])['enc_EncounterDate'].rank(ascending=True, method='dense').astype(int)
+cols=df.columns.tolist()
+cols = cols[-1:] + cols[:-1]
+df=df[cols]
+#%%
 # subset the data based wellness cpt codes
 #well_code=['cpt_G0438', 'cpt_G0439']
-
-wellness=df[(df.cpt_G0438 ==1) |( df.cpt_G0439)]
+wellness=df[(df['cpt_ANNUAL WELLNES VST; PERSNL PPS INIT'] ==1) | (df['cpt_ANNUAL WELLNESS VST; PPS SUBSQT VST']==1)]
 # %%
-wellness.shape
+# add visit # startying at 1 to wellness
+wellness = wellness.sort_values(['person_id', 'enc_EncounterDate'], ascending=[True, True])
+wellness['visit'] = wellness.groupby(['person_id'])['enc_EncounterDate'].rank(ascending=True, method='dense').astype(int)
+cols=wellness.columns.tolist()
+cols = cols[-1:] + cols[:-1]
+wellness=wellness[cols]
+
 # %%
 wellness.head()
 # %%
-wellness.isnull().sum().sort_values(ascending = False)
+# Drop columns not used for modeling
+c_wellness=wellness.drop(['person_id', 'enc_id','enc_EncounterDate',
+'Reason_for_Visit',
+'AD_encounter',
+'AD_person',
+'dem_encounter',
+'dem_person',
+'asmt_icd9cm_code_id',
+'asmt_diagnosis_code_id',
+'asmt_description',
+'asmt_date_onset_sympt',
+'asmt_date_diagnosed',
+'asmt_date_resolved',
+'asmt_status_id',
+'asmt_dx_priority',
+'asmt_chronic_ind',
+'asmt_recorded_elsewhere_ind',
+'ccsr_Neurocognitive disorders',
+
+], axis=1)
 # %%
-wellness.count()
+c_wellness = c_wellness.loc[:, ~c_wellness.columns.str.startswith('cpt_')]
+# %%
+for col in c_wellness.columns: 
+    print(col)
+# %%
+year1 = c_wellness[c_wellness['visit']==1]
+
+# %%
+year1.dropna(inplace=True)
+# %%
+year1.shape
+# %%
+year1=year1.drop(['visit'], axis=1)
+year1 = year1[year1.Cognition !='Dementia']
+
+
+# %%
+
+# %%
+
+pd.set_option('display.max_rows', None)
+year1.isnull().sum().sort_values(ascending = False)
+
+
+# %%
+y1= year1['Cognition']
+
+#%%
+y1
+
+# %%
+y1.Cognition[y1.Cognition =='Normal'] =0
+y1.Cognition[y1.Cognition =='AD'] =1
+
+# %%
+#New table
+y1['Cognition'] = df['Cognition'].replace(['Normal','AD',],[0,1])
+# %%
+X1=year1.drop(['Cognition'], axis=1)
+#  %%
+len(X1.columns)
+# %%
+for col in X1.columns: 
+    print(col)
+
+# %%
+# Second Year
+year2 = c_wellness[c_wellness['visit']==2]
+
+# %%
+year2.shape
+# %%
+year2=year2.drop(['visit'], axis=1)
+year2 = year2[year2.Cognition !='Dementia']
+
+
+#%%
+y2= year2['Cognition']
+# %%
+X2=year2.drop(['Cognition'], axis=1)
+#%$
+y2
+
+# %%
+from sklearn.model_selection import train_test_split
+# %%
+X1_train, X1_test, y1_train, y1_test = train_test_split(X1, y1, test_size=10, random_state=42)
+# %%
+from sklearn.preprocessing import StandardScaler
+# %%
+feature_scaler = StandardScaler()
+X1_train = feature_scaler.fit_transform(X1_train)
+X1_test = feature_scaler.transform(X1_test)
+#%%
+from sklearn.ensemble import RandomForestClassifier
+classifier = RandomForestClassifier(n_estimators=300, random_state=42)
+# %%
+classifier.fit(X1_train, y1_train)
+y_pred = classifier.predict(X1_test)
+
+# %%
+
+from sklearn import metrics
+print('Mean Absolute Error:', metrics.accuracy_score(y1_test, y_pred))
+print('Mean Squared Error:', metrics.mean_squared_error(y1_test, y_pred))
+print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y1_test, y_pred)))
+
+# %%
+from sklearn.model_selection import cross_val_score
+all_accuracies = cross_val_score(estimator=classifier, X=X1_train, y=y1_train, cv=10)
+# %%
+
+print(all_accuracies)
+
+# %%
+for col in X1.columns: 
+    print(col)
+
+
+
+# %%
+
+from sklearn import datasets
+from sklearn.model_selection import cross_validate
+from sklearn.svm import LinearSVC
+from sklearn.ensemble import  RandomForestClassifier
+import pandas as pd
+# %%
+
+X1=year1.drop(['Cognition'], axis=1)
+
+# %%
+
+# %%
+X1, y1= year1, year1.Cognition
+# %%
+clf=RandomForestClassifier(n_estimators =20, random_state = 42)
+output = cross_validate(clf, X1, y1, cv=5, scoring = 'accuracy', return_estimator =True)
+# %%
+clf.fit(X1, y1)
+# %%
+
+#clf.feature_importances_
+clf.score()
+
+# %%
+
+for idx,estimator in enumerate(output['estimator']):
+    print("Features sorted by their score for estimator {}:".format(idx))
+    feature_importances = pd.DataFrame(estimator.feature_importances_,
+                                       index = X1.feature_names,
+                                        columns=['importance']).sort_values('importance', ascending=False)
+    print(feature_importances)
+
+# %%
+plt.barh(year1.feature_names, rf.feature_importances_)
+
+
 # %%
 #541 Normal
 #88 AD
@@ -83,13 +261,9 @@ plt.hist(well_frequency, bins = 20)
 plt.show()
 
 # %%
-df1 = wellness.sort_values(['person_id', 'enc_EncounterDate'], ascending=[True, True])
-df1['visit'] = df1.groupby(['person_id'])['enc_EncounterDate'].rank(ascending=True, method='dense').astype(int)
-cols=df1.columns.tolist()
-cols = cols[-1:] + cols[:-1]
-df1=df1[cols]
+
 # %%
-df1
+df.head()
 
 # %%
 df1.head()

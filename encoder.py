@@ -69,8 +69,9 @@ class Encoder(DataLoader):
         self.main['enc_EncounterDate'] = self.main['enc_EncounterDate'].apply(lambda x: x.toordinal())
 
         # Onehot encode 
-        self.main = pd.get_dummies(self.main, columns=['enc_Gender'], drop_first=True)
+        self.main = pd.get_dummies(self.main, columns=['enc_Gender'], drop_first= True)
         self.main = pd.get_dummies(self.main, columns=['enc_RaceEth'], drop_first=False)
+        
 
 
     def get_labs(self):

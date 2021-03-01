@@ -135,7 +135,7 @@ class DataLoader:
                 'White, Not Hispanic or Latino',				
                 'Black or African American',				
                 'Declined To Specify',				
-                'White Not Hispanic or Latino',				
+                'White, Not Hispanic or Latino',				
                 'Declined To Specify',				
                 'Asian',			
                 'Declined To Specify',				
