@@ -390,15 +390,15 @@ scoring = {'recall':make_scorer(mt.recall_score),
             'ppv':make_scorer(ppv_score)
             }
 
-print("RF_results Year 1")
+print("RF_results Year 1 ##################################")
 rf_results1 = gridsearch(rfc,grid, rf, scoring, X1_test, y1_test, X1_sm, y1_sm, cv=cv)
-print("RF_results Year 2")
+print("RF_results Year 2 ##################################")
 rf_results2 = gridsearch(rfc,grid, rf, scoring, X2_test, y2_test, X2_sm, y2_sm, cv=cv)
-print("RF_results Year 3")
+print("RF_results Year 3 ##################################")
 rf_results3 = gridsearch(rfc,grid, rf, scoring, X3_test, y3_test, X3_sm, y3_sm, cv=cv)
-print("RF_results Year 4")
+print("RF_results Year 4 ##################################")
 rf_results4 = gridsearch(rfc,grid, rf, scoring, X4_test, y4_test, X4_sm, y4_sm, cv=cv)
-print("RF_results All Data")
+print("RF_results All Data ################################")
 rf_all_data_results = gridsearch(rfc,grid, rf, scoring, X_test, y_test, X_sm, y_sm, cv=cv)
 
 # %% Logistic Grid Search 
@@ -416,16 +416,68 @@ scoring = {'npv': make_scorer(npv_score),
             'ppv':make_scorer(ppv_score)}
 
 #execute grid search on first years1
-print("LR_results Year 1")
+print("LR_results Year 1  ##################################")
 lr_results1 = gridsearch(clf,grid, rf, scoring, X1_test, y1_test, X1_sm, y1_sm, cv=cv)
-print("LR_results Year 2")
+print("LR_results Year 2  ##################################")
 lr_results2 = gridsearch(clf,grid, rf, scoring, X2_test, y2_test, X2_sm, y2_sm, cv=cv)
-print("LR_results Year 3")
+print("LR_results Year 3  ##################################")
 lr_results3 = gridsearch(clf,grid, rf, scoring, X3_test, y3_test, X3_sm, y3_sm, cv=cv)
-print("LR_results Year 4")
+print("LR_results Year 4  ##################################")
 lr_results4 = gridsearch(clf,grid, rf, scoring, X4_test, y4_test, X4_sm, y4_sm, cv=cv)
-print("LR_results all data")
-lr_results_all = gridsearch(clf,grid, rf, scoring, X4_test, y4_test, X4_sm, y4_sm, cv=cv)
+print("LR_results all data  ################################")
+lr_results_all = gridsearch(clf,grid, rf, scoring, X_test, y_test, X_sm, y_sm, cv=cv)
 
 
+# %% SGD fridsearch
+
+from sklearn.linear_model import SGDClassifier
+
+sgd = SGDClassifier(n_jobs = -1)
+cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
+
+grid = {'penalty':['l1','l2'],
+        'alpha': [0.0001, 0.001, 0.01, 0.1],
+        'n_iter_no_change': [5,10,15]}
+rf = "npv"
+scoring = {'npv': make_scorer(npv_score),
+            'ppv':make_scorer(ppv_score)}
+
+#execute grid search on first years1
+print("SGD_results Year 1  ##################################")
+sgd_results1 = gridsearch(sgd,grid, rf, scoring, X1_test, y1_test, X1_sm, y1_sm, cv=cv)
+print("SGD_results Year 2  ##################################")
+sgd_results2 = gridsearch(sgd,grid, rf, scoring, X2_test, y2_test, X2_sm, y2_sm, cv=cv)
+print("SGD_results Year 3  ##################################")
+sgd_results3 = gridsearch(sgd,grid,
+ rf, scoring, X3_test, y3_test, X3_sm, y3_sm, cv=cv)
+print("SGD_results Year 4  ##################################")
+sgd_results4 = gridsearch(sgd,grid, rf, scoring, X4_test, y4_test, X4_sm, y4_sm, cv=cv)
+print("SGD_results all data  ################################")
+sgd_results_all = gridsearch(sgd,grid, rf, scoring, X_test, y_test, X_sm, y_sm, cv=cv)
+
+
+# %% SVM Gridsearch
+
+from sklearn.svm import SVC
+
+sgd = SVC()
+cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
+
+grid = {'C':[0.001,0.01,0.1,1],
+        'kernel': ['linear','ploy','rfb']}
+rf = "npv"
+scoring = {'npv': make_scorer(npv_score),
+            'ppv':make_scorer(ppv_score)}
+
+#execute grid search on first years1
+print("SVM_results Year 1  ##################################")
+sgd_results1 = gridsearch(sgd,grid, rf, scoring, X1_test, y1_test, X1_sm, y1_sm, cv=cv)
+print("SVM_results Year 2  ##################################")
+sgd_results2 = gridsearch(sgd,grid, rf, scoring, X2_test, y2_test, X2_sm, y2_sm, cv=cv)
+print("SVM_results Year 3  ##################################")
+sgd_results3 = gridsearch(sgd,grid, rf, scoring, X3_test, y3_test, X3_sm, y3_sm, cv=cv)
+print("SVM_results Year 4  ##################################")
+sgd_results4 = gridsearch(sgd,grid, rf, scoring, X4_test, y4_test, X4_sm, y4_sm, cv=cv)
+print("SVM_results all data  ################################")
+sgd_results_all = gridsearch(sgd,grid, rf, scoring, X_test, y_test, X_sm, y_sm, cv=cv)
 # %%
