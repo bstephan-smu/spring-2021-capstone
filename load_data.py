@@ -460,9 +460,15 @@ class DataLoader:
 
     # helper function write entire class object to your project directory
     def write(self, filename='dataloader'):
-        with open('bin/' + filename + '.pickle', 'wb') as picklefile:
-            pickle.dump(self, picklefile)
+        try:
+            with open('bin/' + filename + '.pickle', 'wb') as picklefile:
+                pickle.dump(self, picklefile)
 
+        except FileNotFoundError:
+            from os import mkdir
+            mkdir('bin')
+            with open('bin/' + filename + '.pickle', 'wb') as picklefile:
+                pickle.dump(self, picklefile)
 
     # helper function to return entire class object to your project directory
     def load(self, filename='dataloader'):
@@ -472,6 +478,7 @@ class DataLoader:
         except FileNotFoundError:
             print('DataLoader not found. Running create() to rebuild..')
             self.create()
+
 
 if __name__ == "__main__":
     data = DataLoader(subset=1000)
