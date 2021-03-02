@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, precision_score,\
-    recall_score, roc_auc_score
+    recall_score, roc_auc_score, confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -13,11 +13,12 @@ from scipy.sparse import csc_matrix
 class GridSearch:
     def __init__(self):
         self.data = None
-        self.clf_dict = None,
+        self.clf_dict = None
         self.clf_hypers = None
         self.metric = None
         self._best = None
         self.results = None
+        self.target = None
 
 
     def _plot_metric(self, metric='auc', save=False):
@@ -106,7 +107,7 @@ class GridSearch:
 
 
     def run_grid(self, n_folds=5, splits=True, scale=True, sparse=False, \
-        verbose=False):
+        verbose=False, target=''):
         """
         Runs a grid search for each classifier and each iteration of paramsets
         \nn_folds: number of kfolds for stratified cross validation
@@ -114,6 +115,8 @@ class GridSearch:
         \nscale: boolean to use min_max scaler on input data
         \nReturns: dictionary
         """
+        import logging
+        logging.basicConfig(filename='./GridSearch/models.log', encoding='utf-8', level=logging.DEBUG)
 
         print('Grid Search running...')
         clf_dict = self.clf_dict
@@ -136,6 +139,34 @@ class GridSearch:
             'best_overall': {
                 metric: 0}}  # classic explication of results
         
+        
+        def npv_score(ytest, yhat):
+            # Negative Predictive Value identifies the probability that a patient is actually negative for a test
+            confusion = confusion_matrix(yhat, ytest)
+            TN = confusion[0, 0]
+            FN = confusion[1, 0]
+            # convert to float and Calculate score 
+            npv = (TN.astype(float)/(FN.astype(float)+TN.astype(float)))
+            #    (True Negative/(Predicted Negative + True Negative))
+            return npv
+
+        def ppv_score(ytest, yhat):
+            # Posotive Predictive Value identifies the probability that a patient is actually positive for a test
+            confusion = confusion_matrix(yhat, ytest)
+            FP = confusion[0, 1]
+            TP = confusion[1, 1]
+            # convert to float and Calculate score 
+            ppv = (TP.astype(float)/(FP.astype(float)+TP.astype(float)))
+            #    (True Negative/(Predicted Negative + True Positive))
+            return ppv  
+
+        def specificity_score(ytest, yhat):
+            confusion = confusion_matrix(yhat, ytest)
+            TN = confusion[0, 0]
+            FP = confusion[0, 1]
+            spec = TN.astype(float)/(FP.astype(float) + TN.astype(float))
+            return spec
+
         def split_avg(metric, split_results):
             metrics = [split_results[id][metric] for id in split_results]
             return np.mean(metrics)
@@ -153,6 +184,9 @@ class GridSearch:
                 if verbose:
                     print('\n\ntraining '+a_clf+' model_id: '+str(model_id))
                     print('--params: '+str(iteration))
+                    logging.info('\n\ntraining '+a_clf+' model_id: '+str(model_id))
+                    logging.info('--params: '+str(iteration))
+
 
                 clf_params = iteration
                 clf = None
@@ -172,6 +206,7 @@ class GridSearch:
                     preds = clf.predict(M[test_index])
                     if verbose:
                         print('----k_fold '+str(split_id+1)+' complete')
+                        logging.info('----k_fold '+str(split_id+1)+' complete')
 
                     split_results[split_id] = {
                         'train_index': train_index,
@@ -185,7 +220,13 @@ class GridSearch:
                         'split_f1_score': f1_score(
                             L[test_index], preds),
                         'split_auc': roc_auc_score(
-                            L[test_index], preds)
+                            L[test_index], preds),
+                        'split_specificity': specificity_score(
+                            L[test_index], preds),
+                        'split_ppv_score': ppv_score(
+                            L[test_index], preds),
+                        'split_npv': npv_score(
+                            L[test_index], preds),                            
                         }
 
                 iteration_results = {
@@ -198,7 +239,10 @@ class GridSearch:
                     'precision': split_avg('split_precision', split_results),
                     'recall': split_avg('split_recall', split_results),
                     'f1_score': split_avg('split_f1_score', split_results),
-                    'auc': split_avg('split_auc', split_results)
+                    'auc': split_avg('split_auc', split_results),
+                    'specificity': split_avg('split_specificity', split_results),
+                    'ppv': split_avg('split_ppv', split_results),
+                    'npv': split_avg('split_npv', split_results)
                     }
 
                 if not splits:
@@ -206,7 +250,8 @@ class GridSearch:
 
                 if verbose:
                     print(iteration_results)
-                                    
+                    logging.info(iteration_results)
+        
                 clf_results.append(iteration_results)
                 
                 if iteration_results[metric] > best_iteration[metric]:
@@ -222,13 +267,15 @@ class GridSearch:
 
         print('Grid Search complete!\n\nBest Model:')
         print(grid_dict['best_overall'])
+        logging.info('Grid Search complete!\n\nBest Model:')
+        logging.info(grid_dict['best_overall'])
 
         self._best = grid_dict['best_overall']['clf']
         self.results = grid_dict
         return self.results
 
     def plot_metrics(self, save=False):
-        metrics = ['accuracy', 'auc', 'f1_score', 'precision', 'recall']
+        metrics = ['accuracy', 'auc', 'f1_score', 'precision', 'recall', 'specificity', 'ppv','npv']
         for metric in metrics:
             self._plot_metric(metric, save)
         if save:

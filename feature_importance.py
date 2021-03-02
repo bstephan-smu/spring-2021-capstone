@@ -1,6 +1,6 @@
 #%%
-from load_data import DataLoader
-capData = DataLoader().load()
+from encoder import Encoder
+capData = Encoder().load()
 #pd.set_option('display.max_columns', None)
 
 
@@ -19,8 +19,6 @@ def get_data(self, data_cols='all', target_col='AD_encounter', alt_data=None):
 
     if alt_data != None:
         column_list += alt_data
-
-    dropcols = [col for col in df if col.lstrip('asmt_icd_') in self.dementia_icd_codes]
         
     response_cols = [
         'Cognition',
@@ -30,12 +28,12 @@ def get_data(self, data_cols='all', target_col='AD_encounter', alt_data=None):
         'AD_encounter',
         'dem_person',
         'dem_encounter',
-        'ccsr_NVS011'
+        'ccsr_Neurocognitive disorders'
         ]
     
     response_cols.remove(target_col)
     
-    dropcols += response_cols
+    dropcols = response_cols
 
     # Drop str cols
     dropcols += [col for col in capData.main if type(capData.main[col][0]) == str]
@@ -57,14 +55,14 @@ def get_data(self, data_cols='all', target_col='AD_encounter', alt_data=None):
     return (X,y)
 
 
-def get_feature_importance(dataloader=capData, table='all', target='dem_person', alt_data=None):
+def get_feature_importance(dataloader=capData, table='all', target='AD_person', alt_data=None):
 
     import numpy as np
     import pandas as pd
     from sklearn.metrics import accuracy_score, f1_score, precision_score,\
         recall_score, roc_auc_score
     from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-    #from sklearn.linear_model import LogisticRegression
+    from sklearn.linear_model import LogisticRegression
     #from sklearn.svm import SVC
     from sklearn.model_selection import StratifiedKFold
     from scipy.sparse import csc_matrix
@@ -77,7 +75,7 @@ def get_feature_importance(dataloader=capData, table='all', target='dem_person',
     M = csc_matrix(X)
     L = y
     for split_id, (train_index, test_index) in enumerate(skf.split(X, y)):
-        clf = LogisticRegression()
+        clf = LogisticRegression(solver='sag',max_iter=5000, class_weight='balanced', C=.01)
         #clf = RandomForestClassifier()
         #from sklearn.ensemble import ExtraTreesClassifier
         #clf = ExtraTreesClassifier()
@@ -116,15 +114,20 @@ def get_feature_importance(dataloader=capData, table='all', target='dem_person',
         }
 
     print(table, final_results)
+    # # Get Feature Importances
+    # iDF = pd.DataFrame(zip(X,clf.feature_importances_), 
+    # columns=['Feature','Feature_Importance']).sort_values(
+    #     by='Feature_Importance', ascending=False)
 
-    # Get Feature Importances
-    iDF = pd.DataFrame(zip(X,clf.feature_importances_), 
-    columns=['Feature','Feature_Importance']).sort_values(
-        by='Feature_Importance', ascending=False)
+    import pandas as pd
+    coefs = list(final_results.get('clf').coef_[0])
+    labels = list(X)
 
-    print(iDF.nlargest(20, 'Feature_Importance'))
+    LR_coefs = pd.DataFrame(zip(labels,coefs), columns = ['Feature', 'Coefficient']).sort_values(by='Coefficient', ascending=False)
+
+    print(LR_coefs.nlargest(20, 'Coefficient'))
     
-    return iDF
+    return LR_coefs
 
 
 # %% less biased feature importance
@@ -150,6 +153,9 @@ FI_cpt = get_feature_importance(capData, table='cpt_')
 FI_lab = get_feature_importance(capData, table='lab_')
 FI_CCSR = get_feature_importance(capData, table='ccsr_')
 FI_diag = get_feature_importance(capData, table='asmt_')
+
+# %%
+
 FI_all = get_feature_importance(capData)
 
 
@@ -189,24 +195,28 @@ from sklearn.naive_bayes import BernoulliNB
 warnings.simplefilter(action="default")
 
 import pandas as pd
-LR_coefs = pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/model_results/20210210/LR_Coefs.csv')
-LR_coefs = LR_coefs[abs(LR_coefs.Coefficient) >  2]
+#LR_coefs = pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/model_results/20210210/LR_Coefs.csv')
+
+FI_all = get_feature_importance(capData)
+
+LR_coefs = pd.concat([FI_all.head(75) , FI_all.tail(75)])
+#LR_coefs = LR_coefs[abs(LR_coefs.Coefficient) >  2]
 LR_coefs = LR_coefs[LR_coefs['Feature'] != 'enc_Race_Native Hawaiian or Other Pacific Islander']
 LR_coefs = LR_coefs[LR_coefs['Feature'] != 'enc_Race_ ']
 
 # Get Data:
-data = get_data(capData, data_cols='xxx', target_col='dem_person', alt_data=list(LR_coefs['Feature']))
+data = get_data(capData, data_cols='xxx', target_col='AD_person', alt_data=list(LR_coefs['Feature']))
 
 # Choose classifiers to run
 classifiers = {
-    #'Random_Forest': RandomForestClassifier,
+    'Random_Forest': RandomForestClassifier,
     'Logistic_Regression': LogisticRegression,
-    'XGBoost': XGBClassifier
-    #'SVM': LinearSVC,
-    #'GBoost': GradientBoostingClassifier,
-    #'AdaBoost': AdaBoostClassifier,
-    #'Naive_Bayes': BernoulliNB,
-    #'SGD': SGDClassifier
+    'XGBoost': XGBClassifier,
+    'SVM': LinearSVC,
+    'GBoost': GradientBoostingClassifier,
+    'AdaBoost': AdaBoostClassifier,
+    'Naive_Bayes': BernoulliNB,
+    'SGD': SGDClassifier
 }
 
 # Edit grid params.
@@ -235,13 +245,13 @@ param_grid = {
         },
     'Logistic_Regression': {
          'C': [.001,.01,.1,1,10], 
-         'class_weight': [{1:6},{1:11}],
+         'class_weight': [{1:6},'balanced'],
     #     # 'dual': False,
     #     # 'fit_intercept': True,
     #     # 'intercept_scaling': [1, 10],
     #     # 'l1_ratio': None,
          'max_iter': [5000],
-         'multi_class': ['auto', 'ovr'],
+         'multi_class': ['ovr'],
     #     # 'n_jobs': None,
          'penalty': ['l2'], # sag requires L2 solver
     #     # 'random_state': None,
@@ -260,7 +270,7 @@ param_grid = {
         'loss': ['squared_hinge'],
         'max_iter': [5000],
         # 'multi_class': 'ovr',
-        'penalty': ['l1','l2'],
+        'penalty': ['l2'],
         # 'random_state': None,
         # 'tol': 0.0001,
         # 'verbose': 0
@@ -295,7 +305,7 @@ param_grid = {
         'algorithm': ['SAMME.R','SAMME'],
        # 'base_estimator': None,
         'learning_rate': [.1, .5, 1],
-        'n_estimators': [50, 100, 1000],
+        'n_estimators': [1000],
        # 'random_state': None
         },
 
@@ -344,7 +354,7 @@ param_grid = {
     # 'interaction_constraints': None,
     # 'learning_rate': None,
      'max_delta_step': [0],
-     'max_depth': [20],
+     'max_depth': [10, 20],
      'min_child_weight': [15],
     # 'missing': nan,
     # 'monotone_constraints': None,
@@ -352,8 +362,8 @@ param_grid = {
     # 'n_jobs': None,
     # 'num_parallel_tree': None,
     # 'random_state': None,
-     'reg_alpha': [.01],
-     'reg_lambda': [.01],
+     'reg_alpha': [.01, .025],
+     'reg_lambda': [.01, .025],
     # 'scale_pos_weight': None,
      'subsample': [.6],
      'tree_method': ['hist']
@@ -382,7 +392,7 @@ labels = list(data[0])
 LR_coefs = pd.DataFrame(zip(labels,coefs), columns = ['Feature', 'Coefficient']).sort_values(by='Coefficient', ascending=False)
 
 #LR_coefs = LR_coefs[abs(LR_coefs.Coefficient) >  2]
-LR_coefs[abs(LR_coefs.Coefficient) >  3]
+LR_coefs[abs(LR_coefs.Coefficient) >  1]
 
 
 
@@ -400,7 +410,7 @@ RF_coefs[RF_coefs.Feature_Importance >  .001]
 # %% Save Results Dict to pickle in your local dir
 
 import pickle
-with open('20210211results.pickle', 'wb') as picklefile:
+with open('20210301results.pickle', 'wb') as picklefile:
     pickle.dump(results, picklefile)
 
 
