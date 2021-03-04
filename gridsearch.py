@@ -116,7 +116,7 @@ class GridSearch:
         \nReturns: dictionary
         """
         import logging
-        logging.basicConfig(filename='./GridSearch/models.log', encoding='utf-8', level=logging.DEBUG)
+        logging.basicConfig(filename='./GridSearch/models.log', level=logging.INFO)
 
         print('Grid Search running...')
         clf_dict = self.clf_dict
@@ -223,7 +223,7 @@ class GridSearch:
                             L[test_index], preds),
                         'split_specificity': specificity_score(
                             L[test_index], preds),
-                        'split_ppv_score': ppv_score(
+                        'split_ppv': ppv_score(
                             L[test_index], preds),
                         'split_npv': npv_score(
                             L[test_index], preds),                            

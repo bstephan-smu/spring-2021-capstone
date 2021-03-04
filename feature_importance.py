@@ -130,7 +130,7 @@ def get_feature_importance(dataloader=capData, table='all', target='AD_person', 
     return LR_coefs
 
 
-# %% less biased feature importance
+#  less biased feature importance
 
 # from sklearn.inspection import permutation_importance
 # r = permutation_importance(clf, M, L,
@@ -145,43 +145,43 @@ def get_feature_importance(dataloader=capData, table='all', target='AD_person', 
 
 
 
-# %% get all feature importance
-FI_enc = get_feature_importance(capData, table='enc_')
-FI_vit = get_feature_importance(capData, table='vit_')
-FI_med = get_feature_importance(capData, table='med_')
-FI_cpt = get_feature_importance(capData, table='cpt_')
-FI_lab = get_feature_importance(capData, table='lab_')
-FI_CCSR = get_feature_importance(capData, table='ccsr_')
-FI_diag = get_feature_importance(capData, table='asmt_')
+# # %% get all feature importance
+# FI_enc = get_feature_importance(capData, table='enc_')
+# FI_vit = get_feature_importance(capData, table='vit_')
+# FI_med = get_feature_importance(capData, table='med_')
+# FI_cpt = get_feature_importance(capData, table='cpt_')
+# FI_lab = get_feature_importance(capData, table='lab_')
+# FI_CCSR = get_feature_importance(capData, table='ccsr_')
+# FI_diag = get_feature_importance(capData, table='asmt_')
 
-# %%
+# # %%
 
-FI_all = get_feature_importance(capData)
+# FI_all = get_feature_importance(capData)
 
 
-# %%
+# # %%
 
-import pandas as pd
-cols = [FI_enc, FI_vit, FI_med, FI_diag, FI_cpt, FI_lab, FI_CCSR]
-all_df = pd.DataFrame()
-for df in cols:
-    tab = df.Feature[0][:3]
-    df.to_csv('FI_'+tab+'.csv')
-    all_df = pd.concat([all_df, df[df['Feature_Importance'] > .001]])
+# import pandas as pd
+# cols = [FI_enc, FI_vit, FI_med, FI_diag, FI_cpt, FI_lab, FI_CCSR]
+# all_df = pd.DataFrame()
+# for df in cols:
+#     tab = df.Feature[0][:3]
+#     df.to_csv('FI_'+tab+'.csv')
+#     all_df = pd.concat([all_df, df[df['Feature_Importance'] > .001]])
 
-FI_all = get_feature_importance(capData, alt_data=list(all_df.Feature), table='all', target='dem_person')
-FI_all.to_csv('FI_all.csv')
+# FI_all = get_feature_importance(capData, alt_data=list(all_df.Feature), table='all', target='dem_person')
+# FI_all.to_csv('FI_all.csv')
 
-FI_all.nlargest(30, 'Feature_Importance') 
+# FI_all.nlargest(30, 'Feature_Importance') 
 
-# %%
-FI_lab = get_feature_importance(capData, table='lab')
-FI_lab
+# # %%
+# FI_lab = get_feature_importance(capData, table='lab')
+# FI_lab
 
-# %%
-get_feature_importance(capData)
+# # %%
+# get_feature_importance(capData)
 
-# %%
+# # 
 # %% GridSearch
 from gridsearch import GridSearch
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
@@ -197,12 +197,17 @@ warnings.simplefilter(action="default")
 import pandas as pd
 #LR_coefs = pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/model_results/20210210/LR_Coefs.csv')
 
-FI_all = get_feature_importance(capData)
+try:
+    FI_all = pd.read_csv('./ref/FI_all.csv')
+except FileNotFoundError:
+    FI_all = get_feature_importance(capData)
 
 LR_coefs = pd.concat([FI_all.head(75) , FI_all.tail(75)])
 #LR_coefs = LR_coefs[abs(LR_coefs.Coefficient) >  2]
 LR_coefs = LR_coefs[LR_coefs['Feature'] != 'enc_Race_Native Hawaiian or Other Pacific Islander']
 LR_coefs = LR_coefs[LR_coefs['Feature'] != 'enc_Race_ ']
+LR_coefs = LR_coefs[LR_coefs['Feature'] != 'enc_AgeAtEnc']
+
 
 # Get Data:
 data = get_data(capData, data_cols='xxx', target_col='AD_person', alt_data=list(LR_coefs['Feature']))
@@ -213,7 +218,7 @@ classifiers = {
     'Logistic_Regression': LogisticRegression,
     'XGBoost': XGBClassifier,
     'SVM': LinearSVC,
-    'GBoost': GradientBoostingClassifier,
+    #'GBoost': GradientBoostingClassifier,
     'AdaBoost': AdaBoostClassifier,
     'Naive_Bayes': BernoulliNB,
     'SGD': SGDClassifier
@@ -244,7 +249,7 @@ param_grid = {
     #     'warm_start': False
         },
     'Logistic_Regression': {
-         'C': [.001,.01,.1,1,10], 
+         'C': [1,10], 
          'class_weight': [{1:6},'balanced'],
     #     # 'dual': False,
     #     # 'fit_intercept': True,
@@ -256,13 +261,13 @@ param_grid = {
          'penalty': ['l2'], # sag requires L2 solver
     #     # 'random_state': None,
          'solver': ['sag'], # sag needs scaled data, but runs well on large datasets
-         'tol': [0.0001,.001,.01],
+         'tol': [0.0001],
     #     # 'verbose': 0,
     #     # 'warm_start': False
          },
 
     'SVM' :{
-        'C': [.001, .01, .1, 1, 10],
+        'C': [1],
         'class_weight': [{1:6},{1:11}], # 1/6 = dem_person, 1/11 = AD_person
         'dual': [False],
         # 'fit_intercept': True,
@@ -310,7 +315,7 @@ param_grid = {
         },
 
     'SGD': {
-         'alpha':[.00001,.0001,.001,.01],
+         'alpha':[.00001],
         # 'average': False,
          'class_weight': [{1:6},{1:11}],
         # 'early_stopping': False,
@@ -335,7 +340,7 @@ param_grid = {
 
     'Naive_Bayes' : {
         'alpha':[.01,.1,1],
-        'binarize':[.1,1],
+        'binarize':[.1],
         'fit_prior':[True,False],
         # 'class_prior':
     },
@@ -389,10 +394,10 @@ gs.plot_metrics(save=True)
 import pandas as pd
 coefs = list(results.get('Logistic_Regression')['best_Logistic_Regression']['clf'].coef_[0])
 labels = list(data[0])
-LR_coefs = pd.DataFrame(zip(labels,coefs), columns = ['Feature', 'Coefficient']).sort_values(by='Coefficient', ascending=False)
+best_LR_coefs = pd.DataFrame(zip(labels,coefs), columns = ['Feature', 'Coefficient']).sort_values(by='Coefficient', ascending=False)
 
 #LR_coefs = LR_coefs[abs(LR_coefs.Coefficient) >  2]
-LR_coefs[abs(LR_coefs.Coefficient) >  1]
+best_LR_coefs[abs(best_LR_coefs.Coefficient) >  1]
 
 
 
@@ -410,7 +415,7 @@ RF_coefs[RF_coefs.Feature_Importance >  .001]
 # %% Save Results Dict to pickle in your local dir
 
 import pickle
-with open('20210301results.pickle', 'wb') as picklefile:
+with open('20210303results.pickle', 'wb') as picklefile:
     pickle.dump(results, picklefile)
 
 
@@ -421,7 +426,7 @@ with open('20210301results.pickle', 'wb') as picklefile:
 #         print(x['set_params'], '\nAUC: ', x['auc'],'\n F1: ', x['f1_score'],'\nPrecision: ',x['precision'],'\nRecall: ',x['recall'],'\nAcc: ',x['accuracy'])
 # %%
 import pickle
-with open('E:\\20201208_Dementia_AD_Research_David_Julovich\QueryResult\model_results\\20210211\\20210211results.pickle', 'rb') as picklefile:
+with open('E:\\20201208_Dementia_AD_Research_David_Julovich\QueryResult\model_results\\20210301\\20210301results.pickle', 'rb') as picklefile:
     results = pickle.load(picklefile)
 
 # %%
