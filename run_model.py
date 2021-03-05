@@ -4,9 +4,8 @@ capData = Encoder().load()
 #pd.set_option('display.max_columns', None)
 
 
-# %%
-
-def get_data(self, data_cols='all', target_col='AD_encounter', alt_data=None):
+# Setup:
+def get_data(self, data_cols='all', target_col='AD_encounter', alt_data=None, holdout=False):
     """
     \ndata_cols: pass the table prefix to return only a table from main options: 
     \n{'cpt_','lab_','vit_','medid_','asmt_icd', 'enc_'}
@@ -14,6 +13,8 @@ def get_data(self, data_cols='all', target_col='AD_encounter', alt_data=None):
     \nalt_data: pass in a list of columns to run grid on
     \ne.g. X, y = get_data(capData, data_cols='vit_')
     """
+    from sklearn.model_selection import train_test_split
+
     df = self.main.copy()
     column_list = [target_col]# + alt_data
 
@@ -52,6 +53,9 @@ def get_data(self, data_cols='all', target_col='AD_encounter', alt_data=None):
     X.reset_index(drop=True, inplace=True)
     y = X[target_col]
     X.drop(columns=target_col, inplace=True)
+
+    if holdout:
+        return train_test_split(X,y, test_size=.1, random_state=86, stratify=y)
     return (X,y)
 
 
@@ -114,10 +118,6 @@ def get_feature_importance(dataloader=capData, table='all', target='AD_person', 
         }
 
     print(table, final_results)
-    # # Get Feature Importances
-    # iDF = pd.DataFrame(zip(X,clf.feature_importances_), 
-    # columns=['Feature','Feature_Importance']).sort_values(
-    #     by='Feature_Importance', ascending=False)
 
     import pandas as pd
     coefs = list(final_results.get('clf').coef_[0])
@@ -129,60 +129,7 @@ def get_feature_importance(dataloader=capData, table='all', target='AD_person', 
     
     return LR_coefs
 
-
-#  less biased feature importance
-
-# from sklearn.inspection import permutation_importance
-# r = permutation_importance(clf, M, L,
-#                            n_repeats=3,
-#                            random_state=86)
-# for i in r.importances_mean.argsort()[::-1]:
-#     if r.importances_mean[i] - 2 * r.importances_std[i] > 0:
-#         print(f"{M.columns[i]:<20}"
-#               f"{r.importances_mean[i]:.3f}"
-#               f" +/- {r.importances_std[i]:.3f}")
-
-
-
-
-# # %% get all feature importance
-# FI_enc = get_feature_importance(capData, table='enc_')
-# FI_vit = get_feature_importance(capData, table='vit_')
-# FI_med = get_feature_importance(capData, table='med_')
-# FI_cpt = get_feature_importance(capData, table='cpt_')
-# FI_lab = get_feature_importance(capData, table='lab_')
-# FI_CCSR = get_feature_importance(capData, table='ccsr_')
-# FI_diag = get_feature_importance(capData, table='asmt_')
-
-# # %%
-
-# FI_all = get_feature_importance(capData)
-
-
-# # %%
-
-# import pandas as pd
-# cols = [FI_enc, FI_vit, FI_med, FI_diag, FI_cpt, FI_lab, FI_CCSR]
-# all_df = pd.DataFrame()
-# for df in cols:
-#     tab = df.Feature[0][:3]
-#     df.to_csv('FI_'+tab+'.csv')
-#     all_df = pd.concat([all_df, df[df['Feature_Importance'] > .001]])
-
-# FI_all = get_feature_importance(capData, alt_data=list(all_df.Feature), table='all', target='dem_person')
-# FI_all.to_csv('FI_all.csv')
-
-# FI_all.nlargest(30, 'Feature_Importance') 
-
-# # %%
-# FI_lab = get_feature_importance(capData, table='lab')
-# FI_lab
-
-# # %%
-# get_feature_importance(capData)
-
-# # 
-# %% GridSearch
+# Run GridSearch
 from gridsearch import GridSearch
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn.linear_model import LogisticRegression
@@ -193,9 +140,7 @@ from scipy.sparse.csc import csc_matrix
 from sklearn.linear_model import SGDClassifier
 from sklearn.naive_bayes import BernoulliNB
 warnings.simplefilter(action="default")
-
 import pandas as pd
-#LR_coefs = pd.read_csv('E:/20201208_Dementia_AD_Research_David_Julovich/QueryResult/model_results/20210210/LR_Coefs.csv')
 
 try:
     FI_all = pd.read_csv('./ref/FI_all.csv')
@@ -389,44 +334,58 @@ gs.plot_metrics(save=True)
 
 
 
-# %%
 # Get Logistic Regression Coefficients 
 import pandas as pd
 coefs = list(results.get('Logistic_Regression')['best_Logistic_Regression']['clf'].coef_[0])
 labels = list(data[0])
 best_LR_coefs = pd.DataFrame(zip(labels,coefs), columns = ['Feature', 'Coefficient']).sort_values(by='Coefficient', ascending=False)
-
-#LR_coefs = LR_coefs[abs(LR_coefs.Coefficient) >  2]
-best_LR_coefs[abs(best_LR_coefs.Coefficient) >  1]
-
+print('Logistic Regression Coefs > abs(1)')
+pd.display(best_LR_coefs[abs(best_LR_coefs.Coefficient) >  1])
 
 
-# %% Get Random Forest Coefficients
+#  Get Random Forest Coefficients
 coefs = results.get('Random_Forest')['best_Random_Forest']['clf'].feature_importances_
 labels = list(data[0])
-
 RF_coefs = pd.DataFrame(zip(labels,coefs), 
 columns=['Feature','Feature_Importance']).sort_values(
     by='Feature_Importance', ascending=False)
+print('Random Forest Feature Importances > .001')
+pd.display(RF_coefs[RF_coefs.Feature_Importance >  .001])
 
-RF_coefs[RF_coefs.Feature_Importance >  .001]
 
-
-# %% Save Results Dict to pickle in your local dir
-
+# Save Results Dict to pickle in your local dir
 import pickle
-with open('20210303results.pickle', 'wb') as picklefile:
+with open('./GridSearch/results.pickle', 'wb') as picklefile:
     pickle.dump(results, picklefile)
 
+# %% Run model on holdout set
+from sklearn.metrics import accuracy_score, f1_score, precision_score,\
+    recall_score, roc_auc_score, confusion_matrix
 
-# %% Print metrics per param setting:
-# for clf in results:
-#     print(clf)
-#     for x in results[clf]['iteration']:
-#         print(x['set_params'], '\nAUC: ', x['auc'],'\n F1: ', x['f1_score'],'\nPrecision: ',x['precision'],'\nRecall: ',x['recall'],'\nAcc: ',x['accuracy'])
-# %%
-import pickle
-with open('E:\\20201208_Dementia_AD_Research_David_Julovich\QueryResult\model_results\\20210301\\20210301results.pickle', 'rb') as picklefile:
-    results = pickle.load(picklefile)
+X_train, X_test, y_train, y_test = get_data(capData, data_cols='xxx', target_col='AD_person', alt_data=list(LR_coefs['Feature']), holdout=True)
+clf = results['best_overall']['clf']
+clf.fit(X_train,X_test)
+preds = clf.predict(y_train)
 
-# %%
+holdout_results = {
+    'accuracy': accuracy_score(
+        y_test, preds),
+    'precision': precision_score(
+        y_test, preds),
+    'recall': recall_score(
+        y_test, preds),
+    'f1_score': f1_score(
+        y_test, preds),
+    'auc': roc_auc_score(
+        y_test, preds),
+    'specificity': gs.specificity_score(
+        y_test, preds),
+    'ppv': gs.ppv_score(
+        y_test, preds),
+    'npv': gs.npv_score(
+        y_test, preds),                            
+    }
+
+gs.results = holdout_results
+gs.plot_metrics()
+print(holdout_results)

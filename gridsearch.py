@@ -91,6 +91,32 @@ class GridSearch:
 
         return trimmed_list
 
+    def npv_score(self, ytest, yhat):
+        # Negative Predictive Value identifies the probability that a patient is actually negative for a test
+        confusion = confusion_matrix(yhat, ytest)
+        TN = confusion[0, 0]
+        FN = confusion[1, 0]
+        # convert to float and Calculate score 
+        npv = (TN.astype(float)/(FN.astype(float)+TN.astype(float)))
+        #    (True Negative/(Predicted Negative + True Negative))
+        return npv
+
+    def ppv_score(self, ytest, yhat):
+        # Posotive Predictive Value identifies the probability that a patient is actually positive for a test
+        confusion = confusion_matrix(yhat, ytest)
+        FP = confusion[0, 1]
+        TP = confusion[1, 1]
+        # convert to float and Calculate score 
+        ppv = (TP.astype(float)/(FP.astype(float)+TP.astype(float)))
+        #    (True Negative/(Predicted Negative + True Positive))
+        return ppv  
+
+    def specificity_score(self, ytest, yhat):
+        confusion = confusion_matrix(yhat, ytest)
+        TN = confusion[0, 0]
+        FP = confusion[0, 1]
+        spec = TN.astype(float)/(FP.astype(float) + TN.astype(float))
+        return spec
 
     def set_params(self, data, classifiers={}, param_grid={}, metric='auc'):
         """
@@ -143,34 +169,6 @@ class GridSearch:
         grid_dict = {
             'best_overall': {
                 metric: 0}}  # classic explication of results
-        
-        
-        def npv_score(ytest, yhat):
-            # Negative Predictive Value identifies the probability that a patient is actually negative for a test
-            confusion = confusion_matrix(yhat, ytest)
-            TN = confusion[0, 0]
-            FN = confusion[1, 0]
-            # convert to float and Calculate score 
-            npv = (TN.astype(float)/(FN.astype(float)+TN.astype(float)))
-            #    (True Negative/(Predicted Negative + True Negative))
-            return npv
-
-        def ppv_score(ytest, yhat):
-            # Posotive Predictive Value identifies the probability that a patient is actually positive for a test
-            confusion = confusion_matrix(yhat, ytest)
-            FP = confusion[0, 1]
-            TP = confusion[1, 1]
-            # convert to float and Calculate score 
-            ppv = (TP.astype(float)/(FP.astype(float)+TP.astype(float)))
-            #    (True Negative/(Predicted Negative + True Positive))
-            return ppv  
-
-        def specificity_score(ytest, yhat):
-            confusion = confusion_matrix(yhat, ytest)
-            TN = confusion[0, 0]
-            FP = confusion[0, 1]
-            spec = TN.astype(float)/(FP.astype(float) + TN.astype(float))
-            return spec
 
         def split_avg(metric, split_results):
             metrics = [split_results[id][metric] for id in split_results]
@@ -226,11 +224,11 @@ class GridSearch:
                             L[test_index], preds),
                         'split_auc': roc_auc_score(
                             L[test_index], preds),
-                        'split_specificity': specificity_score(
+                        'split_specificity': self.specificity_score(
                             L[test_index], preds),
-                        'split_ppv': ppv_score(
+                        'split_ppv': self.ppv_score(
                             L[test_index], preds),
-                        'split_npv': npv_score(
+                        'split_npv': self.npv_score(
                             L[test_index], preds),                            
                         }
 
