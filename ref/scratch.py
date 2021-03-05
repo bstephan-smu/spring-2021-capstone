@@ -623,3 +623,57 @@ tmp.main[tmp.main['ccsr_INF003']]
 # %%
 [x for x in df if df[x] > 0]
 # %%
+
+
+#  less biased feature importance
+
+# from sklearn.inspection import permutation_importance
+# r = permutation_importance(clf, M, L,
+#                            n_repeats=3,
+#                            random_state=86)
+# for i in r.importances_mean.argsort()[::-1]:
+#     if r.importances_mean[i] - 2 * r.importances_std[i] > 0:
+#         print(f"{M.columns[i]:<20}"
+#               f"{r.importances_mean[i]:.3f}"
+#               f" +/- {r.importances_std[i]:.3f}")
+
+
+
+
+# # %% get all feature importance
+# FI_enc = get_feature_importance(capData, table='enc_')
+# FI_vit = get_feature_importance(capData, table='vit_')
+# FI_med = get_feature_importance(capData, table='med_')
+# FI_cpt = get_feature_importance(capData, table='cpt_')
+# FI_lab = get_feature_importance(capData, table='lab_')
+# FI_CCSR = get_feature_importance(capData, table='ccsr_')
+# FI_diag = get_feature_importance(capData, table='asmt_')
+
+# # %%
+
+# FI_all = get_feature_importance(capData)
+
+
+# # %%
+
+# import pandas as pd
+# cols = [FI_enc, FI_vit, FI_med, FI_diag, FI_cpt, FI_lab, FI_CCSR]
+# all_df = pd.DataFrame()
+# for df in cols:
+#     tab = df.Feature[0][:3]
+#     df.to_csv('FI_'+tab+'.csv')
+#     all_df = pd.concat([all_df, df[df['Feature_Importance'] > .001]])
+
+# FI_all = get_feature_importance(capData, alt_data=list(all_df.Feature), table='all', target='dem_person')
+# FI_all.to_csv('FI_all.csv')
+
+# FI_all.nlargest(30, 'Feature_Importance') 
+
+# # %%
+# FI_lab = get_feature_importance(capData, table='lab')
+# FI_lab
+
+# # %%
+# get_feature_importance(capData)
+
+# # 
