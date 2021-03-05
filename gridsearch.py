@@ -116,7 +116,12 @@ class GridSearch:
         \nReturns: dictionary
         """
         import logging
-        logging.basicConfig(filename='./GridSearch/models.log', level=logging.INFO)
+        try:
+            logging.basicConfig(filename='./GridSearch/models.log', level=logging.INFO)
+        except FileNotFoundError:
+            from os import mkdir
+            mkdir('./GridSearch')
+            logging.basicConfig(filename='./GridSearch/models.log', level=logging.INFO)
 
         print('Grid Search running...')
         clf_dict = self.clf_dict
@@ -281,6 +286,17 @@ class GridSearch:
         if save:
             print('\nPlots Saved!')
 
+    def update_best_metric(results:dict, metric:str = 'npv'):
+        for clf_key in results:
+            if clf_key != 'best_overall':
+                clf_dict = results[clf_key]
+                best_clf =  clf_dict['best_'+clf_key]
+                for iteration in clf_dict['iterations']:
+                    if iteration[metric] > best_clf[metric]:
+                        best_clf = iteration
+                    if iteration[metric] > results['best_overall'][metric]:
+                        results['best_overall'] = iteration   
+        return results
 
 def main():  # POC for the class
 
@@ -307,7 +323,7 @@ def main():  # POC for the class
         'Random_Forest': {
             # 'bootstrap': True,
             # 'ccp_alpha': 0.0,
-            'class_weight': ['balanced', None],
+            'class_weight': ['balanced'],
             'criterion': ['gini', 'entropy'],
             # 'max_depth': None,
             'max_features': ['auto', None],
@@ -318,7 +334,7 @@ def main():  # POC for the class
             # 'min_samples_leaf': 1,
             # 'min_samples_split': 2,
             # 'min_weight_fraction_leaf': 0.0,
-            'n_estimators': [10, 100]
+            'n_estimators': [100]
             # 'n_jobs': None,
             # 'oob_score': False,
             # 'random_state': None,
@@ -327,7 +343,7 @@ def main():  # POC for the class
             },
         'Logistic_Regression': {
             'C': [1.0, .5],
-            'class_weight': ['balanced', None],
+            'class_weight': ['balanced'],
             # 'dual': False,
             # 'fit_intercept': True,
             'intercept_scaling': [1, 10],
@@ -335,7 +351,7 @@ def main():  # POC for the class
             # 'max_iter': [10, 100],
             # 'multi_class': 'auto',
             # 'n_jobs': None,
-            'penalty': ['l1', 'l2'],
+            'penalty': ['l2'],
             # 'random_state': None,
             'solver': ['sag'] # sag needs scaled data, but runs well on large datasets
             # 'tol': 0.0001,
@@ -343,10 +359,10 @@ def main():  # POC for the class
             # 'warm_start': False
             },
         'SVM': {
-            'C': [0.01, .1, 1, 10],
+            'C': [.1, 1],
             # 'break_ties': False,
             # 'cache_size': 200,
-            'class_weight': ['balanced', None],
+            'class_weight': ['balanced'],
             # 'coef0': 0.0,
             # 'decision_function_shape': 'ovr',
             # 'degree': 3,
@@ -375,4 +391,4 @@ def main():  # POC for the class
 
 
 if __name__ == "__main__":
-    main()
+    grid_results = main()
